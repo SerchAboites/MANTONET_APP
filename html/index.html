@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTONET - Reporte de Inspección</title>
+    <!-- Incluimos Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados para la animación de carga y colores de marca */
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loader {
+            border-top-color: #C51E1F; /* Color rojo de tu marca */
+            animation: spin 1s linear infinite;
+        }
+        /* Ajuste para el selector de fecha en modo oscuro */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+        }
+        video::-webkit-media-controls { display: none !important; }
+        video { object-fit: cover; }
+    </style>
+</head>
+<!-- Se aplican los colores de fondo de tu marca -->
+<body class="bg-[#252525] text-white font-sans">
+
+    <!-- Animación de Carga (oculta por defecto) -->
+    <div id="loader-overlay" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" style="display: none;">
+        <div class="loader ease-linear rounded-full border-8 border-t-8 border-gray-500 h-32 w-32"></div>
+    </div>
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-2xl">
+
+        <header class="text-center mb-8">
+            <!-- Aquí podrías poner tu logo en formato SVG o PNG -->
+            <h1 class="text-3xl sm:text-4xl font-bold text-white">MANTONET</h1>
+            <p class="text-gray-400">Registro de Incidencias</p>
+        </header>
+
+        <!-- Formulario con colores de marca -->
+        <form id="incidencia-form" class="bg-[#3a3a3a] p-6 rounded-lg shadow-lg space-y-6">
+            
+            <!-- Campos del formulario con acentos de marca -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="fecha" class="block text-sm font-medium text-gray-300 mb-1">Fecha</label>
+                    <input type="date" id="fecha" name="fecha" required class="w-full bg-[#2c2c2c] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-[#C51E1F] focus:border-[#C51E1F] outline-none">
+                </div>
+                <div>
+                    <label for="area" class="block text-sm font-medium text-gray-300 mb-1">Área de Inspección</label>
+                    <input type="text" id="area" name="area" placeholder="Ej. Cocina, Oficina Principal" required class="w-full bg-[#2c2c2c] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-[#C51E1F] focus:border-[#C51E1F] outline-none">
+                </div>
+            </div>
+            
+            <!-- ... (el resto de los inputs y selects se actualizan de forma similar) ... -->
+            <div>
+                <label for="elementoInspeccionado" class="block text-sm font-medium text-gray-300 mb-1">Elemento Inspeccionado</label>
+                <input type="text" id="elementoInspeccionado" name="elementoInspeccionado" placeholder="Ej. Ventana corrediza, Lámpara de techo" required class="w-full bg-[#2c2c2c] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-[#C51E1F] focus:border-[#C51E1F] outline-none">
+            </div>
+            <div>
+                <label for="especialidad" class="block text-sm font-medium text-gray-300 mb-1">Especialidad del Servicio</label>
+                <select id="especialidad" name="especialidad" required class="w-full bg-[#2c2c2c] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-[#C51E1F] focus:border-[#C51E1F] outline-none">
+                    <option value="" disabled selected>Selecciona una categoría...</option>
+                    <option value="Plomería">Plomería</option>
+                    <option value="Electricidad">Electricidad</option>
+                    <option value="Impermeabilización">Impermeabilización</option>
+                    <option value="Cancelería">Cancelería (Ventanas y Puertas)</option>
+                    <option value="Carpintería">Carpintería</option>
+                    <option value="Acabados">Acabados (Pintura, Muros)</option>
+                    <option value="General">Mantenimiento General</option>
+                </select>
+            </div>
+            <div>
+                <label for="descripcion" class="block text-sm font-medium text-gray-300 mb-1">Descripción del Hallazgo</label>
+                <textarea id="descripcion" name="descripcion" rows="4" placeholder="Describe el problema o la observación." required class="w-full bg-[#2c2c2c] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-[#C51E1F] focus:border-[#C51E1F] outline-none"></textarea>
+            </div>
+            <div>
+                <label for="diagnostico" class="block text-sm font-medium text-gray-300 mb-1">Diagnóstico</label>
+                <select id="diagnostico" name="diagnostico" required class="w-full bg-[#2c2c2c] border border-gray-600 rounded-md p-2 focus:ring-2 focus:ring-[#C51E1F] focus:border-[#C51E1F] outline-none">
+                    <option value="" disabled selected>Selecciona un diagnóstico...</option>
+                    <option value="Buen Estado">Buen Estado</option>
+                    <option value="Necesita Ajuste">Necesita Ajuste</option>
+                    <option value="Necesita Reemplazo">Necesita Reemplazo</option>
+                    <option value="Necesita Limpieza">Necesita Limpieza</option>
+                </select>
+            </div>
+
+            <!-- Sección de Cámara -->
+            <div class="space-y-4">
+                <label class="block text-sm font-medium text-gray-300">Fotografía de Evidencia</label>
+                <div id="camera-container" class="w-full aspect-square bg-[#2c2c2c] border-2 border-dashed border-gray-600 rounded-md flex items-center justify-center overflow-hidden">
+                    <canvas id="camera-preview" class="hidden"></canvas>
+                    <span id="camera-placeholder" class="text-gray-500">La cámara está apagada</span>
+                </div>
+                <video id="camera-stream" playsinline autoplay class="hidden"></video>
+                <input type="hidden" id="imagenIncidencia" name="imagenIncidencia">
+                <div class="flex gap-4">
+                    <button type="button" id="open-camera-btn" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-md transition-colors duration-300">
+                        Abrir Cámara
+                    </button>
+                    <button type="button" id="capture-photo-btn" class="flex-1 bg-[#C51E1F] hover:bg-[#a32a2a] text-white font-bold py-2 px-4 rounded-md transition-colors duration-300 hidden">
+                        Capturar Foto
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Botón de Envío con color de marca -->
+            <div class="pt-4">
+                <button type="submit" id="submit-form-btn" class="w-full bg-[#C51E1F] hover:bg-[#a32a2a] text-white font-bold py-3 px-4 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:ring-[#C51E1F] transition-colors duration-300">
+                    Registrar Incidencia
+                </button>
+            </div>
+        </form>
+
+        <!-- Sección de Reporte Final con color de marca -->
+        <div class="mt-12 bg-[#3a3a3a] p-6 rounded-lg shadow-lg text-center">
+            <h2 class="text-xl font-bold mb-4">Finalizar Visita</h2>
+            <p class="text-gray-400 mb-4">Una vez que hayas registrado todas las incidencias, genera el reporte consolidado.</p>
+            <button id="generate-report-btn" class="w-full bg-[#691415] hover:bg-[#a32a2a] text-white font-bold py-3 px-4 rounded-md transition-colors duration-300">
+                Generar Reporte de Visita
+            </button>
+            <div id="report-link-container" class="mt-4 text-center" style="display: none;">
+                <a id="report-link" href="#" target="_blank" class="text-[#C51E1F] hover:text-[#cf3838] font-semibold">
+                    Ver Reporte en PDF
+                </a>
+            </div>
+        </div>
+
+    </div>
+    <script src="/js/main.js"></script>
+</body>
+</html>
