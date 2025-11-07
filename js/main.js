@@ -107,13 +107,30 @@ document.addEventListener('DOMContentLoaded', () => {
             cameraStream.srcObject = currentStream;
 
             cameraStream.onloadedmetadata = () => {
+                
+                // ==== INICIO DE CAMBIOS: Vista Previa Nítida (devicePixelRatio) ====
+                
+                // 1. Obtener el tamaño de píxeles lógicos (CSS)
                 const containerWidth = cameraPreview.parentElement.offsetWidth;
-                // El canvas de VISTA PREVIA sigue usando el tamaño del contenedor
-                cameraPreview.width = containerWidth;
-                cameraPreview.height = containerWidth;
+                // 2. Obtener la densidad de píxeles del dispositivo (ej. 2x, 3x)
+                const dpr = window.devicePixelRatio || 1;
+
+                // 3. Establecer el tamaño real del bitmap del canvas (píxeles físicos)
+                cameraPreview.width = containerWidth * dpr;
+                cameraPreview.height = containerWidth * dpr;
+
+                // 4. Establecer el tamaño de visualización del canvas (píxeles lógicos)
+                cameraPreview.style.width = `${containerWidth}px`;
+                cameraPreview.style.height = `${containerWidth}px`;
+
+                // 5. Asegurar que el contexto sepa que está escalado
+                context.scale(dpr, dpr);
+                
+                // ==== FIN DE CAMBIOS ====
+
                 cameraPreview.classList.remove('hidden');
                 cameraPlaceholder.classList.add('hidden');
-                startDrawingLoop(); 
+                startDrawingLoop(containerWidth); // Pasamos el tamaño lógico
                 openCameraButton.classList.add('hidden');
                 capturePhotoButton.classList.remove('hidden');
                 
@@ -162,43 +179,43 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     const openCamera = async () => {
 
-        // Verificar si el navegador soporta mediaDevices y es un contexto seguro
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             console.error("navigator.mediaDevices.getUserMedia no está disponible.");
             alert("No se puede acceder a la cámara. Asegúrate de que estás en una conexión segura (https://) y has concedido permisos.");
-            return; // Detener la ejecución
+            return;
         }
-
-
-        // ==== INICIO DE CAMBIOS: Solicitud de Alta Resolución ====
         
-        // 1. Definir constraints de alta resolución
+        // ==== INICIO DE CAMBIOS: Solicitud de Enfoque Continuo ====
+        
         const constraints_hd_rear = { 
             video: { 
                 facingMode: 'environment',
-                width: { ideal: 1920 }, // Pedir 1920x1080 (Full HD)
-                height: { ideal: 1080 }
+                width: { ideal: 1920 },
+                height: { ideal: 1080 },
+                advanced: [ // Pedir enfoque continuo
+                    { focusMode: 'continuous' }
+                ]
             } 
         };
         
         try {
-            // 2. Intentar abrir la cámara trasera en alta resolución
             await startStream(constraints_hd_rear);
         } catch (err) {
             console.warn("Fallo al obtener 'environment' en HD. Probando frontal/default en HD.");
             
-            // 3. Si falla, probar la cámara frontal (o default) en alta resolución
             const constraints_hd_front = { 
                 video: { 
                     width: { ideal: 1920 }, 
-                    height: { ideal: 1080 }
+                    height: { ideal: 1080 },
+                    advanced: [ // También para la frontal, por si acaso
+                        { focusMode: 'continuous' }
+                    ]
                 } 
             };
             
             try {
                 await startStream(constraints_hd_front);
             } catch (err2) {
-                // 4. Si todo falla, pedir la cámara por defecto (baja res)
                 console.warn("Fallaron las cámaras HD. Probando 'video: true' (baja res)");
                 await startStream({ video: true }); 
             }
@@ -208,14 +225,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const resetCameraUI = () => {
         stopCurrentStream();
-        context.clearRect(0, 0, cameraPreview.width, cameraPreview.height);
         
-        // --- INICIO DE CAMBIO ---
-        // Devolver el canvas al tamaño del contenedor (por si se cambió en la captura)
-        const containerWidth = cameraPreview.parentElement.offsetWidth;
-        cameraPreview.width = containerWidth || 300; // 300 como fallback
-        cameraPreview.height = containerWidth || 300;
-        // --- FIN DE CAMBIO ---
+        // ==== INICIO DE CAMBIOS: Reset con devicePixelRatio ====
+        const containerWidth = cameraPreview.parentElement.offsetWidth || 300;
+        const dpr = window.devicePixelRatio || 1;
+        
+        // Limpiar el contexto antes de redimensionar
+        context.clearRect(0, 0, cameraPreview.width, cameraPreview.height);
+
+        // Resetear la transformación de escala
+        context.setTransform(1, 0, 0, 1, 0, 0); 
+        
+        // Devolver el canvas al tamaño del contenedor
+        cameraPreview.width = containerWidth * dpr;
+        cameraPreview.height = containerWidth * dpr;
+        cameraPreview.style.width = `${containerWidth}px`;
+        cameraPreview.style.height = `${containerWidth}px`;
+        // ==== FIN DE CAMBIOS ====
         
         cameraPreview.classList.add('hidden');
         cameraPlaceholder.classList.remove('hidden');
@@ -230,17 +256,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // Dibuja el video en el canvas de VISTA PREVIA (baja res, estirado)
-    const startDrawingLoop = () => {
+    // Dibuja el video en el canvas de VISTA PREVIA
+    const startDrawingLoop = (containerWidth) => {
         const draw = () => {
-            if (!currentStream) return; // Detener si el stream ya no existe
+            if (!currentStream) return;
             const videoWidth = cameraStream.videoWidth;
             const videoHeight = cameraStream.videoHeight;
             const size = Math.min(videoWidth, videoHeight);
             const x = (videoWidth - size) / 2;
             const y = (videoHeight - size) / 2;
-            // Dibuja el "cuadrado" del video en el canvas de vista previa
-            context.drawImage(cameraStream, x, y, size, size, 0, 0, cameraPreview.width, cameraPreview.height);
+            
+            // Limpiar canvas
+            context.clearRect(0, 0, containerWidth, containerWidth); 
+            // Dibuja el "cuadrado" del video en el canvas (tamaño lógico)
+            context.drawImage(cameraStream, x, y, size, size, 0, 0, containerWidth, containerWidth);
+            
             animationFrameId = requestAnimationFrame(draw);
         };
         draw();
@@ -252,32 +282,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const capturePhoto = () => {
         if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
 
-        // ==== INICIO DE CAMBIOS: Captura en Alta Resolución ====
-        
-        // 1. Obtener dimensiones NATIVAS del video (ej. 1920x1080)
+        // 1. Obtener dimensiones NATIVAS del video
         const videoWidth = cameraStream.videoWidth;
         const videoHeight = cameraStream.videoHeight;
 
-        // 2. Calcular el corte cuadrado (misma lógica que el preview, pero con números grandes)
-        const size = Math.min(videoWidth, videoHeight); // ej. 1080
-        const x = (videoWidth - size) / 2; // ej. (1920 - 1080) / 2 = 420
-        const y = (videoHeight - size) / 2; // ej. (1080 - 1080) / 2 = 0
+        // 2. Calcular el corte cuadrado
+        const size = Math.min(videoWidth, videoHeight);
+        const x = (videoWidth - size) / 2;
+        const y = (videoHeight - size) / 2;
 
-        // 3. Redimensionar el canvas (temporalmente) a la resolución de la FUENTE
-        // El canvas ahora es (ej) 1080x1080, no 360x360
+        // ==== INICIO DE CAMBIOS: Captura HD (Corregido) ====
+        
+        // 3. Resetear la escala del contexto para dibujar 1:1
+        context.setTransform(1, 0, 0, 1, 0, 0); 
+
+        // 4. Redimensionar el bitmap del canvas a la resolución de CAPTURA (ej. 1080x1080)
         cameraPreview.width = size;
         cameraPreview.height = size;
-
-        // 4. Dibujar el frame de alta res (1080x1080) en el canvas de alta res (1080x1080)
+        
+        // 5. Dibujar el frame de alta res 1:1
         context.drawImage(cameraStream, x, y, size, size, 0, 0, size, size);
 
-        // 5. Capturar la imagen del canvas (que ahora es de alta res)
+        // 6. Capturar la imagen del canvas (que ahora es de alta res)
         const imageDataUrl = cameraPreview.toDataURL('image/jpeg', 0.9);
         hiddenImageInput.value = imageDataUrl;
         
         // ==== FIN DE CAMBIOS ====
 
-        // 6. Detener el stream y actualizar UI
+        // 7. Detener el stream y actualizar UI
         stopCurrentStream(); 
         
         capturePhotoButton.textContent = 'Foto Capturada ✔';
@@ -371,7 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
         resetCameraUI();
         
-        // Ponemos el <select> de proyecto en el valor por defecto
         const proyectoSelect = document.getElementById('proyecto-select');
         if (proyectoSelect) {
             proyectoSelect.selectedIndex = 0;
@@ -380,9 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Asignar eventos ---
     
-    // Ahora que todas las funciones están definidas, cargamos los proyectos.
     cargarProyectos();
-
     form.addEventListener('submit', handleFormSubmit);
     generateReportButton.addEventListener('click', handleGenerateReport);
     openCameraButton.addEventListener('click', openCamera);
@@ -392,15 +421,19 @@ document.addEventListener('DOMContentLoaded', () => {
     cameraSelect.addEventListener('change', (e) => {
         const newCameraId = e.target.value;
         if (newCameraId) {
-            // Inicia un nuevo stream con el ID exacto del dispositivo seleccionado
-            // E intenta mantener la alta resolución
+            
+            // ==== INICIO DE CAMBIOS: Enfoque Continuo al cambiar ====
             startStream({ 
                 video: { 
                     deviceId: { exact: newCameraId },
                     width: { ideal: 1920 },
-                    height: { ideal: 1080 }
+                    height: { ideal: 1080 },
+                    advanced: [
+                        { focusMode: 'continuous' }
+                    ]
                 } 
             });
+            // ==== FIN DE CAMBIOS ====
         }
     });
 });
