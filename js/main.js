@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let animationFrameId = null;
 
     // --- URL de tu Web App ---
-    const webAppUrl = 'https://script.google.com/macros/s/AKfycbzy1leyzn0NK4S-l25S4dHgb6YcM01peULVE0bX9qMToMgDgsvoUAJJ2RLocadiZSsmzg/exec';
+    const webAppUrl = 'https://script.google.com/macros/s/AKfycbzsdh5nHJjv4UHssD9pJ_2BrfqhNkhvl4RWJqlYgQyCHL9Sg6UP69f4zMqjGasiqCaeBQ/exec';
 
     // --- Lógica de Cargar Proyectos ---
     const cargarProyectos = async () => {
