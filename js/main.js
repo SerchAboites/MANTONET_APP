@@ -1,5 +1,35 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    // ==== INICIO DE NUEVA FUNCIÓN (Establecer Fecha/Hora) ====
+    /**
+     * Establece la fecha y hora actual en el input #fecha
+     */
+    const setDefaultDateTime = () => {
+        const fechaInput = document.getElementById('fecha');
+        if (!fechaInput) return;
+
+        const now = new Date();
+        
+        // Formatear la fecha a YYYY-MM-DDTHH:MM (requerido por datetime-local)
+        // Se usa la zona horaria local del usuario
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0'); // M(0-11) -> (1-12)
+        const dd = String(now.getDate()).padStart(2, '0');
+        
+        // ==== INICIO DE CAMBIO: Formato de Fecha ====
+        // El input en el HTML ahora es type="date", por lo que solo acepta "YYYY-MM-DD"
+        // const hh = String(now.getHours()).padStart(2, '0');
+        // const min = String(now.getMinutes()).padStart(2, '0');
+        
+        // Formato final: YYYY-MM-DD
+        const formattedDate = `${yyyy}-${mm}-${dd}`;
+        
+        fechaInput.value = formattedDate;
+        // ==== FIN DE CAMBIO ====
+    };
+    // ==== FIN DE NUEVA FUNCIÓN ====
+
+
     // --- Referencias a los elementos ---
     const form = document.getElementById('incidencia-form');
     const generateReportButton = document.getElementById('generate-report-btn');
@@ -14,12 +44,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const hiddenImageInput = document.getElementById('imagenIncidencia');
     const cameraSelect = document.getElementById('camera-select');
     const retakePhotoButton = document.getElementById('retake-photo-btn');
-
-    // ==== INICIO DE NUEVO BLOQUE (Galería) ====
     const selectGalleryButton = document.getElementById('select-gallery-btn');
     const galleryInput = document.getElementById('gallery-input');
-    // ==== FIN DE NUEVO BLOQUE (Galería) ====
-    
     const context = cameraPreview.getContext('2d');
     let currentStream = null;
     let animationFrameId = null;
@@ -29,56 +55,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Lógica de Cargar Proyectos ---
     const cargarProyectos = async () => {
-      const proyectoSelect = document.getElementById('proyecto-select');
-      
-      try {
-        const response = await fetch(webAppUrl, {
-          method: 'POST',
-          redirect: 'follow',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8'
-          },
-          body: JSON.stringify({ action: 'getProyectos' })
-        });
+        const proyectoSelect = document.getElementById('proyecto-select');
+        
+        try {
+            const response = await fetch(webAppUrl, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                body: JSON.stringify({ action: 'getProyectos' })
+            });
 
-        const result = await response.json();
+            const result = await response.json();
 
-        if (result.status === 'error') {
-          throw new Error(result.message);
+            if (result.status === 'error') {
+                throw new Error(result.message);
+            }
+
+            poblarSelectProyectos(result.proyectos);
+
+        } catch (error) {
+            console.error('Error al cargar proyectos:', error);
+            proyectoSelect.innerHTML = `<option value="" disabled selected>Error al cargar proyectos</option>`;
+            alert(`Error fatal al cargar proyectos: ${error.message}. La página no funcionará correctamente.`);
         }
-
-        poblarSelectProyectos(result.proyectos);
-
-      } catch (error) {
-        console.error('Error al cargar proyectos:', error);
-        proyectoSelect.innerHTML = `<option value="" disabled selected>Error al cargar proyectos</option>`;
-        alert(`Error fatal al cargar proyectos: ${error.message}. La página no funcionará correctamente.`);
-      }
     };
 
     const poblarSelectProyectos = (proyectos) => {
-      const proyectoSelect = document.getElementById('proyecto-select');
-      
-      proyectoSelect.innerHTML = ''; 
+        const proyectoSelect = document.getElementById('proyecto-select');
+        
+        proyectoSelect.innerHTML = ''; 
 
-      if (!proyectos || proyectos.length === 0) {
-        proyectoSelect.innerHTML = `<option value="" disabled selected>No se encontraron proyectos</option>`;
-        return;
-      }
+        if (!proyectos || proyectos.length === 0) {
+            proyectoSelect.innerHTML = `<option value="" disabled selected>No se encontraron proyectos</option>`;
+            return;
+        }
 
-      const defaultOption = document.createElement('option');
-      defaultOption.value = "";
-      defaultOption.textContent = "Selecciona un proyecto...";
-      defaultOption.disabled = true;
-      defaultOption.selected = true;
-      proyectoSelect.appendChild(defaultOption);
+        const defaultOption = document.createElement('option');
+        defaultOption.value = "";
+        defaultOption.textContent = "Selecciona un proyecto...";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        proyectoSelect.appendChild(defaultOption);
 
-      proyectos.forEach(proyecto => {
-        const option = document.createElement('option');
-        option.value = proyecto.id;
-        option.textContent = proyecto.nombre;
-        proyectoSelect.appendChild(option);
-      });
+        proyectos.forEach(proyecto => {
+            const option = document.createElement('option');
+            option.value = proyecto.id;
+            option.textContent = proyecto.nombre;
+            proyectoSelect.appendChild(option);
+        });
     };
     
     // --- Funciones para el loader ---
@@ -112,56 +138,38 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             currentStream = await navigator.mediaDevices.getUserMedia(constraints);
             
-            // ==== INICIO DE CAMBIO: Guardar en localStorage ====
             const currentCameraId = currentStream.getVideoTracks()[0]?.getSettings()?.deviceId;
             if (currentCameraId) {
                 localStorage.setItem('preferredCameraId', currentCameraId);
             }
-            // ==== FIN DE CAMBIO ====
 
             cameraStream.srcObject = currentStream;
 
             cameraStream.onloadedmetadata = () => {
                 
-                // ==== INICIO DE CAMBIOS: Vista Previa Nítida (devicePixelRatio) ====
-                
-                // 1. Obtener el tamaño de píxeles lógicos (CSS)
                 const containerWidth = cameraPreview.parentElement.offsetWidth;
-                // 2. Obtener la densidad de píxeles del dispositivo (ej. 2x, 3x)
                 const dpr = window.devicePixelRatio || 1;
 
-                // 3. Establecer el tamaño real del bitmap del canvas (píxeles físicos)
                 cameraPreview.width = containerWidth * dpr;
                 cameraPreview.height = containerWidth * dpr;
 
-                // 4. Establecer el tamaño de visualización del canvas (píxeles lógicos)
                 cameraPreview.style.width = `${containerWidth}px`;
                 cameraPreview.style.height = `${containerWidth}px`;
 
-                // 5. Asegurar que el contexto sepa que está escalado
                 context.scale(dpr, dpr);
                 
-                // ==== FIN DE CAMBIOS ====
-
                 cameraPreview.classList.remove('hidden');
                 cameraPlaceholder.classList.add('hidden');
                 startDrawingLoop(containerWidth); // Pasamos el tamaño lógico
                 openCameraButton.classList.add('hidden');
                 
-                // ==== INICIO DE CAMBIO: Arreglo Botón "Reintentar" ====
-                // Resetear el botón de captura a su estado original
                 capturePhotoButton.textContent = 'Capturar Foto';
                 capturePhotoButton.disabled = false;
                 capturePhotoButton.classList.remove('is-captured');
-                // ==== FIN DE CAMBIO ====
 
-                capturePhotoButton.classList.remove('hidden'); // <-- MODIFICADO (asegurar que se muestre)
-                
-                // ==== INICIO BLOQUE MODIFICADO (Galería) ====
-                selectGalleryButton.classList.add('hidden'); // Ocultar galería si la cámara se abrió
-                // ==== FIN BLOQUE MODIFICADO (Galería) ====
-
-                retakePhotoButton.classList.add('hidden'); // <-- AÑADIDO (ocultar al reintentar)
+                capturePhotoButton.classList.remove('hidden'); 
+                selectGalleryButton.classList.add('hidden'); // Ocultar galería al abrir cámara
+                retakePhotoButton.classList.add('hidden'); 
                 
                 updateCameraList();
             };
@@ -204,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * (Función original modificada) Inicia la cámara por primera vez
+     * Inicia la cámara por primera vez
      */
     const openCamera = async () => {
 
@@ -214,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
-        // ==== INICIO DE CAMBIO: Leer de localStorage ====
         const preferredCameraId = localStorage.getItem('preferredCameraId');
         if (preferredCameraId) {
             try {
@@ -236,9 +243,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.removeItem('preferredCameraId'); // Limpiar ID inválido
             }
         }
-        // ==== FIN DE CAMBIO ====
-        
-        // ==== INICIO DE CAMBIOS: Solicitud de Enfoque Continuo ====
         
         const constraints_hd_rear = { 
             video: { 
@@ -273,48 +277,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 await startStream({ video: true }); 
             }
         }
-        // ==== FIN DE CAMBIOS ====
     };
 
     const resetCameraUI = () => {
         stopCurrentStream();
         
-        // ==== INICIO DE CAMBIOS: Reset con devicePixelRatio ====
         const containerWidth = cameraPreview.parentElement.offsetWidth || 300;
         const dpr = window.devicePixelRatio || 1;
         
-        // Limpiar el contexto antes de redimensionar
         context.clearRect(0, 0, cameraPreview.width, cameraPreview.height);
-
-        // Resetear la transformación de escala
         context.setTransform(1, 0, 0, 1, 0, 0); 
         
-        // Devolver el canvas al tamaño del contenedor
         cameraPreview.width = containerWidth * dpr;
         cameraPreview.height = containerWidth * dpr;
         cameraPreview.style.width = `${containerWidth}px`;
         cameraPreview.style.height = `${containerWidth}px`;
-        // ==== FIN DE CAMBIOS ====
         
         cameraPreview.classList.add('hidden');
         cameraPlaceholder.classList.remove('hidden');
         cameraPlaceholder.textContent = 'La cámara está apagada';
-        capturePhotoButton.classList.add('hidden'); // <-- MODIFICADO (asegurar que se oculte)
+        capturePhotoButton.classList.add('hidden'); 
         capturePhotoButton.textContent = 'Capturar Foto';
         capturePhotoButton.disabled = false;
         capturePhotoButton.classList.remove('is-captured');
         openCameraButton.classList.remove('hidden');
-
-        // ==== INICIO DE BLOQUE MODIFICADO (Galería) ====
+        
         selectGalleryButton.classList.remove('hidden'); // Mostrar botón de galería
         if (galleryInput) {
             galleryInput.value = null; // Limpiar el input de archivo
         }
-        // ==== FIN DE BLOQUE MODIFICADO (Galería) ====
 
         hiddenImageInput.value = '';
         cameraSelect.classList.add('hidden'); 
-        retakePhotoButton.classList.add('hidden'); // <-- AÑADIDO
+        retakePhotoButton.classList.add('hidden'); 
     };
 
 
@@ -328,9 +323,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const x = (videoWidth - size) / 2;
             const y = (videoHeight - size) / 2;
             
-            // Limpiar canvas
             context.clearRect(0, 0, containerWidth, containerWidth); 
-            // Dibuja el "cuadrado" del video en el canvas (tamaño lógico)
             context.drawImage(cameraStream, x, y, size, size, 0, 0, containerWidth, containerWidth);
             
             animationFrameId = requestAnimationFrame(draw);
@@ -339,50 +332,37 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     /**
-     * (Función modificada) Captura la foto en alta resolución
+     * Captura la foto en alta resolución
      */
     const capturePhoto = () => {
         if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
 
-        // 1. Obtener dimensiones NATIVAS del video
         const videoWidth = cameraStream.videoWidth;
         const videoHeight = cameraStream.videoHeight;
-
-        // 2. Calcular el corte cuadrado
         const size = Math.min(videoWidth, videoHeight);
         const x = (videoWidth - size) / 2;
         const y = (videoHeight - size) / 2;
 
-        // ==== INICIO DE CAMBIOS: Captura HD (Corregido) ====
-        
-        // 3. Resetear la escala del contexto para dibujar 1:1
         context.setTransform(1, 0, 0, 1, 0, 0); 
 
-        // 4. Redimensionar el bitmap del canvas a la resolución de CAPTURA (ej. 1080x1080)
         cameraPreview.width = size;
         cameraPreview.height = size;
         
-        // 5. Dibujar el frame de alta res 1:1
         context.drawImage(cameraStream, x, y, size, size, 0, 0, size, size);
 
-        // 6. Capturar la imagen del canvas (que ahora es de alta res)
         const imageDataUrl = cameraPreview.toDataURL('image/jpeg', 0.9);
         hiddenImageInput.value = imageDataUrl;
         
-        // ==== FIN DE CAMBIOS ====
-
-        // 7. Detener el stream y actualizar UI
         stopCurrentStream(); 
         
         capturePhotoButton.textContent = 'Foto Capturada ✔';
         capturePhotoButton.classList.add('is-captured');
         capturePhotoButton.disabled = true;
-        capturePhotoButton.classList.add('hidden'); // <-- AÑADIDO (ocultar después de capturar)
-        retakePhotoButton.classList.remove('hidden'); // <-- AÑADIDO (mostrar "Reintentar")
+        capturePhotoButton.classList.add('hidden'); 
+        retakePhotoButton.classList.remove('hidden'); 
         cameraSelect.classList.add('hidden');
     };
-    
-    // ==== INICIO DE NUEVA FUNCIÓN (Galería) ====
+
     /**
      * Maneja la selección de un archivo de la galería
      */
@@ -397,36 +377,28 @@ document.addEventListener('DOMContentLoaded', () => {
         reader.onload = (e) => {
             const img = new Image();
             img.onload = () => {
-                // 1. Detener cualquier stream de cámara activo
                 stopCurrentStream();
 
-                // 2. Obtener dimensiones y calcular el corte cuadrado (idéntico a capturePhoto)
                 const videoWidth = img.width;
                 const videoHeight = img.height;
                 const size = Math.min(videoWidth, videoHeight);
                 const x = (videoWidth - size) / 2;
                 const y = (videoHeight - size) / 2;
 
-                // 3. Resetear la escala del contexto para dibujar 1:1
                 context.setTransform(1, 0, 0, 1, 0, 0);
 
-                // 4. Redimensionar el bitmap del canvas a la resolución de CAPTURA
                 cameraPreview.width = size;
                 cameraPreview.height = size;
                 
-                // 5. Dibujar el frame de alta res 1:1
                 context.drawImage(img, x, y, size, size, 0, 0, size, size);
 
-                // 6. Capturar la imagen del canvas y guardarla en el input oculto
                 const imageDataUrl = cameraPreview.toDataURL('image/jpeg', 0.9);
                 hiddenImageInput.value = imageDataUrl;
 
-                // 7. Ajustar el TAMAÑO DE VISUALIZACIÓN del canvas (para que se vea bien)
                 const containerWidth = cameraPreview.parentElement.offsetWidth;
                 cameraPreview.style.width = `${containerWidth}px`;
                 cameraPreview.style.height = `${containerWidth}px`;
 
-                // 8. Actualizar la UI al estado "Foto Capturada"
                 cameraPreview.classList.remove('hidden');
                 cameraPlaceholder.classList.add('hidden');
                 
@@ -436,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 retakePhotoButton.classList.remove('hidden'); // <-- Mostrar "Reintentar"
                 cameraSelect.classList.add('hidden');
             };
-            img.src = e.target.result; // Cargar la imagen desde el base64 del FileReader
+            img.src = e.target.result; 
         };
 
         reader.onerror = (err) => {
@@ -444,16 +416,37 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('No se pudo leer el archivo de imagen.');
         };
 
-        reader.readAsDataURL(file); // Convertir el archivo a base64
+        reader.readAsDataURL(file); 
     };
-    // ==== FIN DE NUEVA FUNCIÓN (Galería) ====
-
+    
     // --- Lógica de envío ---
     const handleFormSubmit = async (event) => {
         event.preventDefault();
-        if (!hiddenImageInput.value) { alert('Por favor, captura una foto de evidencia o selecciona una de la galería.'); return; }
+        if (!hiddenImageInput.value) { 
+            alert('Por favor, captura una foto de evidencia.'); 
+            return; 
+        }
         
         const payload = Object.fromEntries(new FormData(form));
+        
+        // ==== INICIO DE CAMBIO: Capturar Proyecto manualmente ====
+        // Como el <select> de proyecto está FUERA del <form>, 
+        // FormData no lo captura. Debemos añadirlo manualmente.
+        const proyectoSelect = document.getElementById('proyecto-select');
+        if (proyectoSelect) {
+            payload.proyectoSheetId = proyectoSelect.value;
+        }
+        // ==== FIN DE CAMBIO ====
+
+
+        // ==== INICIO DE CAMBIO: Revisar si el payload tiene el ID
+        if (!payload.proyectoSheetId) {
+             // Mensaje de error actualizado (ya no necesita recargar)
+             alert('Error: No se ha seleccionado ningún proyecto. Por favor, selecciona un proyecto.');
+             return;
+        }
+        // ==== FIN DE CAMBIO ====
+
         payload.imagenBase64 = payload.imagenIncidencia;
         delete payload.imagenIncidencia;
         
@@ -530,16 +523,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- resetForm ---
     const resetForm = () => {
-        form.reset();
+        form.reset(); // Esto borra la fecha y otros campos
         resetCameraUI();
         
+        // ==== INICIO DE CAMBIO: Corrección del error 'proyectoSheetId' ====
+        // La línea 'proyectoSelect.selectedIndex = 0;' se ha eliminado.
+        // Ahora, el 'form.reset()' pondrá el dropdown en su estado inicial 
+        // (que es "Selecciona un proyecto..." si la lista ya cargó),
+        // pero NO lo forzaremos a 0 si el usuario quiere mantener el proyecto.
+        
+        // PERO, para evitar el error, es mejor NO resetear el proyecto.
+        // Vamos a guardar el proyecto actual y restaurarlo después del reset.
         const proyectoSelect = document.getElementById('proyecto-select');
+        let currentProjectValue = null;
         if (proyectoSelect) {
-            proyectoSelect.selectedIndex = 0;
+            currentProjectValue = proyectoSelect.value;
         }
+
+        form.reset(); // Resetea todo (incluido el proyecto a "Selecciona...")
+        resetCameraUI(); // Resetea la cámara
+
+        // Ahora, restauramos el valor del proyecto
+        // NOTA: Esta lógica se mantiene, ya que sacar el <select> del <form>
+        // previene que form.reset() lo afecte, pero es bueno tenerlo por si acaso.
+        if (proyectoSelect && currentProjectValue) {
+            proyectoSelect.value = currentProjectValue;
+        }
+        // ==== FIN DE CAMBIO ====
+        
+        // Volver a poner la fecha/hora actual después de resetear
+        setDefaultDateTime(); 
     };
 
-    // ==== INICIO DE NUEVA FUNCIÓN ====
     /**
      * Intenta forzar un re-enfoque de la cámara (Tap-to-Focus)
      */
@@ -549,19 +564,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const track = currentStream.getVideoTracks()[0];
         const capabilities = track.getCapabilities();
 
-        // Verificar si el dispositivo soporta 'focusMode'
         if (!capabilities.focusMode) {
             console.warn('El dispositivo no soporta focusMode.');
             return;
         }
 
         try {
-            // 1. Aplicar 'manual' despierta el motor de enfoque
             await track.applyConstraints({
                 advanced: [{ focusMode: 'manual' }]
             });
             
-            // 2. Volver immediately a 'continuous' para que re-enfoque
             await track.applyConstraints({
                 advanced: [{ focusMode: 'continuous' }]
             });
@@ -570,21 +582,19 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error al aplicar constraints de enfoque:', err);
         }
     };
-    // ==== FIN DE NUEVA FUNCIÓN ====
 
 
     // --- Asignar eventos ---
     
+    setDefaultDateTime(); // <-- Se llama al cargar la página
     cargarProyectos();
     form.addEventListener('submit', handleFormSubmit);
     generateReportButton.addEventListener('click', handleGenerateReport);
     openCameraButton.addEventListener('click', openCamera);
     capturePhotoButton.addEventListener('click', capturePhoto);
     
-    // ==== INICIO DE BLOQUE MODIFICADO/NUEVO (Galería y Reintentar) ====
-
     // 'Reintentar' ahora resetea la UI para permitir elegir de nuevo
-    retakePhotoButton.addEventListener('click', resetCameraUI); // <-- MODIFICADO
+    retakePhotoButton.addEventListener('click', resetCameraUI); 
 
     // Botón 'Galería' hace clic en el input de archivo oculto
     selectGalleryButton.addEventListener('click', () => {
@@ -597,16 +607,14 @@ document.addEventListener('DOMContentLoaded', () => {
             handleGalleryFile(e.target.files[0]);
         }
     });
-    // ==== FIN DE BLOQUE MODIFICADO/NUEVO (Galería y Reintentar) ====
 
-    cameraPreview.addEventListener('click', handleManualFocus); // <-- AÑADIDO (Tap-to-Focus)
+    cameraPreview.addEventListener('click', handleManualFocus); // (Tap-to-Focus)
 
     // Listener para el CAMBIO de cámara
     cameraSelect.addEventListener('change', (e) => {
         const newCameraId = e.target.value;
         if (newCameraId) {
             
-            // ==== INICIO DE CAMBIOS: Enfoque Continuo al cambiar ====
             startStream({ 
                 video: { 
                     deviceId: { exact: newCameraId },
@@ -617,7 +625,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 } 
             });
-            // ==== FIN DE CAMBIOS ====
         }
     });
 });
