@@ -10,22 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const now = new Date();
         
-        // Formatear la fecha a YYYY-MM-DDTHH:MM (requerido por datetime-local)
-        // Se usa la zona horaria local del usuario
+        // Formatear la fecha a YYYY-MM-DD (requerido por type="date")
         const yyyy = now.getFullYear();
         const mm = String(now.getMonth() + 1).padStart(2, '0'); // M(0-11) -> (1-12)
         const dd = String(now.getDate()).padStart(2, '0');
-        
-        // ==== INICIO DE CAMBIO: Formato de Fecha ====
-        // El input en el HTML ahora es type="date", por lo que solo acepta "YYYY-MM-DD"
-        // const hh = String(now.getHours()).padStart(2, '0');
-        // const min = String(now.getMinutes()).padStart(2, '0');
         
         // Formato final: YYYY-MM-DD
         const formattedDate = `${yyyy}-${mm}-${dd}`;
         
         fechaInput.value = formattedDate;
-        // ==== FIN DE CAMBIO ====
     };
     // ==== FIN DE NUEVA FUNCIÓN ====
 
@@ -51,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let animationFrameId = null;
 
     // --- URL de tu Web App ---
+    // (Asegúrate que esta URL sea la de tu última implementación de Google Apps Script)
     const webAppUrl = 'https://script.google.com/macros/s/AKfycbzsdh5nHJjv4UHssD9pJ_2BrfqhNkhvl4RWJqlYgQyCHL9Sg6UP69f4zMqjGasiqCaeBQ/exec';
 
     // --- Lógica de Cargar Proyectos ---
@@ -102,21 +96,14 @@ document.addEventListener('DOMContentLoaded', () => {
         proyectos.forEach(proyecto => {
             const option = document.createElement('option');
             
-            // ==== INICIO DE CAMBIO ====
-            // El servidor ahora envía 'id' (Sheet ID) y 'folderUrl' (Drive Folder)
-            // Necesitamos AMBOS. Los guardaremos como un objeto JSON
-            // stringificado en el 'value' del select.
-            
+            // El servidor envía 'id' (Sheet ID) y 'folderUrl' (Drive Folder)
+            // Los guardamos como un objeto JSON stringificado en el 'value'.
             const projectData = {
-              sheetId: proyecto.id,
-              folderUrl: proyecto.folderUrl
+              sheetId: proyecto.id, // <-- Este es el 'id' (Col L) que envía tu Apps Script
+              folderUrl: proyecto.folderUrl // <-- Esta es la 'folderUrl' (Col M)
             };
             
-            // Guardamos el JSON como un string en el value
             option.value = JSON.stringify(projectData);
-            
-            // ==== FIN DE CAMBIO ====
-
             option.textContent = proyecto.nombre;
             proyectoSelect.appendChild(option);
         });
@@ -134,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loaderOverlay.classList.add('hidden');
     };
 
-    // --- Lógica de la cámara (REESTRUCTURADA) ---
+    // --- Lógica de la cámara ---
 
     const stopCurrentStream = () => {
         if (currentStream) {
@@ -226,9 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    /**
-     * Inicia la cámara por primera vez
-     */
     const openCamera = async () => {
 
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -328,7 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
 
-    // Dibuja el video en el canvas de VISTA PREVIA
     const startDrawingLoop = (containerWidth) => {
         const draw = () => {
             if (!currentStream) return;
@@ -346,9 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
         draw();
     };
 
-    /**
-     * Captura la foto en alta resolución
-     */
     const capturePhoto = () => {
         if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
 
@@ -378,9 +358,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cameraSelect.classList.add('hidden');
     };
 
-    /**
-     * Maneja la selección de un archivo de la galería
-     */
     const handleGalleryFile = (file) => {
         if (!file || !file.type.startsWith('image/')) {
             alert('Por favor, selecciona un archivo de imagen válido.');
@@ -444,28 +421,40 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const payload = Object.fromEntries(new FormData(form));
         
-        // ==== INICIO DE CAMBIO: Capturar Proyecto manualmente ====
-        // Como el <select> de proyecto está FUERA del <form>, 
-        // FormData no lo captura. Debemos añadirlo manualmente.
+        // Añadir manualmente el proyecto (porque está fuera del form)
         const proyectoSelect = document.getElementById('proyecto-select');
         if (proyectoSelect) {
-            // ==== INICIO DE CAMBIO ====
-            // El 'value' ahora es el JSON stringificado (ej: {"sheetId":"...", "folderUrl":"..."})
-            // Lo enviamos tal cual. El servidor se encargará de parsearlo.
             payload.proyectoInfo = proyectoSelect.value;
-            // ==== FIN DE CAMBIO ====
         }
-        // ==== FIN DE CAMBIO ====
 
 
-        // ==== INICIO DE CAMBIO: Revisar si el payload tiene el ID
-        // Ahora revisamos la nueva propiedad 'proyectoInfo'
+        // ==== INICIO DE NUEVA LÓGICA: Fecha y Hora (Solicitud del Usuario) ====
+        
+        // 1. Obtener la fecha de "hoy" en formato YYYY-MM-DD
+        const now = new Date();
+        const todayYYYYMMDD = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+        // 2. Comprobar si la fecha del formulario es la de hoy
+        if (payload.fecha === todayYYYYMMDD) {
+            // 3. Si ES HOY: Reformatear la fecha para incluir la hora actual exacta
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            
+            // Este es el formato que Google Sheets entiende como fecha/hora
+            payload.fecha = `${todayYYYYMMDD} ${hh}:${min}:${ss}`;
+        }
+        // 4. Si NO ES HOY: Se queda como está (ej. "2025-11-06"), 
+        // Google Sheets lo interpretará como esa fecha a las 00:00.
+        
+        // ==== FIN DE NUEVA LÓGICA: Fecha y Hora ====
+
+
+        // Revisar si el payload tiene el ID del proyecto
         if (!payload.proyectoInfo) {
-             // Mensaje de error actualizado (ya no necesita recargar)
              alert('Error: No se ha seleccionado ningún proyecto. Por favor, selecciona un proyecto.');
              return;
         }
-        // ==== FIN DE CAMBIO ====
 
         payload.imagenBase64 = payload.imagenIncidencia;
         delete payload.imagenIncidencia;
@@ -500,12 +489,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const handleGenerateReport = async () => {
         const proyectoSelect = document.getElementById('proyecto-select');
         
-        // ==== INICIO DE CAMBIO ====
         // Obtenemos el JSON stringificado del 'value'
         const proyectoInfoString = proyectoSelect.value;
         
         if (!proyectoInfoString) {
-        // ==== FIN DE CAMBIO ====
             alert("Por favor, selecciona un proyecto antes de generar un reporte.");
             return;
         }
@@ -522,10 +509,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ 
                     action: 'generarReporte',
-                    // ==== INICIO DE CAMBIO ====
                     // Enviamos el JSON stringificado al servidor
                     payload: { proyectoInfo: proyectoInfoString } 
-                    // ==== FIN DE CAMBIO ====
                 })
             });
 
@@ -550,33 +535,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- resetForm ---
     const resetForm = () => {
-        form.reset(); // Esto borra la fecha y otros campos
-        resetCameraUI();
         
-        // ==== INICIO DE CAMBIO: Corrección del error 'proyectoSheetId' ====
-        // La línea 'proyectoSelect.selectedIndex = 0;' se ha eliminado.
-        // Ahora, el 'form.reset()' pondrá el dropdown en su estado inicial 
-        // (que es "Selecciona un proyecto..." si la lista ya cargó),
-        // pero NO lo forzaremos a 0 si el usuario quiere mantener el proyecto.
-        
-        // PERO, para evitar el error, es mejor NO resetear el proyecto.
-        // Vamos a guardar el proyecto actual y restaurarlo después del reset.
+        // Guardar el proyecto actual antes de resetear
         const proyectoSelect = document.getElementById('proyecto-select');
         let currentProjectValue = null;
         if (proyectoSelect) {
             currentProjectValue = proyectoSelect.value;
         }
 
-        form.reset(); // Resetea todo (incluido el proyecto a "Selecciona...")
+        form.reset(); // Resetea campos del formulario
         resetCameraUI(); // Resetea la cámara
 
-        // Ahora, restauramos el valor del proyecto
-        // NOTA: Esta lógica se mantiene, ya que sacar el <select> del <form>
-        // previene que form.reset() lo afecte, pero es bueno tenerlo por si acaso.
+        // Restaurar el valor del proyecto
         if (proyectoSelect && currentProjectValue) {
             proyectoSelect.value = currentProjectValue;
         }
-        // ==== FIN DE CAMBIO ====
         
         // Volver a poner la fecha/hora actual después de resetear
         setDefaultDateTime(); 
