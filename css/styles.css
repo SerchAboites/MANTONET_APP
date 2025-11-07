@@ -41,6 +41,7 @@ body {
     width: 10rem; /* Ajusta el tamaño de tu video si es necesario */
     height: 10rem;
     object-fit: contain; /* Asegura que el video se vea completo */
+    border-radius: 50%;
 }
 /* ==== FIN DE CAMBIOS ==== */
 
