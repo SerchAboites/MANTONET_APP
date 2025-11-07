@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cameraPlaceholder = document.getElementById('camera-placeholder');
     const hiddenImageInput = document.getElementById('imagenIncidencia');
     const cameraSelect = document.getElementById('camera-select');
+    const retakePhotoButton = document.getElementById('retake-photo-btn'); // <-- AÑADIDO
     const context = cameraPreview.getContext('2d');
     let currentStream = null;
     let animationFrameId = null;
@@ -132,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 cameraPlaceholder.classList.add('hidden');
                 startDrawingLoop(containerWidth); // Pasamos el tamaño lógico
                 openCameraButton.classList.add('hidden');
-                capturePhotoButton.classList.remove('hidden');
+                capturePhotoButton.classList.remove('hidden'); // <-- MODIFICADO (asegurar que se muestre)
+                retakePhotoButton.classList.add('hidden'); // <-- AÑADIDO (ocultar al reintentar)
                 
                 updateCameraList();
             };
@@ -246,13 +248,14 @@ document.addEventListener('DOMContentLoaded', () => {
         cameraPreview.classList.add('hidden');
         cameraPlaceholder.classList.remove('hidden');
         cameraPlaceholder.textContent = 'La cámara está apagada';
-        capturePhotoButton.classList.add('hidden');
+        capturePhotoButton.classList.add('hidden'); // <-- MODIFICADO (asegurar que se oculte)
         capturePhotoButton.textContent = 'Capturar Foto';
         capturePhotoButton.disabled = false;
         capturePhotoButton.classList.remove('is-captured');
         openCameraButton.classList.remove('hidden');
         hiddenImageInput.value = '';
         cameraSelect.classList.add('hidden'); 
+        retakePhotoButton.classList.add('hidden'); // <-- AÑADIDO
     };
 
 
@@ -315,6 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
         capturePhotoButton.textContent = 'Foto Capturada ✔';
         capturePhotoButton.classList.add('is-captured');
         capturePhotoButton.disabled = true;
+        capturePhotoButton.classList.add('hidden'); // <-- AÑADIDO (ocultar después de capturar)
+        retakePhotoButton.classList.remove('hidden'); // <-- AÑADIDO (mostrar "Reintentar")
         cameraSelect.classList.add('hidden');
     };
     
@@ -409,6 +414,40 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // ==== INICIO DE NUEVA FUNCIÓN ====
+    /**
+     * Intenta forzar un re-enfoque de la cámara (Tap-to-Focus)
+     */
+    const handleManualFocus = async () => {
+        if (!currentStream) return; // No hacer nada si la cámara está apagada
+
+        const track = currentStream.getVideoTracks()[0];
+        const capabilities = track.getCapabilities();
+
+        // Verificar si el dispositivo soporta 'focusMode'
+        if (!capabilities.focusMode) {
+            console.warn('El dispositivo no soporta focusMode.');
+            return;
+        }
+
+        try {
+            // 1. Aplicar 'manual' despierta el motor de enfoque
+            await track.applyConstraints({
+                advanced: [{ focusMode: 'manual' }]
+            });
+            
+            // 2. Volver inmediatamente a 'continuous' para que re-enfoque
+            await track.applyConstraints({
+                advanced: [{ focusMode: 'continuous' }]
+            });
+            console.log('Re-enfoque solicitado.');
+        } catch (err) {
+            console.error('Error al aplicar constraints de enfoque:', err);
+        }
+    };
+    // ==== FIN DE NUEVA FUNCIÓN ====
+
+
     // --- Asignar eventos ---
     
     cargarProyectos();
@@ -416,6 +455,8 @@ document.addEventListener('DOMContentLoaded', () => {
     generateReportButton.addEventListener('click', handleGenerateReport);
     openCameraButton.addEventListener('click', openCamera);
     capturePhotoButton.addEventListener('click', capturePhoto);
+    retakePhotoButton.addEventListener('click', openCamera); // <-- AÑADIDO
+    cameraPreview.addEventListener('click', handleManualFocus); // <-- AÑADIDO (Tap-to-Focus)
 
     // Listener para el CAMBIO de cámara
     cameraSelect.addEventListener('change', (e) => {
