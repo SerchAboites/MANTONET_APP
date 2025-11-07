@@ -13,7 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const cameraPlaceholder = document.getElementById('camera-placeholder');
     const hiddenImageInput = document.getElementById('imagenIncidencia');
     const cameraSelect = document.getElementById('camera-select');
-    const retakePhotoButton = document.getElementById('retake-photo-btn'); // <-- AÑADIDO
+    const retakePhotoButton = document.getElementById('retake-photo-btn');
+
+    // ==== INICIO DE NUEVO BLOQUE (Galería) ====
+    const selectGalleryButton = document.getElementById('select-gallery-btn');
+    const galleryInput = document.getElementById('gallery-input');
+    // ==== FIN DE NUEVO BLOQUE (Galería) ====
+    
     const context = cameraPreview.getContext('2d');
     let currentStream = null;
     let animationFrameId = null;
@@ -150,6 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // ==== FIN DE CAMBIO ====
 
                 capturePhotoButton.classList.remove('hidden'); // <-- MODIFICADO (asegurar que se muestre)
+                
+                // ==== INICIO BLOQUE MODIFICADO (Galería) ====
+                selectGalleryButton.classList.add('hidden'); // Ocultar galería si la cámara se abrió
+                // ==== FIN BLOQUE MODIFICADO (Galería) ====
+
                 retakePhotoButton.classList.add('hidden'); // <-- AÑADIDO (ocultar al reintentar)
                 
                 updateCameraList();
@@ -293,6 +304,14 @@ document.addEventListener('DOMContentLoaded', () => {
         capturePhotoButton.disabled = false;
         capturePhotoButton.classList.remove('is-captured');
         openCameraButton.classList.remove('hidden');
+
+        // ==== INICIO DE BLOQUE MODIFICADO (Galería) ====
+        selectGalleryButton.classList.remove('hidden'); // Mostrar botón de galería
+        if (galleryInput) {
+            galleryInput.value = null; // Limpiar el input de archivo
+        }
+        // ==== FIN DE BLOQUE MODIFICADO (Galería) ====
+
         hiddenImageInput.value = '';
         cameraSelect.classList.add('hidden'); 
         retakePhotoButton.classList.add('hidden'); // <-- AÑADIDO
@@ -363,10 +382,76 @@ document.addEventListener('DOMContentLoaded', () => {
         cameraSelect.classList.add('hidden');
     };
     
+    // ==== INICIO DE NUEVA FUNCIÓN (Galería) ====
+    /**
+     * Maneja la selección de un archivo de la galería
+     */
+    const handleGalleryFile = (file) => {
+        if (!file || !file.type.startsWith('image/')) {
+            alert('Por favor, selecciona un archivo de imagen válido.');
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                // 1. Detener cualquier stream de cámara activo
+                stopCurrentStream();
+
+                // 2. Obtener dimensiones y calcular el corte cuadrado (idéntico a capturePhoto)
+                const videoWidth = img.width;
+                const videoHeight = img.height;
+                const size = Math.min(videoWidth, videoHeight);
+                const x = (videoWidth - size) / 2;
+                const y = (videoHeight - size) / 2;
+
+                // 3. Resetear la escala del contexto para dibujar 1:1
+                context.setTransform(1, 0, 0, 1, 0, 0);
+
+                // 4. Redimensionar el bitmap del canvas a la resolución de CAPTURA
+                cameraPreview.width = size;
+                cameraPreview.height = size;
+                
+                // 5. Dibujar el frame de alta res 1:1
+                context.drawImage(img, x, y, size, size, 0, 0, size, size);
+
+                // 6. Capturar la imagen del canvas y guardarla en el input oculto
+                const imageDataUrl = cameraPreview.toDataURL('image/jpeg', 0.9);
+                hiddenImageInput.value = imageDataUrl;
+
+                // 7. Ajustar el TAMAÑO DE VISUALIZACIÓN del canvas (para que se vea bien)
+                const containerWidth = cameraPreview.parentElement.offsetWidth;
+                cameraPreview.style.width = `${containerWidth}px`;
+                cameraPreview.style.height = `${containerWidth}px`;
+
+                // 8. Actualizar la UI al estado "Foto Capturada"
+                cameraPreview.classList.remove('hidden');
+                cameraPlaceholder.classList.add('hidden');
+                
+                openCameraButton.classList.add('hidden');
+                selectGalleryButton.classList.add('hidden');
+                capturePhotoButton.classList.add('hidden');
+                retakePhotoButton.classList.remove('hidden'); // <-- Mostrar "Reintentar"
+                cameraSelect.classList.add('hidden');
+            };
+            img.src = e.target.result; // Cargar la imagen desde el base64 del FileReader
+        };
+
+        reader.onerror = (err) => {
+            console.error('Error al leer el archivo:', err);
+            alert('No se pudo leer el archivo de imagen.');
+        };
+
+        reader.readAsDataURL(file); // Convertir el archivo a base64
+    };
+    // ==== FIN DE NUEVA FUNCIÓN (Galería) ====
+
     // --- Lógica de envío ---
     const handleFormSubmit = async (event) => {
         event.preventDefault();
-        if (!hiddenImageInput.value) { alert('Por favor, captura una foto de evidencia.'); return; }
+        if (!hiddenImageInput.value) { alert('Por favor, captura una foto de evidencia o selecciona una de la galería.'); return; }
         
         const payload = Object.fromEntries(new FormData(form));
         payload.imagenBase64 = payload.imagenIncidencia;
@@ -495,7 +580,25 @@ document.addEventListener('DOMContentLoaded', () => {
     generateReportButton.addEventListener('click', handleGenerateReport);
     openCameraButton.addEventListener('click', openCamera);
     capturePhotoButton.addEventListener('click', capturePhoto);
-    retakePhotoButton.addEventListener('click', openCamera); // <-- AÑADIDO
+    
+    // ==== INICIO DE BLOQUE MODIFICADO/NUEVO (Galería y Reintentar) ====
+
+    // 'Reintentar' ahora resetea la UI para permitir elegir de nuevo
+    retakePhotoButton.addEventListener('click', resetCameraUI); // <-- MODIFICADO
+
+    // Botón 'Galería' hace clic en el input de archivo oculto
+    selectGalleryButton.addEventListener('click', () => {
+        galleryInput.click();
+    });
+
+    // El input de archivo oculto maneja la selección
+    galleryInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handleGalleryFile(e.target.files[0]);
+        }
+    });
+    // ==== FIN DE BLOQUE MODIFICADO/NUEVO (Galería y Reintentar) ====
+
     cameraPreview.addEventListener('click', handleManualFocus); // <-- AÑADIDO (Tap-to-Focus)
 
     // Listener para el CAMBIO de cámara

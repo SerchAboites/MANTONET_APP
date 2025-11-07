@@ -92,29 +92,36 @@
                 <video id="camera-stream" playsinline autoplay class="hidden"></video>
                 <input type="hidden" id="imagenIncidencia" name="imagenIncidencia">
                 
+                <!-- ==== INICIO DE NUEVO BLOQUE (Galería) ==== -->
+                <input type="file" id="gallery-input" accept="image/*" class="hidden">
+                <!-- ==== FIN DE NUEVO BLOQUE (Galería) ==== -->
+                
                 <!-- Usamos la clase 'camera-buttons' de nuestro CSS -->
                 <div class="camera-buttons">
                     
-                    <!-- ==== INICIO DE NUEVO BLOQUE ==== -->
                     <!-- Este select se rellenará y mostrará con JavaScript -->
                     <select id="camera-select" class="btn hidden">
                         <!-- Opciones se añaden dinámicamente -->
                     </select>
-                    <!-- ==== FIN DE NUEVO BLOQUE ==== -->
-
+                    
                     <!-- Usamos la clase 'btn' de nuestro CSS -->
                     <button type="button" id="open-camera-btn" class="btn">
                         Abrir Cámara
                     </button>
+                    
+                    <!-- ==== INICIO DE NUEVO BLOQUE (Galería) ==== -->
+                    <button type="button" id="select-gallery-btn" class="btn">
+                        Galería
+                    </button>
+                    <!-- ==== FIN DE NUEVO BLOQUE (Galería) ==== -->
+                    
                     <button type="button" id="capture-photo-btn" class="btn hidden">
                         Capturar Foto
                     </button>
                     
-                    <!-- ==== INICIO DE NUEVO BLOQUE ==== -->
                     <button type="button" id="retake-photo-btn" class="btn hidden">
                         Reintentar
                     </button>
-                    <!-- ==== FIN DE NUEVO BLOQUE ==== -->
 
                 </div>
             </div>
