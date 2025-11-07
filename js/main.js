@@ -105,6 +105,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+            
+            // ==== INICIO DE CAMBIO: Guardar en localStorage ====
+            const currentCameraId = currentStream.getVideoTracks()[0]?.getSettings()?.deviceId;
+            if (currentCameraId) {
+                localStorage.setItem('preferredCameraId', currentCameraId);
+            }
+            // ==== FIN DE CAMBIO ====
+
             cameraStream.srcObject = currentStream;
 
             cameraStream.onloadedmetadata = () => {
@@ -133,6 +141,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 cameraPlaceholder.classList.add('hidden');
                 startDrawingLoop(containerWidth); // Pasamos el tamaño lógico
                 openCameraButton.classList.add('hidden');
+                
+                // ==== INICIO DE CAMBIO: Arreglo Botón "Reintentar" ====
+                // Resetear el botón de captura a su estado original
+                capturePhotoButton.textContent = 'Capturar Foto';
+                capturePhotoButton.disabled = false;
+                capturePhotoButton.classList.remove('is-captured');
+                // ==== FIN DE CAMBIO ====
+
                 capturePhotoButton.classList.remove('hidden'); // <-- MODIFICADO (asegurar que se muestre)
                 retakePhotoButton.classList.add('hidden'); // <-- AÑADIDO (ocultar al reintentar)
                 
@@ -186,6 +202,30 @@ document.addEventListener('DOMContentLoaded', () => {
             alert("No se puede acceder a la cámara. Asegúrate de que estás en una conexión segura (https://) y has concedido permisos.");
             return;
         }
+        
+        // ==== INICIO DE CAMBIO: Leer de localStorage ====
+        const preferredCameraId = localStorage.getItem('preferredCameraId');
+        if (preferredCameraId) {
+            try {
+                console.log('Intentando abrir cámara preferida:', preferredCameraId);
+                const preferredConstraints = { 
+                    video: { 
+                        deviceId: { exact: preferredCameraId },
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 },
+                        advanced: [
+                            { focusMode: 'continuous' }
+                        ]
+                    } 
+                };
+                await startStream(preferredConstraints);
+                return; // Si tiene éxito, salimos de la función
+            } catch (err) {
+                console.warn('No se pudo abrir la cámara preferida. Volviendo al default.', err);
+                localStorage.removeItem('preferredCameraId'); // Limpiar ID inválido
+            }
+        }
+        // ==== FIN DE CAMBIO ====
         
         // ==== INICIO DE CAMBIOS: Solicitud de Enfoque Continuo ====
         
@@ -436,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 advanced: [{ focusMode: 'manual' }]
             });
             
-            // 2. Volver inmediatamente a 'continuous' para que re-enfoque
+            // 2. Volver immediately a 'continuous' para que re-enfoque
             await track.applyConstraints({
                 advanced: [{ focusMode: 'continuous' }]
             });
