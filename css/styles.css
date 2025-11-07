@@ -16,8 +16,11 @@ body {
     display: none !important;
 }
 
-/* --- Animación de Carga (Tu código original) --- */
-@keyframes spin {
+/* --- Animación de Carga (Tu código original MODIFICADO) --- */
+
+/* ==== INICIO DE CAMBIOS: Loader de Video ==== */
+/* Elimina todas las reglas CSS del antiguo .loader */
+/* @keyframes spin {
     to {
         transform: rotate(360deg);
     }
@@ -26,14 +29,21 @@ body {
 .loader {
     border-top-color: #C51E1F;
     animation: spin 1s linear infinite;
-    /* Clases de Tailwind traducidas */
     border-width: 8px;
     border-style: solid;
-    border-color: #6b7280; /* gray-500 */
-    border-radius: 9999px; /* rounded-full */
-    height: 8rem; /* h-32 */
-    width: 8rem; /* w-32 */
+    border-color: #6b7280;
+    border-radius: 9999px;
+    height: 8rem;
+    width: 8rem;
+} */
+
+#loader-video {
+    width: 10rem; /* Ajusta el tamaño de tu video si es necesario */
+    height: 10rem;
+    object-fit: contain; /* Asegura que el video se vea completo */
 }
+/* ==== FIN DE CAMBIOS ==== */
+
 
 #loader-overlay {
     position: fixed;
@@ -107,7 +117,10 @@ label {
     margin-bottom: 0.25rem; /* mb-1 */
 }
 
-input[type="date"],
+/* ==== INICIO DE CAMBIOS: Estilo para datetime-local ==== */
+/* Se mantiene similar a los otros inputs, pero se ajusta el calendario */
+input[type="datetime-local"], 
+input[type="date"], /* Mantén esta regla si quieres que todos los inputs date tengan el mismo aspecto */
 input[type="text"],
 select,
 textarea {
@@ -121,6 +134,7 @@ textarea {
     transition: all 0.2s ease-in-out;
 }
 
+input[type="datetime-local"]:focus,
 input[type="date"]:focus,
 input[type="text"]:focus,
 select:focus,
@@ -136,9 +150,12 @@ textarea {
 }
 
 /* Ajustes Específicos (Tu código original) */
-input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator /* Añadido */ {
     filter: invert(1);
 }
+/* ==== FIN DE CAMBIOS ==== */
+
 
 /* --- Sección de Cámara --- */
 #camera-container {
@@ -265,7 +282,20 @@ video {
     background-color: #374151; /* hover:bg-gray-700 */
 }
 
-/* ==== INICIO DE NUEVO BLOQUE ==== */
+/* ==== INICIO DE NUEVO BLOQUE (Galería) ==== */
+/* Botón Galería (Gris) - Estilo idéntico a Abrir Cámara */
+#select-gallery-btn {
+    flex: 1; /* flex-1 */
+    background-color: #4b5563; /* bg-gray-600 */
+    color: #ffffff;
+    padding: 0.5rem 1rem; /* py-2 px-4 */
+}
+#select-gallery-btn:hover {
+    background-color: #374151; /* hover:bg-gray-700 */
+}
+/* ==== FIN DE NUEVO BLOQUE (Galería) ==== */
+
+
 /* Botón Reintentar (Gris) */
 #retake-photo-btn {
     flex: 1; /* flex-1 */
@@ -276,7 +306,6 @@ video {
 #retake-photo-btn:hover {
     background-color: #374151; /* hover:bg-gray-700 */
 }
-/* ==== FIN DE NUEVO BLOQUE ==== */
 
 
 /* --- Sección de Reporte Final --- */
