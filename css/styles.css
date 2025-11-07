@@ -185,11 +185,18 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator /* Añadido */ {
 video::-webkit-media-controls {
     display: none !important;
 }
-video {
+
+/* ==== INICIO DE CAMBIOS: Regla de video corregida ==== */
+/* * La regla 'video { display: none; }' se eliminó porque ocultaba 
+ * el video de carga (#loader-video).
+ * * Ahora, el video de la cámara se oculta usando la clase .hidden 
+ * directamente en el HTML, y solo aplicamos el object-fit aquí.
+*/
+video#camera-stream {
     object-fit: cover;
-    /* Esta clase .hidden es de tu HTML original, la necesitamos */
-    display: none; 
+    /* La clase .hidden en el HTML se encarga de ocultarlo. */
 }
+/* ==== FIN DE CAMBIOS ==== */
 
 /* Contenedor de botones de cámara */
 .camera-buttons {
