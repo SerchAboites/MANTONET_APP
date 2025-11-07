@@ -101,7 +101,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         proyectos.forEach(proyecto => {
             const option = document.createElement('option');
-            option.value = proyecto.id;
+            
+            // ==== INICIO DE CAMBIO ====
+            // El servidor ahora envía 'id' (Sheet ID) y 'folderUrl' (Drive Folder)
+            // Necesitamos AMBOS. Los guardaremos como un objeto JSON
+            // stringificado en el 'value' del select.
+            
+            const projectData = {
+              sheetId: proyecto.id,
+              folderUrl: proyecto.folderUrl
+            };
+            
+            // Guardamos el JSON como un string en el value
+            option.value = JSON.stringify(projectData);
+            
+            // ==== FIN DE CAMBIO ====
+
             option.textContent = proyecto.nombre;
             proyectoSelect.appendChild(option);
         });
@@ -434,13 +449,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // FormData no lo captura. Debemos añadirlo manualmente.
         const proyectoSelect = document.getElementById('proyecto-select');
         if (proyectoSelect) {
-            payload.proyectoSheetId = proyectoSelect.value;
+            // ==== INICIO DE CAMBIO ====
+            // El 'value' ahora es el JSON stringificado (ej: {"sheetId":"...", "folderUrl":"..."})
+            // Lo enviamos tal cual. El servidor se encargará de parsearlo.
+            payload.proyectoInfo = proyectoSelect.value;
+            // ==== FIN DE CAMBIO ====
         }
         // ==== FIN DE CAMBIO ====
 
 
         // ==== INICIO DE CAMBIO: Revisar si el payload tiene el ID
-        if (!payload.proyectoSheetId) {
+        // Ahora revisamos la nueva propiedad 'proyectoInfo'
+        if (!payload.proyectoInfo) {
              // Mensaje de error actualizado (ya no necesita recargar)
              alert('Error: No se ha seleccionado ningún proyecto. Por favor, selecciona un proyecto.');
              return;
@@ -479,9 +499,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Lógica de reporte ---
     const handleGenerateReport = async () => {
         const proyectoSelect = document.getElementById('proyecto-select');
-        const proyectoSheetId = proyectoSelect.value;
         
-        if (!proyectoSheetId) {
+        // ==== INICIO DE CAMBIO ====
+        // Obtenemos el JSON stringificado del 'value'
+        const proyectoInfoString = proyectoSelect.value;
+        
+        if (!proyectoInfoString) {
+        // ==== FIN DE CAMBIO ====
             alert("Por favor, selecciona un proyecto antes de generar un reporte.");
             return;
         }
@@ -498,7 +522,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({ 
                     action: 'generarReporte',
-                    payload: { proyectoSheetId: proyectoSheetId } 
+                    // ==== INICIO DE CAMBIO ====
+                    // Enviamos el JSON stringificado al servidor
+                    payload: { proyectoInfo: proyectoInfoString } 
+                    // ==== FIN DE CAMBIO ====
                 })
             });
 
