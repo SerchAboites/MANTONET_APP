@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    /* --- TUS ESTILOS GLOBALES (SIN CAMBIOS) --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #666666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+
+    /* --- TUS ESTILOS DE CONTENEDOR (SIN CAMBIOS) --- */
+    #main-container {
+      width: 100%;
+      max-width: 672px;
+      background-color: #3a3a3a;
+      border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      padding: 24px;
+      transition: all 0.5s;
+      margin-top: 5%;
+      margin-bottom: 5%;
+    }
+
+    /* --- TUS ESTILOS DE TEXTO (SIN CAMBIOS) --- */
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .header p {
+      color: #6b7280;
+      margin-top: 8px;
+    }
+
+    h3 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #cf3838;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      margin-top: 16px;
+    }
+
+    .form-section {
+      margin-bottom: 24px;
+    }
+
+    /* --- TUS ESTILOS DE FORMULARIO (SIN CAMBIOS) --- */
+    .form-label {
+      display: block;
+      font-size: 20px;
+      font-weight: 500;
+      color: #666666;
+      margin-bottom: 4px;
+    }
+
+    input {
+      margin-top: 4px;
+      display: block;
+      width: 100%;
+      padding: 12px 16px;
+      background-color: #666666;
+      transition: all 0.2s ease-in-out;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    select {
+      background-color: #666666;
+      color: white;
+      width: 100%;
+      min-height: 40px;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    textarea {
+      background-color: #666666;
+      width: 100%;
+      min-height: 300px;
+      padding: 10px;
+      border-radius: 10px;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* --- TUS ESTILOS DE GRID (SIN CAMBIOS) --- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    /* --- TUS ESTILOS DE PREVIEW (SIN CAMBIOS) --- */
+    #previewName {
+      color: white;
+      background-color: #666666;
+      padding: 8px;
+      word-break: break-all;
+      border-radius: 10px;
+    }
+
+
+    /* --- SPINNER DE BOTÓN (CORREGIDO) --- */
+    #loading-spinner {
+      animation: spin 1s linear infinite;
+      display: none;
+      width: 20px;
+      height: 20px;
+      margin-left: -4px;
+      margin-right: 12px;
+    }
+
+    /* --- BOTÓN (CORREGIDO) --- */
+    button {
+      font-size: 20px;
+      min-height: 60px;
+      border-radius: 20px;
+      background-color: #a32a2a;
+      color: white;
+      width: 100%;
+      margin-top: 30px;
+      border: none;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    button:disabled {
+      background-color: #525252;
+      cursor: not-allowed;
+    }
+
+    /* --- CORRECCIÓN 1: ANIMACIÓN SPINNER (GLOBAL) --- */
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* --- TUS ESTILOS DE MENSAJE (SIN CAMBIOS) --- */
+    #status-message {
+      margin-top: 24px;
+      text-align: center;
+      padding: 12px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .status-success {
+      display: block;
+      color: #059669;
+      background-color: #d1fae5;
+    }
+
+    .status-error {
+      display: block;
+      color: #dc2626;
+      background-color: #fee2e2;
+    }
+
+    #status-message a {
+      font-weight: 700;
+      color: #2563eb;
+      text-decoration: underline;
+    }
+
+    /* --- ESTILOS PANEL DE ÉXITO --- */
+    #success-panel {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .success-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-top: 16px;
+    }
+
+    .success-text {
+      color: #b0b0b0;
+      margin-top: 8px;
+      font-size: 1rem;
+    }
+
+    #success-link-container {
+      margin-top: 24px;
+      font-size: 1rem;
+    }
+
+    #success-link-container a {
+      color: #4ade80;
+      /* Verde brillante */
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    #reset-button {
+      background-color: #a32a2a;
+      border: 1px solid #888;
+      font-size: 1rem;
+      min-height: 44px;
+      border-radius: 10px;
+      margin-top: 24px;
+      padding: 0 20px;
+      width: auto;
+    }
+
+    #reset-button:hover {
+      background-color: #777;
+    }
+
+    /* --- Animación de la Palomita (Checkmark) --- */
+    .success-checkmark {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: block;
+      stroke-width: 3;
+      stroke: #4CAF50;
+      /* Verde */
+      stroke-miterlimit: 10;
+      margin: 0 auto;
+      box-shadow: inset 0px 0px 0px #4CAF50;
+      animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+    }
+
+    .success-circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      stroke-width: 3;
+      stroke-miterlimit: 10;
+      stroke: #4CAF50;
+      fill: none;
+      animation: stroke .6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+    }
+
+    /* --- CORRECCIÓN 2: PALOMITA BLANCA --- */
+    .success-check {
+      transform-origin: 50% 50%;
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      stroke: #ffffff;
+      /* <-- AÑADIDO: Color blanco */
+      animation: stroke .3s cubic-bezier(0.65, 0, 0.45, 1) .8s forwards;
+    }
+
+    @keyframes stroke {
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes scale {
+
+      0%,
+      100% {
+        transform: none;
+      }
+
+      50% {
+        transform: scale3d(1.1, 1.1, 1);
+      }
+    }
+
+    @keyframes fill {
+      100% {
+        box-shadow: inset 0px 0px 0px 40px #4CAF50;
+      }
+    }
+
+    /* --- ESTILOS PANEL DE CARGA --- */
+    #loading-panel {
+      text-align: center;
+      padding: 80px 20px;
+    }
+
+    #main-loading-spinner {
+      animation: spin 1s linear infinite;
+      width: 60px;
+      height: 60px;
+      color: #cf3838;
+    }
+
+    .loading-text {
+      color: #e0e0e0;
+      font-size: 1.25rem;
+      font-weight: 500;
+      margin-top: 24px;
+    }
+
+
+    #splash-screen {
+      /* Define el panel como pantalla completa */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+
+      /* Tu fondo rojo (tomado del botón) */
+      background-color: #a32a2a;
+
+      /* Centra el logo (como pediste) */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      /* Asegura que esté encima de todo */
+      z-index: 1000;
+
+      /* Prepara la animación de opacidad */
+      opacity: 1;
+      transition: opacity 1s ease-out;
+      /* Duración del fade-out */
+    }
+
+    /* Esta clase la usará JavaScript para desvanecer el splash */
+    #splash-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+      /* <-- AÑADE ESTA LÍNEA */
+    }
+
+    /* Esta animación la usará JavaScript para mostrar tu formulario */
+    #main-container.fade-in {
+      animation: fadeIn 1s ease-in forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+
+    /* * ===============================================
+     * --- TU MEDIA QUERY (SIN CAMBIOS) ---
+     * ===============================================
+     */
+    @media (max-width: 1080px) and (-webkit-min-device-pixel-ratio: 1.8),
+    (max-width: 1080px) and (min-resolution: 1.8dppx) {
+
+      body {
+        padding: 0px;
+        font-size: 45px;
+      }
+
+      input {
+        font-size: 45px;
+        border-radius: 20px;
+        background-color: #666666;
+        min-height: 100px;
+      }
+
+      textarea {
+        border-radius: 20px;
+        font-size: 40px;
+        min-height: 400px;
+        color: white;
+        padding: 30px;
+        font-family: 'Inter', sans-serif;
+      }
+
+      select {
+        font-size: 45px;
+        border-radius: 20px;
+        min-height: 100px;
+      }
+
+      #previewName {
+        border-radius: 20px;
+        padding: 20px;
+        min-height: 120px;
+      }
+
+      .form-label {
+        font-size: 35px;
+        margin-bottom: 20px;
+      }
+
+      button {
+        font-size: 45px;
+        min-height: 120px;
+        border-radius: 20px;
+        background-color: #a32a2a;
+        color: white;
+        width: 100%;
+        margin-top: 30px;
+        border: none;
+      }
+
+      #reset-button {
+        background-color: #a32a2a;
+        font-size: 40px;
+        min-height: 150px;
+        border-radius: 20px;
+        margin-top: 24px;
+        padding: 0 20px;
+        width: auto;
+      }
+
+      #main-container {
+        padding: 32px;
+        min-width: 95%;
+        height: 100%;
+        border-radius: 40px;
+      }
+
+      .header h1 {
+        font-size: 60px;
+        margin-bottom: 30px;
+        margin-top: 30px;
+      }
+
+      h3 {
+        font-size: 45px;
+        margin-top: 40px;
+      }
+
+      #status-message a {
+        font-size: 40px;
+      }
+
+      .grid-cols-md-3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .grid-cols-md-2 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .col-span-md-1 {
+        grid-column: span 1 / span 1;
+      }
+
+      .col-span-md-2 {
+        grid-column: span 2 / span 2;
+      }
+
+
+      #main-loading-spinner {
+        width: 200px;
+        /* <-- Cambia esto (ej. 120px) */
+        height: 200px;
+        /* <-- Cambia esto (ej. 120px) */
+      }
+
+      .loading-text {
+        font-size: 60px;
+        /* <-- Ajusta al tamaño de tus otros textos */
+      }
+
+
+      /* --- TAMAÑO ANIMACIÓN CHECK --- */
+      .success-checkmark {
+        width: 200px;
+        /* <-- Cambia esto (ej. 150px) */
+        height: 200px;
+        /* <-- Cambia esto (ej. 150px) */
+      }
+
+      .success-title {
+        font-size: 60px;
+        /* <-- Ajusta al tamaño de tu H1 */
+      }
+
+      .success-text {
+        font-size: 45px;
+        /* <-- Ajusta al tamaño de tu texto normal */
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div id="splash-screen">
+    <div id="logoAnimado"
+      style="width: 100%; height:200px; display:flex; align-items:center;  justify-content:center; background-color:none;">
+
+      <svg id="LogoSvgMantonet" class="logotipo" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 446.66 134.17">
+        <title>Logotipo de Mantonet</title>
+        <!-- Título para accesibilidad del SVG -->
+        <defs>
+          <style>
+            .cls-1 {
+              fill: none;
+              /* Esto afecta a 'cls-1' específicamente */
+              opacity: 1;
+            }
+
+            .logotipo {
+              display: flex;
+              height: 100%;
+              width: 100%;
+              stroke: white;
+              stroke-width: 1.7;
+              stroke-dasharray: 400;
+              stroke-dashoffset: 400;
+              animation: draw 8s linear infinite alternate;
+              justify-content: center;
+              align-items: center;
+              background: none;
+
+            }
+
+
+            @keyframes draw {
+              0% {
+                stroke-dashoffset: 400;
+                fill: transparent;
+              }
+
+              45% {
+                stroke-dashoffset: 0;
+                fill: white;
+                /* Esto ahora debería funcionar */
+              }
+
+              50% {
+                stroke-dashoffset: 0;
+                fill: transparent;
+              }
+
+              55% {
+                stroke-dashoffset: 0;
+                fill: white;
+              }
+
+              100% {
+                stroke-dashoffset: 400;
+                fill: transparent;
+              }
+            }
+          </style>
+        </defs>
+        <g id="Capa_1-2" data-name="Capa 1">
+          <g>
+            <path class="cls-1 logotipo"
+              d="m311.33,83.59c2.54-16.33-.32-32.54-2.5-41.5,3.14-1.54,4.83-5.13,3.85-8.62-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.98,3.46,4.27,5.64,7.72,5.35,2.09,8.77,4.84,24.66,2.41,40.44-.23.02-.46.04-.7.08-7.59-20.42-22.3-53.99-29.41-69.9,2.52-1.74,3.78-4.95,2.91-8.06-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.05.16.1.32.16.48-16.79,9.77-47.88,28.2-60.73,37.98-.35-.25-.73-.46-1.13-.65,2.99-9.4,10.74-27.2,27.83-34.56,1.25,2.29,3.68,3.84,6.47,3.84,4.07,0,7.38-3.3,7.38-7.38s-3.3-7.38-7.38-7.38-7.38,3.3-7.38,7.38c0,.33.03.66.07.98-18.27,7.73-26.46,26.59-29.59,36.45-.17-.01-.34-.03-.51-.03-4.07,0-7.38,3.3-7.38,7.38,0,3.52,2.47,6.47,5.78,7.2.12,15.78,4.31,52.31,39.43,62.3-.03.75.06,1.51.27,2.27,1.1,3.92,5.18,6.2,9.1,5.1,3.92-1.1,6.2-5.18,5.1-9.1-1.1-3.92-5.18-6.2-9.1-5.1-2.24.63-3.94,2.23-4.79,4.22-33.73-9.62-37.46-44.36-37.42-59.58,2.32-.31,4.3-1.7,5.42-3.66,4.76,1.65,11.66,4.05,19.69,6.83-.41,2.01-.63,4.08-.63,6.21,0,16.88,13.68,30.56,30.56,30.56,12,0,22.37-6.92,27.37-16.98,6.19,2.12,11.67,4,15.97,5.45-.14.99-.09,2.01.2,3.03.5,1.78,1.62,3.22,3.06,4.16-.55,1.41-1.15,2.8-1.83,4.16-4.85,9.74-12.46,17.08-22.67,21.91-1.7-2.69-5.01-4.06-8.23-3.16-3.92,1.1-6.2,5.18-5.1,9.1,1.1,3.92,5.18,6.2,9.1,5.1,3.74-1.05,5.98-4.81,5.22-8.55,10.84-5.08,18.93-12.86,24.08-23.22.7-1.41,1.32-2.85,1.89-4.3,1.14.25,2.37.23,3.57-.11,3.92-1.1,6.2-5.18,5.1-9.1-.7-2.48-2.58-4.3-4.87-5.03Zm-24.42-1.91c1.35-3.45,2.1-7.2,2.1-11.12,0-16.88-13.68-30.56-30.56-30.56-13.81,0-25.48,9.17-29.26,21.75-7.93-2.75-14.76-5.12-19.48-6.76.06-.37.09-.74.09-1.12,0-1.59-.51-3.07-1.37-4.27,11.5-8.31,40.32-25.76,60.29-37.43,1.76,2.05,4.57,3.04,7.35,2.36,7.1,15.87,21.77,49.38,29.33,69.71-1.18.68-2.12,1.66-2.76,2.81-4.24-1.43-9.64-3.28-15.73-5.37Z" />
+            <path class="cls-1 logotipo"
+              d="m40.76,43.88l-9.14,24.84c-2.29,6.48-4.11,12.11-5.41,17.29h-.23c-1.29-5.33-3.05-10.97-5.18-17.29l-8.76-24.84H3.58L0,95.23h6.32l1.37-22.02c.46-7.69.84-16.3.99-22.7h.15c1.45,6.09,3.5,12.72,5.94,19.96l8.3,24.46h5.03l9.07-24.91c2.59-7.09,4.72-13.49,6.48-19.5h.23c-.08,6.4.38,15.01.76,22.17l1.29,22.55h6.48l-3.2-51.35h-8.46Z" />
+            <path class="cls-1 logotipo"
+              d="m75.42,43.88l-17.45,51.35h6.86l5.33-16.15h18.21l5.49,16.15h7.08l-17.52-51.35h-8Zm-3.89,30.02l5.03-14.86c.99-3.12,1.83-6.25,2.59-9.29h.15c.76,2.97,1.52,6.02,2.67,9.37l5.03,14.78h-15.47Z" />
+            <path class="cls-1 logotipo"
+              d="m140.79,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z" />
+            <polygon class="cls-1 logotipo"
+              points="152.75 49.52 168.37 49.52 168.37 95.23 175.07 95.23 175.07 49.52 190.77 49.52 190.77 43.88 152.75 43.88 152.75 49.52" />
+            <path class="cls-1 logotipo"
+              d="m357.98,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z" />
+            <polygon class="cls-1 logotipo"
+              points="382.44 71.15 402.4 71.15 402.4 65.67 382.44 65.67 382.44 49.44 403.54 49.44 403.54 43.88 375.81 43.88 375.81 95.23 404.68 95.23 404.68 89.67 382.44 89.67 382.44 71.15" />
+            <polygon class="cls-1 logotipo"
+              points="408.64 43.88 408.64 49.52 424.26 49.52 424.26 95.23 430.97 95.23 430.97 49.52 446.66 49.52 446.66 43.88 408.64 43.88" />
+          </g>
+        </g>
+      </svg>
+
+    </div>
+  </div>
+
+
+  <div id="main-container" class="hidden">
+
+
+    <div id="logoAnimado"
+      style="width: 100%; height:150px; display:flex; align-items:center;  justify-content:center; background-color:none;">
+
+      <svg id="LogoSvgMantonet" class="logotipo" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 446.66 134.17">
+        <title>Logotipo de Mantonet</title>
+        <!-- Título para accesibilidad del SVG -->
+        <defs>
+          <style>
+            .cls-1 {
+              fill: none;
+              /* Esto afecta a 'cls-1' específicamente */
+              opacity: 1;
+            }
+
+            .logotipo {
+              display: flex;
+              height: 100%;
+              width: 100%;
+              stroke: white;
+              stroke-width: 1.7;
+              stroke-dasharray: 400;
+              stroke-dashoffset: 400;
+              animation: draw 8s linear infinite alternate;
+              justify-content: center;
+              align-items: center;
+              background: none;
+
+            }
+
+
+            @keyframes draw {
+              0% {
+                stroke-dashoffset: 400;
+                fill: transparent;
+              }
+
+              45% {
+                stroke-dashoffset: 0;
+                fill: white;
+                /* Esto ahora debería funcionar */
+              }
+
+              50% {
+                stroke-dashoffset: 0;
+                fill: transparent;
+              }
+
+              55% {
+                stroke-dashoffset: 0;
+                fill: white;
+              }
+
+              100% {
+                stroke-dashoffset: 400;
+                fill: transparent;
+              }
+            }
+          </style>
+        </defs>
+        <g id="Capa_1-2" data-name="Capa 1">
+          <g>
+            <path class="cls-1 logotipo"
+              d="m311.33,83.59c2.54-16.33-.32-32.54-2.5-41.5,3.14-1.54,4.83-5.13,3.85-8.62-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.98,3.46,4.27,5.64,7.72,5.35,2.09,8.77,4.84,24.66,2.41,40.44-.23.02-.46.04-.7.08-7.59-20.42-22.3-53.99-29.41-69.9,2.52-1.74,3.78-4.95,2.91-8.06-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.05.16.1.32.16.48-16.79,9.77-47.88,28.2-60.73,37.98-.35-.25-.73-.46-1.13-.65,2.99-9.4,10.74-27.2,27.83-34.56,1.25,2.29,3.68,3.84,6.47,3.84,4.07,0,7.38-3.3,7.38-7.38s-3.3-7.38-7.38-7.38-7.38,3.3-7.38,7.38c0,.33.03.66.07.98-18.27,7.73-26.46,26.59-29.59,36.45-.17-.01-.34-.03-.51-.03-4.07,0-7.38,3.3-7.38,7.38,0,3.52,2.47,6.47,5.78,7.2.12,15.78,4.31,52.31,39.43,62.3-.03.75.06,1.51.27,2.27,1.1,3.92,5.18,6.2,9.1,5.1,3.92-1.1,6.2-5.18,5.1-9.1-1.1-3.92-5.18-6.2-9.1-5.1-2.24.63-3.94,2.23-4.79,4.22-33.73-9.62-37.46-44.36-37.42-59.58,2.32-.31,4.3-1.7,5.42-3.66,4.76,1.65,11.66,4.05,19.69,6.83-.41,2.01-.63,4.08-.63,6.21,0,16.88,13.68,30.56,30.56,30.56,12,0,22.37-6.92,27.37-16.98,6.19,2.12,11.67,4,15.97,5.45-.14.99-.09,2.01.2,3.03.5,1.78,1.62,3.22,3.06,4.16-.55,1.41-1.15,2.8-1.83,4.16-4.85,9.74-12.46,17.08-22.67,21.91-1.7-2.69-5.01-4.06-8.23-3.16-3.92,1.1-6.2,5.18-5.1,9.1,1.1,3.92,5.18,6.2,9.1,5.1,3.74-1.05,5.98-4.81,5.22-8.55,10.84-5.08,18.93-12.86,24.08-23.22.7-1.41,1.32-2.85,1.89-4.3,1.14.25,2.37.23,3.57-.11,3.92-1.1,6.2-5.18,5.1-9.1-.7-2.48-2.58-4.3-4.87-5.03Zm-24.42-1.91c1.35-3.45,2.1-7.2,2.1-11.12,0-16.88-13.68-30.56-30.56-30.56-13.81,0-25.48,9.17-29.26,21.75-7.93-2.75-14.76-5.12-19.48-6.76.06-.37.09-.74.09-1.12,0-1.59-.51-3.07-1.37-4.27,11.5-8.31,40.32-25.76,60.29-37.43,1.76,2.05,4.57,3.04,7.35,2.36,7.1,15.87,21.77,49.38,29.33,69.71-1.18.68-2.12,1.66-2.76,2.81-4.24-1.43-9.64-3.28-15.73-5.37Z" />
+            <path class="cls-1 logotipo"
+              d="m40.76,43.88l-9.14,24.84c-2.29,6.48-4.11,12.11-5.41,17.29h-.23c-1.29-5.33-3.05-10.97-5.18-17.29l-8.76-24.84H3.58L0,95.23h6.32l1.37-22.02c.46-7.69.84-16.3.99-22.7h.15c1.45,6.09,3.5,12.72,5.94,19.96l8.3,24.46h5.03l9.07-24.91c2.59-7.09,4.72-13.49,6.48-19.5h.23c-.08,6.4.38,15.01.76,22.17l1.29,22.55h6.48l-3.2-51.35h-8.46Z" />
+            <path class="cls-1 logotipo"
+              d="m75.42,43.88l-17.45,51.35h6.86l5.33-16.15h18.21l5.49,16.15h7.08l-17.52-51.35h-8Zm-3.89,30.02l5.03-14.86c.99-3.12,1.83-6.25,2.59-9.29h.15c.76,2.97,1.52,6.02,2.67,9.37l5.03,14.78h-15.47Z" />
+            <path class="cls-1 logotipo"
+              d="m140.79,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z" />
+            <polygon class="cls-1 logotipo"
+              points="152.75 49.52 168.37 49.52 168.37 95.23 175.07 95.23 175.07 49.52 190.77 49.52 190.77 43.88 152.75 43.88 152.75 49.52" />
+            <path class="cls-1 logotipo"
+              d="m357.98,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z" />
+            <polygon class="cls-1 logotipo"
+              points="382.44 71.15 402.4 71.15 402.4 65.67 382.44 65.67 382.44 49.44 403.54 49.44 403.54 43.88 375.81 43.88 375.81 95.23 404.68 95.23 404.68 89.67 382.44 89.67 382.44 71.15" />
+            <polygon class="cls-1 logotipo"
+              points="408.64 43.88 408.64 49.52 424.26 49.52 424.26 95.23 430.97 95.23 430.97 49.52 446.66 49.52 446.66 43.88 408.64 43.88" />
+          </g>
+        </g>
+      </svg>
+
+    </div>
+
+
+    <div class="header">
+      <h1>Registro de Proyecto</h1>
+      <p>Completa los campos para crear un nuevo proyecto.</p>
+    </div>
+
+    <div id="form-container">
+
+      <div id="form-section">
+        <div class="form-section">
+          <h3>Datos para la Carpeta</h3>
+          <div class="form-grid grid-cols-md-3">
+            <div class="col-span-md-1">
+              <label for="titleSelect" class="form-label">Título</label>
+              <select id="titleSelect" class="form-input">
+                <option value="Arq.">Arq.</option>
+                <option value="Lic.">Lic.</option>
+                <option value="Ing.">Ing.</option>
+                <option value="Sr.">Sr.</option>
+                <option value="Sra.">Sra.</option>
+                <option value="Srta.">Srta.</option>
+                <option value="Mtro.">Mtro.</option>
+                <option value="Mtra.">Mtra.</option>
+                <option value="Otro">Otro...</option>
+                <option value="">(Ninguno)</option>
+              </select>
+            </div>
+            <div class="col-span-md-2">
+              <label for="nameInput" class="form-label">Nombre del Cliente</label>
+              <input type="text" id="nameInput" class="form-input" placeholder="Nombre">
+            </div>
+          </div>
+          <input type="text" id="otherTitleInput" class="form-input hidden" placeholder="Escribe el título personalizado">
+
+          <div class="form-grid grid-cols-md-2">
+            <div>
+              <label for="projectInput" class="form-label">Proyecto / Ubicación</label>
+              <input type="text" id="projectInput" class="form-input" placeholder="Ubicación">
+            </div>
+            <div>
+              <label for="detailsInput" class="form-label">Trabajo a realizar</label>
+              <input type="text" id="detailsInput" class="form-input" placeholder="Trabajo">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h3>Datos de Contacto y Notas</h3>
+          <div class="form-grid grid-cols-md-2">
+            <div>
+              <label for="phoneInput" class="form-label">Teléfono</label>
+              <input type="tel" id="phoneInput" class="form-input" placeholder="No. Tel.">
+            </div>
+            <div>
+              <label for="emailInput" class="form-label">Correo Electrónico</label>
+              <input type="email" id="emailInput" class="form-input" placeholder="Correo">
+            </div>
+          </div>
+          <div style="margin-top: 16px;">
+            <label for="notesInput" class="form-label">Notas Adicionales</label>
+            <textarea id="notesInput" class="form-input"
+              placeholder="Anotaciones importantes sobre el cliente o proyecto..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="form-label">Nombre de carpeta resultante:</p>
+        <p id="previewName"></p>
+      </div>
+
+      <div>
+        <button id="submit-button" onclick="runRegistration()">
+          <svg id="loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
+          </svg>
+          <span id="button-text">Registrar y Crear Carpeta</span>
+        </button>
+      </div>
+
+    </div>
+    <div id="loading-panel" class="hidden">
+      <svg id="main-loading-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+        </path>
+      </svg>
+      <p class="loading-text">Registrando proyecto...</p>
+    </div>
+
+
+    <div id="success-panel" class="hidden">
+      <svg class="success-checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+        <circle class="success-circle" cx="26" cy="26" r="25" fill="none" />
+        <path class="success-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+      </svg>
+      <h2 class="success-title">¡Registro Exitoso!</h2>
+      <p class="success-text">Cliente registrado y carpeta creada.</p>
+      <div id="success-link-container"></div>
+      <button id="reset-button" type="button" onclick="resetForm()">Registrar Otro Cliente</button>
+    </div>
+
+    <div id="status-message"></div>
+
+  </div>
+  <script>
+    // =================================================================
+    // --- CAMBIO IMPORTANTE: CONFIGURACIÓN DEL BACKEND ---
+    // =================================================================
+    // 1. Despliega tu archivo Code.gs como una "Aplicación Web".
+    // 2. Asegúrate de que "Quién tiene acceso" esté configurado como "Cualquier persona".
+    // 3. Copia la URL de la aplicación web y pégala aquí.
+    const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyq7erHP1P9-r8cc8sktuhAms97p8byhy-FeVkBc48lGxwK3ESavpysaICdFhvx5R6O/exec'; // <-- ¡Reemplaza esto!
+    // =================================================================
+
+
+    // --- AÑADE ESTA LÓGICA DE SPLASH SCREEN ---
+    window.addEventListener('load', () => {
+      const splashScreen = document.getElementById('splash-screen');
+      const mainContainer = document.getElementById('main-container');
+
+      // 1. Decide cuánto tiempo mostrar el logo (en milisegundos)
+      // Tu animación es de 8s. 4000ms = 4 segundos (la mitad)
+      const splashDuration = 4000;
+
+      setTimeout(() => {
+        // 2. Inicia el desvanecimiento del logo
+        splashScreen.classList.add('fade-out');
+
+        // 3. Muestra el contenedor principal (aún invisible)
+        mainContainer.classList.remove('hidden');
+
+        // 4. Inicia el desvanecimiento DE ENTRADA del formulario
+        mainContainer.classList.add('fade-in');
+
+        // 5. Después de 1s (la duración del fade-out), oculta el splash
+        setTimeout(() => {
+          splashScreen.classList.add('hidden');
+        }, 1000); // Debe coincidir con la transición en el CSS (1s)
+
+      }, splashDuration);
+    });
+    // --- FIN DE LA NUEVA LÓGICA ---
+
+
+
+
+
+    // --- Selectores de elementos ---
+    const titleSelect = document.getElementById('titleSelect');
+    const otherTitleInput = document.getElementById('otherTitleInput');
+    const nameInput = document.getElementById('nameInput');
+    const projectInput = document.getElementById('projectInput');
+    const detailsInput = document.getElementById('detailsInput');
+    const phoneInput = document.getElementById('phoneInput');
+    const emailInput = document.getElementById('emailInput');
+    const notesInput = document.getElementById('notesInput');
+    const previewName = document.getElementById('previewName');
+    const submitButton = document.getElementById('submit-button');
+    const statusMessage = document.getElementById('status-message');
+
+    // --- Selectores de panel ---
+    const formContainer = document.getElementById('form-container');
+    const loadingPanel = document.getElementById('loading-panel');
+    const successPanel = document.getElementById('success-panel');
+    const successLinkContainer = document.getElementById('success-link-container');
+
+
+    // --- Listeners ---
+    [titleSelect, otherTitleInput, nameInput, projectInput, detailsInput].forEach(el => el.addEventListener('input', updatePreview));
+
+    titleSelect.addEventListener('change', () => {
+      otherTitleInput.classList.toggle('hidden', titleSelect.value !== 'Otro');
+      if (titleSelect.value === 'Otro') otherTitleInput.focus();
+      updatePreview();
+    });
+
+    // --- Funciones construct y preview ---
+    function constructFolderName() {
+      let title = titleSelect.value === 'Otro' ? otherTitleInput.value.trim() : titleSelect.value;
+      const name = nameInput.value.trim();
+      const project = projectInput.value.trim();
+      const details = detailsInput.value.trim();
+      let folderNameParts = [title, name].filter(Boolean).join(' ');
+      return [folderNameParts, project, details].filter(Boolean).join(' - ');
+    }
+
+    function updatePreview() {
+      previewName.textContent = constructFolderName();
+    }
+
+    // =================================================================
+    // --- FUNCIÓN 'runRegistration' MODIFICADA PARA USAR FETCH ---
+    // =================================================================
+    async function runRegistration() { // <-- Se convierte en async
+      const folderName = constructFolderName();
+
+      if (!nameInput.value.trim() || !projectInput.value.trim()) {
+        showMessage('El Nombre del Cliente y el Proyecto/Ubicación son obligatorios.', 'error');
+        return;
+      }
+
+      // Validar que la URL del script ha sido configurada
+      if (GAS_WEB_APP_URL === 'URL_DE_TU_WEB_APP_AQUI') {
+        showMessage('Error de configuración: Debes editar el archivo index.html y añadir la URL de tu Google Apps Script en la variable "GAS_WEB_APP_URL".', 'error');
+        return;
+      }
+
+      const clientData = {
+        folderName: folderName,
+        title: titleSelect.value === 'Otro' ? otherTitleInput.value.trim() : titleSelect.value,
+        name: nameInput.value.trim(),
+        project: projectInput.value.trim(),
+        details: detailsInput.value.trim(),
+        phone: phoneInput.value.trim(),
+        email: emailInput.value.trim(),
+        notes: notesInput.value.trim()
+      };
+
+      console.log('📦 Enviando datos al servidor:', clientData);
+
+      submitButton.disabled = true;
+      formContainer.classList.add('hidden');
+      statusMessage.style.display = 'none';
+      loadingPanel.classList.remove('hidden'); // Mostrar "Cargando"
+
+      // --- INICIO DE LA NUEVA LÓGICA FETCH ---
+      try {
+        const response = await fetch(GAS_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'cors', // Necesario para peticiones cross-origin
+          headers: {
+            // Como pediste: enviar como texto plano para evitar preflight de CORS
+            'Content-Type': 'text/plain;charset=utf-8',
+          },
+          // Convertir el objeto JS en un string de texto
+          body: JSON.stringify(clientData)
+        });
+
+        // Obtener la respuesta también como texto
+        const responseText = await response.text();
+        console.log('Respuesta recibida (texto):', responseText);
+
+        // Si la respuesta HTTP no fue exitosa (ej. 404, 500)
+        if (!response.ok) {
+          let errorMsg = `Error de red: ${response.status}`;
+          try {
+            // Intentar parsear el mensaje de error si el backend envió uno
+            errorMsg = JSON.parse(responseText).message || errorMsg;
+          } catch (e) {
+            // No hacer nada, usar el errorMsg de red
+          }
+          throw new Error(errorMsg);
+        }
+
+        // Si la respuesta fue OK, parsear el texto a JSON
+        const result = JSON.parse(responseText);
+
+        // Comprobar el estado *dentro* de la respuesta JSON
+        if (result.status === 'success') {
+          // ¡Éxito! Llamar a la función onSuccess original
+          onSuccess(result.newFolderUrl);
+        } else {
+          // El backend reportó un error
+          onFailure(new Error(result.message || 'Error desconocido del servidor.'));
+        }
+
+      } catch (error) {
+        // Error de red, de fetch, o de parseo
+        console.error('Error durante la petición fetch:', error);
+        onFailure(error);
+      }
+      // --- FIN DE LA NUEVA LÓGICA FETCH ---
+    }
+
+    // --- onSuccess (SIN CAMBIOS) ---
+    // Esta función es llamada por runRegistration cuando todo sale bien
+    function onSuccess(newFolderUrl) {
+      loadingPanel.classList.add('hidden');
+      successLinkContainer.innerHTML = `<a href="${newFolderUrl}" target="_blank" rel="noopener noreferrer">Abrir la nueva carpeta</a>`;
+      successPanel.classList.remove('hidden');
+    }
+
+    // --- onFailure (SIN CAMBIOS) ---
+    // Esta función es llamada por runRegistration cuando algo falla
+    function onFailure(error) {
+      loadingPanel.classList.add('hidden');
+      formContainer.classList.remove('hidden');
+      submitButton.disabled = false;
+      showMessage(`Error: ${error.message}`, 'error');
+    }
+
+    // --- showMessage (SIN CAMBIOS) ---
+    function showMessage(message, type) {
+      statusMessage.innerHTML = message;
+      if (type === 'success') {
+        statusMessage.className = 'status-success';
+      } else {
+        statusMessage.className = 'status-error';
+      }
+    }
+
+    // --- resetForm (SIN CAMBIOS) ---
+    function resetForm() {
+      successPanel.classList.add('hidden');
+
+      document.getElementById('form-section').querySelectorAll('input, select, textarea').forEach(el => {
+        if (el.tagName === 'SELECT') el.selectedIndex = 0;
+        else el.value = '';
+      });
+      otherTitleInput.classList.add('hidden');
+      updatePreview();
+
+      formContainer.classList.remove('hidden');
+      submitButton.disabled = false;
+    }
+
+    updatePreview();
+  </script>
+</body>
+
+</html>

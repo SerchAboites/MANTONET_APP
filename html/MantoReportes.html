@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTONET - Reporte de Inspección</title>
+    
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- ==== INICIO DE NUEVO BLOQUE (Iconos PWA) ==== -->
+    <!-- Icono para Favoritos y Pestañas del Navegador -->
+    <link rel="icon" href="/img/IconoMantoApp.png" type="image/png">
+    
+    <!-- Icono para "Añadir a pantalla de inicio" en iOS y Android -->
+    <link rel="apple-touch-icon" href="/img/IconoMantoApp.png">
+    
+    <!-- Opcional: Le dice a iOS que se abra como app web (sin barras de navegador) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- ==== FIN DE NUEVO BLOQUE ==== -->
+</head>
+<body>
+
+    <!-- Animación de Carga --><div id="loader-overlay" class="hidden">
+        <!-- ==== INICIO DE CAMBIO: Usar video WebM ==== --><video id="loader-video" autoplay loop muted playsinline>
+            <source src="/img/Cargando_ico.webm" type="video/webm">
+            Tu navegador no soporta el video de carga.
+        </video>
+        <!-- ==== FIN DE CAMBIO ==== --><p>Cargando...</p>
+    </div>
+
+    <!-- Contenedor principal con la clase de CSS --><div class="container">
+        <header>
+            <h1>MANTONET</h1>
+            <p>Registro de Incidencias</p>
+        </header>
+
+
+                    <div style="margin-top: 5%; margin-bottom: 5%;">
+                <label for="proyecto-select">Proyecto</label>
+                <select id="proyecto-select" name="proyectoSheetId" required>
+                    <option value="" disabled selected>Cargando proyectos...</option> 
+                </select>
+            </div>
+
+
+        <!-- Formulario (sin clases de Tailwind) --><form id="incidencia-form">
+
+
+
+            <!-- Usamos la clase 'form-grid' de nuestro CSS --><div class="form-grid">
+                <div>
+                    <label for="fecha">Fecha y Hora</label> <!-- Texto cambiado --><input type="date" id="fecha" name="fecha" required> <!-- Tipo cambiado --></div>
+                <div>
+                    <label for="area">Área de Inspección</label>
+                    <input type="text" id="area" name="area" placeholder="Ej. Cocina, Oficina Principal" required>
+                </div>
+            </div>
+
+            <div>
+                <label for="elementoInspeccionado">Elemento Inspeccionado</label>
+                <input type="text" id="elementoInspeccionado" name="elementoInspeccionado" placeholder="Ej. Ventana corrediza, Lámpara de techo" required>
+            </div>
+
+            <div>
+                <label for="especialidad">Especialidad del Servicio</label>
+                <select id="especialidad" name="especialidad" required>
+                    <option value="" disabled selected>Selecciona una categoría...</option>
+                    <option value="Plomería">Plomería</option>
+                    <option value="Electricidad">Electricidad</option>
+                    <option value="Impermeabilización">Impermeabilización</option>
+                    <option value="Cancelería">Cancelería (Ventanas y Puertas)</option>
+                    <option value="Carpintería">Carpintería</option>                    
+                    <option value="Acabados">Acabados (Pintura, Muros)</option>
+                    <option value="General">Mantenimiento General</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="descripcion">Descripción del Hallazgo</label>
+                <textarea id="descripcion" name="descripcion" placeholder="Describe el problema o la observación." required></textarea>
+            </div>
+
+            <div>
+                <label for="diagnostico">Estatus</label>
+                <select id="diagnostico" name="diagnostico" required>
+                    <option value="" disabled selected>Selecciona un Estatus...</option>
+                    <option value="En Proceso">En Proceso</option>
+                    <option value="Terminado">Terminado</option>
+                </select>
+            </div>
+
+            <div>
+                <label>Fotografía de Evidencia</label>
+                <div id="camera-container">
+                    <canvas id="camera-preview" class="hidden"></canvas>
+                    <span id="camera-placeholder">La cámara está apagada</span>
+                </div>
+                <video id="camera-stream" playsinline autoplay class="hidden"></video>
+                <input type="hidden" id="imagenIncidencia" name="imagenIncidencia">
+                
+                <!-- ==== INICIO DE NUEVO BLOQUE (Galería) ==== --><input type="file" id="gallery-input" accept="image/*" class="hidden">
+                <!-- ==== FIN DE NUEVO BLOQUE (Galería) ==== --><!-- Usamos la clase 'camera-buttons' de nuestro CSS --><div class="camera-buttons">
+                    
+                    <!-- Este select se rellenará y mostrará con JavaScript --><select id="camera-select" class="btn hidden">
+                        <!-- Opciones se añaden dinámicamente --></select>
+                    
+                    <!-- Usamos la clase 'btn' de nuestro CSS --><button type="button" id="open-camera-btn" class="btn">
+                        Abrir Cámara
+                    </button>
+                    
+                    <!-- ==== INICIO DE NUEVO BLOQUE (Galería) ==== --><button type="button" id="select-gallery-btn" class="btn">
+                        Galería
+                    </button>
+                    <!-- ==== FIN DE NUEVO BLOQUE (Galería) ==== --><button type="button" id="capture-photo-btn" class="btn hidden">
+                        Capturar Foto
+                    </button>
+                    
+                    <button type="button" id="retake-photo-btn" class="btn hidden">
+                        Reintentar
+                    </button>
+
+                </div>
+            </div>
+
+            <div>
+                <!-- Usamos las clases 'btn' y 'btn-primary' de nuestro CSS --><button type="submit" id="submit-form-btn" class="btn btn-primary">
+                    Registrar Incidencia
+                </button>
+            </div>
+        </form>
+
+        <!-- Sección de Reporte Final --><div class="report-section">
+            <h2>Finalizar Visita</h2>
+            <p>Una vez registradas todas las incidencias, genera el reporte consolidado.</p>
+            <!-- Usamos las clases 'btn' y 'btn-primary' --><button id="generate-report-btn" class="btn btn-primary">
+                1. Generar Reporte en Drive
+            </button>
+            <!-- Usamos la clase 'btn' y 'hidden' --><a id="download-report-link" href="#" target="_blank" class="btn hidden">
+                2. Descargar Último Reporte (PDF)
+            </a>
+        </div>
+    </div>
+    
+    <!-- 3. Enlace a tu JS local con la etiqueta <script> correcta --><script src="/js/main.js"></script>
+
+</body>
+</html>
