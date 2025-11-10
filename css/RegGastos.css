@@ -1,0 +1,296 @@
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Josefin Sans', sans-serif;
+    background: #3a3a3a;
+    display: flex;
+    /* Activamos Flexbox */
+    flex-direction: column;
+    /* Organiza los elementos en una columna */
+    justify-content: center;
+    /* Alinea los elementos al centro verticalmente */
+    align-items: center;
+    /* Centra los elementos horizontalmente */
+    min-height: 100vh;
+    /* Ocupa toda la altura de la pantalla */
+    width: 100%;
+    /* Asegura que ocupe todo el ancho */
+    overflow-y: auto;
+    /* Permite el desplazamiento vertical si es necesario */
+    padding: 20px;
+    gap: 30px;
+  }
+
+
+
+  svg {
+    width: 50%;
+  }
+
+  #loadingMessage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  #subirTicket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .container {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 100%;
+    margin-top: 20px;
+    /* Asegura un pequeño margen superior */
+
+  }
+
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: #666666;
+    width: 100%;
+    justify-content: center;
+    /* Alinea los elementos verticalmente al centro */
+    align-items: center;
+    /* Alinea los elementos horizontalmente al centro */
+    min-height: 100vh;
+    /* Asegura que el formulario tenga suficiente altura */
+    gap: 50px;
+    padding: 20px;
+    border-radius: 20px;
+
+  }
+
+
+  label {
+    font-weight: bold;
+    color: white;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Josefin Sans', sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  input:focus,
+  select:focus {
+    border-color: none;
+    outline: none;
+    box-shadow: 0 0 8px rgba(106, 17, 203, 0.2);
+  }
+
+  .btn {
+    background: pink;
+    ;
+    /* Fondo verde */
+    color: gray;
+    /* Texto blanco */
+    padding: 12px 20px;
+    /* Espaciado interno (alto y ancho) */
+    font-size: 16px;
+    /* Tamaño de fuente */
+    font-weight: bold;
+    /* Peso de la fuente */
+    border: none;
+    /* Sin borde */
+    border-radius: 8px;
+    /* Bordes redondeados */
+    cursor: pointer;
+    /* Cambia el cursor a mano */
+    transition: all 0.3s ease;
+    /* Transición suave al hacer hover */
+    text-align: center;
+    /* Centra el texto dentro del botón */
+    width: 100%;
+    /* El botón ocupa el 100% del ancho disponible */
+    min-height: 80px;
+  }
+
+  .btn:hover {
+    background: darkred;
+    /* Rosa oscuro en formato hexadecimal */
+    /* O también puedes usar un valor en RGB: */
+    /* background: rgb(213, 0, 109); */
+  }
+
+
+  .btn:focus {
+    outline: none;
+    /* Elimina el contorno por defecto al hacer clic */
+    box-shadow: 0 0 8px rgba(106, 17, 203, 0.3);
+    /* Añade sombra al hacer clic */
+  }
+
+  .btn:active {
+    background: pink;
+    /* Color cuando el botón es presionado */
+  }
+
+
+/* 1. Define la animación del pulso */
+@keyframes pulso-rojo {
+  0% {
+    /* Inicia sin sombra, 70% opacidad */
+    box-shadow: 0 0 0 0px rgba(255, 82, 82, 0.7);
+  }
+  100% {
+    /* Termina con una sombra expandida (20px) y transparente */
+    box-shadow: 0 0 0 20px rgba(255, 82, 82, 0);
+  }
+}
+
+
+/* 2. Tu clase con la animación aplicada */
+.BotonNuevoCliente {
+  display: flex;
+  background-color: pink;
+  min-height: 100px;
+  min-width: 60%;
+  color: gray;
+  text-decoration: none;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 20px; /* El borde redondeado es clave para que la sombra se vea bien */
+  text-decoration: none;
+
+  /* --- LÍNEA AÑADIDA --- */
+  /* Aplica la animación 'pulso-rojo', que dure 2 segundos, 
+     con un efecto 'ease-out' y que se repita infinitamente */
+  animation: pulso-rojo 2s ease-out infinite;
+}
+
+
+  input[type="file"].hidden {
+    opacity: 0;
+    position: absolute;
+    width: 1px;
+    /* Reduce el tamaño del input */
+    height: 1px;
+    pointer-events: none;
+    /* Evita la interacción directa con el input */
+  }
+
+  input[name="fechaOperacion"] {
+    text-align: center;
+  }
+
+
+
+
+  fieldset {
+    border: 2px solid white;
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    /* Alinea los elementos de arriba hacia abajo */
+    gap: 15px;
+    /* Espacio entre los elementos */
+    width: 95%;
+    max-width: 95%;
+    min-width: 95%;
+    align-items: center;
+    /* Alinea los elementos horizontalmente al centro */
+    justify-content: center;
+    /* Alinea los elementos verticalmente al centro */
+    min-height: 200px;
+    /* Define una altura mínima para el fieldset */
+  }
+
+  fieldset label,
+  fieldset input,
+  fieldset select {
+    width: 100%;
+    /* Hace que los elementos ocupen el 100% del ancho disponible */
+  }
+
+
+
+  legend {
+    font-weight: bold;
+    padding: 15px;
+  }
+
+  .titulo {
+    display: flex;
+    flex-direction: column;
+    background: #2c2c2c;
+    border-radius: 20px;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    min-width: 95%;
+    min-height: 100px;
+    padding: 20px;
+  }
+
+
+
+  #imagenPrototipo {
+    min-width: 95%;
+    background: blue;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #imagenPrototipo img {
+    max-width: 100%;
+    /* Limita el ancho de la imagen al tamaño del contenedor */
+    max-height: 100%;
+    /* Limita la altura de la imagen al tamaño del contenedor */
+    object-fit: contain;
+    /* Ajusta la imagen para que se ajuste sin perder su proporción */
+  }
+
+  .main-content {
+    display: flex;
+    flex: 1;
+    width: 100%;
+    background-color: none;
+    gap: 0px;
+    justify-content: center;
+    align-items: center;
+    margin: 0px;
+    padding: 0px;
+  }
+
+  .footer-content {
+    background-color: none;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+  }
