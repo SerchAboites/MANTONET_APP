@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <title>MANTONET - Menú Reportes</title>
-    
-    <link rel="stylesheet" href="/css/styles.css">
-    
+
+    <link rel="stylesheet" href="/css/stylesReportes.css">
+
     <link rel="icon" href="/img/IconoMantoApp.png" type="image/png">
     <link rel="apple-touch-icon" href="/img/IconoMantoApp.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
 </head>
+
 <body>
 
     <div id="loader-overlay" class="hidden">
@@ -23,26 +24,37 @@
     </div>
 
     <div class="container">
-        <header>
-            <h1>MANTONET</h1>
-            <p>Sección de Reportes</p>
-        </header>
 
-        <nav class="main-nav" style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
-            
-            <a href="/html/RegistroDeClientes.html" class="btn btn-primary">Registro de Clientes</a>
-            
-            <a href="/html/RegistroDeGastos.html" class="btn btn-primary">Registro de Gastos</a>
-            
-            <a href="/html/MantoReportes.html" class="btn btn-primary">Manto Reportes</a>
+        <div class="background-gray">
 
-            <a href="/html/CarpetasDeClientes.html" class="btn btn-primary">Carpetas de Clientes</a>
-            
+
+
+            <header>
+                <div id="logoAnimado"
+                    style="width: 100%; height:180px; display:flex; align-items:center;  justify-content:center; background-color:none;">
+                    <img src="/img/LogoMantonet.svg" alt="Logo de Mantonet" height="100%">
+                </div>
+                <p>Menu Mantonet</p>
+            </header>
+
+            <nav class="main-nav" style="margin-top: 20px; display: flex; flex-direction: column; gap: 15px;">
+
+                <a href="/html/RegistroDeClientes.html">Registro de Clientes</a>
+
+                <a href="/html/RegistroDeGastos.html">Registro de Gastos</a>
+
+                <a href="/html/MantoReportes.html">Manto Reportes</a>
+
+                <a href="/html/CarpetasDeClientes.html">Carpetas de Clientes</a>
+
             </nav>
-        
+
         </div>
-    
+
+    </div>
+
     <script src="/js/main.js"></script>
 
 </body>
+
 </html>

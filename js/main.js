@@ -555,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setDefaultDateTime(); 
     };
 
-    /**
+    /**proyecto-select
      * Intenta forzar un re-enfoque de la cámara (Tap-to-Focus)
      */
     const handleManualFocus = async () => {

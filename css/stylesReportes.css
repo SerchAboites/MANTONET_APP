@@ -1,0 +1,520 @@
+/* --- Reset Básico y Estilos Globales (Desktop-First) --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    background-color: #666666;
+    color: #ffffff;
+    font-size: 16px;
+    /* Base para consistencia */
+}
+
+a {
+    text-decoration: none;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    background-color: #a32a2a;
+    color: white;
+    min-height: 100px;
+    margin-top: 50px;
+    font-size: 40px;
+    font-weight: 500;
+    border-radius: 20px;
+}
+
+/* --- Clases de Utilidad (para JS) --- */
+.hidden {
+    display: none !important;
+}
+
+/* --- Animación de Carga --- */
+#loader-video {
+    width: 160px;
+    /* 10rem */
+    height: 160px;
+    /* 10rem */
+    object-fit: contain;
+    border-radius: 50%;
+}
+
+#loader-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+#loader-overlay p {
+    margin-top: 16px;
+    /* 1rem */
+    font-size: 18px;
+    /* 1.125rem */
+    color: #ffffff;
+}
+
+/* --- Contenedor Principal y Cabecera (Desktop por defecto) --- */
+.container {
+    display: flex;
+    padding: 30px;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 70%;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 32px;
+    /* 2rem */
+}
+
+header h1 {
+    font-size: 36px;
+    /* 2.25rem (sm:text-4xl) */
+    font-weight: 700;
+    color: #ffffff;
+}
+
+header p {
+    color: #9ca3af;
+}
+
+/* --- Formulario (Desktop por defecto) --- */
+#incidencia-form {
+    background-color: #3a3a3a;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+}
+
+#incidencia-form>div {
+    margin-bottom: 24px;
+    /* 1.5rem */
+}
+
+#incidencia-form>div:last-child {
+    margin-bottom: 0;
+}
+
+/* Grid para campos (2 columnas por defecto para Desktop) */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    /* md:grid-cols-2 */
+    gap: 24px;
+    /* 1.5rem (gap-6) */
+}
+
+/* Estilos de inputs, selects, textareas */
+label {
+    display: block;
+    font-size: 14px;
+    /* 0.875rem */
+    font-weight: 500;
+    color: #d1d5db;
+    margin-bottom: 4px;
+    /* 0.25rem */
+}
+
+input[type="datetime-local"],
+input[type="date"],
+input[type="text"],
+select,
+textarea {
+    width: 100%;
+    background-color: #2c2c2c;
+    border: 1px solid #4b5563;
+    border-radius: 6px;
+    /* 0.375rem */
+    padding: 8px;
+    /* 0.5rem (p-2) */
+    color: #ffffff;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+    font-size: 16px;
+    /* 1rem - Asegura legibilidad */
+}
+
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="text"]:focus,
+select:focus,
+textarea:focus {
+    --ring-color: #C51E1F;
+    border-color: #C51E1F;
+    box-shadow: 0 0 0 2px var(--ring-color);
+}
+
+textarea {
+    min-height: 128px;
+    /* 8rem */
+    resize: vertical;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+
+/* --- Sección de Cámara --- */
+#camera-container {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background-color: #2c2c2c;
+    border: 2px dashed #4b5563;
+    border-radius: 6px;
+    /* 0.375rem */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+#camera-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+}
+
+#camera-placeholder {
+    color: #6b7280;
+}
+
+video::-webkit-media-controls {
+    display: none !important;
+}
+
+video#camera-stream {
+    object-fit: cover;
+}
+
+/* Contenedor de botones de cámara */
+.camera-buttons {
+    display: flex;
+    gap: 16px;
+    /* 1rem */
+    flex-wrap: wrap;
+}
+
+/* --- Estilos de Botones --- */
+.btn {
+    width: 100%;
+    font-weight: 700;
+    padding: 12px 16px;
+    /* 0.75rem 1rem */
+    border-radius: 6px;
+    /* 0.375rem */
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    font-size: 16px;
+    /* 1rem */
+}
+
+/* Botón Primario (Rojo) */
+.btn-primary {
+    background-color: #C51E1F;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #a32a2a;
+}
+
+.btn-primary:focus {
+    outline: 2px solid #C51E1F;
+    outline-offset: 2px;
+}
+
+/* Botón Secundario (Gris) */
+.btn-secondary {
+    background-color: #4b5563;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background-color: #374151;
+}
+
+/* Estilo para el nuevo selector de cámara */
+#camera-select {
+    width: 100%;
+    flex-basis: 100%;
+    margin-bottom: 8px;
+    /* 0.5rem */
+    background-color: #374151;
+    border: 1px solid #4b5563;
+    color: #ffffff;
+    padding: 8px;
+    /* 0.5rem */
+    border-radius: 6px;
+    /* 0.375rem */
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20128c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4l128-128c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 0.7rem top 50%;
+    background-size: 0.65rem auto;
+}
+
+/* Botón de Captura (Rojo) */
+#capture-photo-btn {
+    flex: 1;
+    background-color: #C51E1F;
+    color: #ffffff;
+    padding: 8px 16px;
+    /* 0.5rem 1rem */
+}
+
+#capture-photo-btn:hover {
+    background-color: #a32a2a;
+}
+
+#capture-photo-btn.is-captured {
+    background-color: #16a085;
+    border-color: #16a085;
+    cursor: not-allowed;
+}
+
+#capture-photo-btn.is-captured:hover {
+    background-color: #16a085;
+}
+
+/* Botón Abrir Cámara (Gris) */
+#open-camera-btn {
+    flex: 1;
+    background-color: #4b5563;
+    color: #ffffff;
+    padding: 8px 16px;
+    /* 0.5rem 1rem */
+}
+
+#open-camera-btn:hover {
+    background-color: #374151;
+}
+
+/* Botón Galería (Gris) */
+#select-gallery-btn {
+    flex: 1;
+    background-color: #4b5563;
+    color: #ffffff;
+    padding: 8px 16px;
+    /* 0.5rem 1rem */
+}
+
+#select-gallery-btn:hover {
+    background-color: #374151;
+}
+
+/* Botón Reintentar (Gris) */
+#retake-photo-btn {
+    flex: 1;
+    background-color: #4b5563;
+    color: #ffffff;
+    padding: 8px 16px;
+    /* 0.5rem 1rem */
+}
+
+#retake-photo-btn:hover {
+    background-color: #374151;
+}
+
+
+/* --- Sección de Reporte Final --- */
+.report-section {
+    margin-top: 48px;
+    background-color: #3a3a3a;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.report-section h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.report-section p {
+    color: #9ca3af;
+    margin-bottom: 16px;
+    /* 1rem */
+}
+
+/* Botón Generar Reporte (Rojo Oscuro) */
+#generate-report-btn {
+    background-color: #691415;
+    color: #ffffff;
+}
+
+#generate-report-btn:hover {
+    background-color: #a32a2a;
+}
+
+/* Enlace Descargar Reporte (Verde) */
+#download-report-link {
+    display: inline-block;
+    text-decoration: none;
+    margin-top: 16px;
+    /* 1rem */
+    background-color: #16a34a;
+    color: #ffffff;
+}
+
+#download-report-link:hover {
+    background-color: #15803d;
+}
+
+.background-gray {
+    background: #3a3a3a;
+    width: 95%;
+    height: 95%;
+    padding: 5%;
+    border-radius: 5%;
+}
+
+.container-logo {
+background-color: #3a3a3a;
+width: 100%;
+margin-bottom: 30px;
+border-radius: 30px;
+padding: 40px;
+}
+
+
+/*
+ * --- MEDIA QUERY PARA MÓVILES (Tu media query) ---
+ * Se activa en pantallas de alta densidad menores a 1080px
+ * Aquí ponemos los estilos para MÓVIL (1 columna, etc.)
+ */
+@media (max-width: 1080px) and (-webkit-min-device-pixel-ratio: 1.8),
+(max-width: 1080px) and (min-resolution: 1.8dppx) {
+
+    p {
+        font-size: 50px;
+    }
+
+
+    .report-section h2 {
+        font-size: 55px;
+    }
+
+    input,
+    select {
+        font-size: 45px;
+        min-height: 120px;
+        border-radius: 20px;
+    }
+
+    textarea {
+        min-height: 400px;
+    }
+
+    label {
+        margin-top: 50px;
+        margin-bottom: 20px;
+        font-size: 45px;
+    }
+
+/* --- Contenedor Principal y Cabecera (Desktop por defecto) --- */
+.container {
+    width: 100%;
+}
+
+
+    header h1 {
+        font-size: 80px;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    #incidencia-form {
+        padding: 0px;
+    }
+
+    /* Aquí está la magia: cambia a 1 columna en móvil */
+    .form-grid {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 16px;
+        /* 1rem - Menos gap */
+    }
+
+    input[type="datetime-local"],
+    input[type="date"],
+    input[type="text"],
+    select,
+    textarea {
+        padding: 12px;
+        /* 0.75rem - Inputs más grandes para tap */
+        font-size: 45px;
+        border-radius: 20px;
+    }
+
+    .btn {
+        font-size: 40px;
+        margin-top: 30px;
+        border-radius: 15px;
+        min-height: 100px;
+    }
+
+    .report-section {
+        padding: 16px;
+        /* 1rem */
+    }
+
+    #camera-placeholder {
+        font-size: 45px;
+    }
+
+    /* --- Animación de Carga --- */
+    #loader-video {
+        width: 600px;
+
+        height: 600px;
+
+        object-fit: contain;
+        border-radius: 50%;
+    }
+
+    #loader-overlay p {
+        font-size: 45px;
+    }
+
+    /* --- Formulario (Desktop por defecto) --- */
+    #incidencia-form {
+        border-radius: 30px;
+        padding: 50px;
+    }
+
+    .report-section {
+        border-radius: 30px;
+        padding: 50px;
+    }
+
+}
