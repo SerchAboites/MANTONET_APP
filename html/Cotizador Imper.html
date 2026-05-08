@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mantonet | ERP de Ingeniería v11.3</title>
+    <title>Mantonet | ERP de Ingeniería v11.4</title>
     <style>
         :root {
             --oxford: #34495e; --mantored: #c0392b; --white: #ffffff; --bg: #2c3e50; 
@@ -34,7 +34,7 @@
         .insumo-card span { font-size: 10px; text-transform: uppercase; opacity: 0.8; }
 
         /* Estilos del Desglose Desplegable (Acordeón) */
-        .accordion { background-color: #ecf0f1; color: var(--oxford); cursor: pointer; padding: 15px; width: 100%; border: 2px solid var(--oxford); text-align: left; outline: none; font-size: 14px; font-weight: bold; transition: 0.4s; border-radius: 4px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .accordion { background-color: #ecf0f1; color: var(--oxford); cursor: pointer; padding: 15px; width: 100%; border: 2px solid var(--oxford); text-align: left; outline: none; font-size: 14px; font-weight: bold; transition: 0.4s; border-radius: 4px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
         .accordion:hover { background-color: #d0d3d4; }
         .accordion:after { content: '\002B'; color: var(--mantored); font-weight: bold; font-size: 18px; }
         .accordion.active:after { content: "\2212"; }
@@ -47,6 +47,8 @@
 
         .summary-panel { background: #ecf0f1; border: 2px solid var(--oxford); padding: 25px; border-radius: 4px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
         .price { font-size: 48px; font-weight: bold; color: var(--oxford); }
+        
+        .finance-box { margin-top: 25px; background: #fff; padding: 15px; border-radius: 4px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: space-between; }
     </style>
 </head>
 <body>
@@ -163,7 +165,16 @@
         </div>
     </div>
 
-    <button class="accordion">Ver Desglose Exacto de Costos</button>
+    <div class="finance-box">
+        <label style="margin: 0; font-size: 14px; color: var(--oxford);"><b>Parámetros Financieros (Margen de Ganancia):</b></label>
+        <select id="margen" style="width: 150px; margin: 0; border: 2px solid var(--oxford);" onchange="calculate()">
+            <option value="0.10">10%</option>
+            <option value="0.20" selected>20%</option>
+            <option value="0.30">30%</option>
+        </select>
+    </div>
+
+    <button class="accordion">Ver Desglose Exacto de Costos e Impuestos</button>
     <div class="panel">
         <ul class="breakdown-list">
             <li><span>Mano de Obra (Incluye retiros, modificadores y chaflanes)</span> <span id="bdMO">$0.00</span></li>
@@ -177,6 +188,12 @@
             <li><span>Logística: Gasolina</span> <span id="bdGasolina">$0.00</span></li>
             <li><span>Logística: Acarreo Vertical (Material en Obra)</span> <span id="bdAV">$0.00</span></li>
             <li><span>Servicio: Camión para Escombro</span> <span id="bdCamion">$0.00</span></li>
+            
+            <li style="border-top: 2px solid var(--oxford); margin-top: 5px; padding-top: 10px;"><span><b>SUBTOTAL COSTOS OPERATIVOS</b></span> <span id="bdSubtotalOperativo"><b>$0.00</b></span></li>
+            <li><span>Utilidad Empresa (<span id="txtMargen">20%</span>)</span> <span id="bdUtilidad" style="color: var(--accent);">$0.00</span></li>
+            <li style="border-top: 1px solid #ccc; margin-top: 5px; padding-top: 10px;"><span><b>SUBTOTAL FACTURA</b></span> <span id="bdSubtotalFactura"><b>$0.00</b></span></li>
+            <li><span>IVA (16%)</span> <span id="bdIVA">$0.00</span></li>
+            <li><span>ISR (2.5%)</span> <span id="bdISR">$0.00</span></li>
         </ul>
     </div>
 
@@ -299,8 +316,17 @@
             costoAV = rollos * pisosAcarreo * 50;
         }
 
-        // 4. TOTAL FINAL
-        const total = subtotalMO + costoManto + costoP + costoA + costoS + costoGas + tools + viaticos + gasolina + costoAV + costoCamion;
+        // 4. TOTALES Y FINANZAS
+        const costoOperativo = subtotalMO + costoManto + costoP + costoA + costoS + costoGas + tools + viaticos + gasolina + costoAV + costoCamion;
+        
+        const margenPorcentaje = parseFloat(document.getElementById('margen').value);
+        const utilidad = costoOperativo * margenPorcentaje;
+        
+        const subtotalFactura = costoOperativo + utilidad;
+        const iva = subtotalFactura * 0.16;
+        const isr = subtotalFactura * 0.025;
+        
+        const totalFinal = subtotalFactura + iva + isr;
 
         // OUTPUTS GLOBALES
         document.getElementById('outRollos').innerText = rollos;
@@ -312,7 +338,7 @@
         document.getElementById('outDias').innerText = dias;
         document.getElementById('outGasolina').innerText = "$" + Math.round(gasolina);
         document.getElementById('outViaticos').innerText = "$" + viaticos;
-        document.getElementById('outTotal').innerText = formatCurrency(total);
+        document.getElementById('outTotal').innerText = formatCurrency(totalFinal);
 
         // OUTPUTS DESGLOSE (Acordeón)
         document.getElementById('bdMO').innerText = formatCurrency(subtotalMO);
@@ -326,6 +352,14 @@
         document.getElementById('bdGasolina').innerText = formatCurrency(gasolina);
         document.getElementById('bdAV').innerText = formatCurrency(costoAV);
         document.getElementById('bdCamion').innerText = formatCurrency(costoCamion);
+        
+        // Output de Finanzas
+        document.getElementById('txtMargen').innerText = (margenPorcentaje * 100) + "%";
+        document.getElementById('bdSubtotalOperativo').innerHTML = "<b>" + formatCurrency(costoOperativo) + "</b>";
+        document.getElementById('bdUtilidad').innerHTML = "<b>" + formatCurrency(utilidad) + "</b>";
+        document.getElementById('bdSubtotalFactura').innerHTML = "<b>" + formatCurrency(subtotalFactura) + "</b>";
+        document.getElementById('bdIVA').innerText = formatCurrency(iva);
+        document.getElementById('bdISR').innerText = formatCurrency(isr);
 
         // Actualizar Gráfica
         const score = area > 0 ? PRECIOS_PREFAB[modelo].score : 0;
