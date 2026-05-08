@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantonet | ERP de Ingeniería v11.3</title>
+    <style>
+        :root {
+            --oxford: #34495e; --mantored: #c0392b; --white: #ffffff; --bg: #2c3e50; 
+            --accent: #27ae60; --warning: #f1c40f; --danger: #e74c3c;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--oxford); margin: 0; padding: 20px; font-size: 13px; }
+        .container { max-width: 1200px; margin: auto; background: var(--white); padding: 35px; border-top: 12px solid var(--mantored); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--oxford); padding-bottom: 15px; margin-bottom: 25px; }
+        .logo { font-weight: 900; font-size: 30px; letter-spacing: -1px; }
+        .logo span { color: var(--mantored); }
+        h3 { background: var(--oxford); color: white; padding: 10px; font-size: 12px; text-transform: uppercase; border-left: 6px solid var(--mantored); margin-top: 25px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
+        .section { border: 1px solid #eee; padding: 15px; border-radius: 4px; background: #fff; }
+        label { display: block; font-weight: bold; font-size: 11px; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; box-sizing: border-box; }
+        .cost-check { display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; padding: 8px 12px; border: 1px solid #eee; margin-bottom: 5px; border-radius: 4px; font-size: 12px; cursor: pointer; }
+        .cost-val { font-weight: bold; color: var(--mantored); }
+        
+        /* Gráfica de Protección */
+        .scale-container { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; text-align: center; background: #fdfdfd; }
+        .scale-bar { height: 25px; width: 100%; background: linear-gradient(to right, #e74c3c 0%, #f1c40f 50%, #27ae60 100%); border-radius: 15px; position: relative; margin: 15px 0; border: 1px solid #ccc; }
+        .scale-pointer { position: absolute; top: -8px; width: 8px; height: 40px; background: var(--oxford); transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; box-shadow: 0 0 8px rgba(0,0,0,0.4); border-radius: 4px; }
+
+        .insumos-box { background: var(--oxford); color: white; padding: 20px; border-radius: 4px; margin-top: 25px; }
+        .insumos-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; text-align: center; }
+        .insumo-card { background: rgba(255,255,255,0.1); padding: 12px; border-radius: 4px; border: 1px solid #5d6d7e; }
+        .insumo-card b { font-size: 20px; color: #f1c40f; display: block; }
+        .insumo-card span { font-size: 10px; text-transform: uppercase; opacity: 0.8; }
+
+        /* Estilos del Desglose Desplegable (Acordeón) */
+        .accordion { background-color: #ecf0f1; color: var(--oxford); cursor: pointer; padding: 15px; width: 100%; border: 2px solid var(--oxford); text-align: left; outline: none; font-size: 14px; font-weight: bold; transition: 0.4s; border-radius: 4px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .accordion:hover { background-color: #d0d3d4; }
+        .accordion:after { content: '\002B'; color: var(--mantored); font-weight: bold; font-size: 18px; }
+        .accordion.active:after { content: "\2212"; }
+        .panel { padding: 0 15px; background-color: white; display: none; border-left: 2px solid var(--oxford); border-right: 2px solid var(--oxford); border-bottom: 2px solid var(--oxford); border-radius: 0 0 4px 4px; }
+        .panel.show { display: block; }
+        .breakdown-list { list-style: none; padding: 10px 0; margin: 0; }
+        .breakdown-list li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ccc; font-size: 13px; }
+        .breakdown-list li:last-child { border-bottom: none; }
+        .breakdown-list li span:last-child { font-weight: bold; color: var(--oxford); }
+
+        .summary-panel { background: #ecf0f1; border: 2px solid var(--oxford); padding: 25px; border-radius: 4px; margin-top: 25px; display: flex; justify-content: space-between; align-items: center; }
+        .price { font-size: 48px; font-weight: bold; color: var(--oxford); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">MANT<span>O</span>NET</div>
+        <div style="text-align:right; font-size:11px;">
+            <strong>SOLUCIONES TÉCNICAS DE HERMETICIDAD</strong><br>
+            Tlalnepantla de Baz | <span id="currentDate"></span>
+        </div>
+    </header>
+
+    <h3>1. Logística y Accesibilidad</h3>
+    <div class="grid">
+        <div class="section">
+            <label>Área a Intervenir ($m^2$)</label>
+            <input type="number" id="area" value="0" min="0" oninput="calculate()">
+            <label style="margin-top:10px;">Distancia Base -> Obra (KM)</label>
+            <input type="number" id="distancia" value="0" min="0" oninput="calculate()">
+            <label style="margin-top:10px;">Nivel / Piso de trabajo (0=PB)</label>
+            <input type="number" id="niveles" value="0" min="0" oninput="calculate()">
+        </div>
+        <div class="section">
+            <label>Método de Acarreo de Material</label>
+            <div class="cost-check"><label><input type="radio" name="acarreoV" value="0" checked onchange="calculate()"> Planta Baja</label><span class="cost-val">Base</span></div>
+            <div class="cost-check"><label><input type="radio" name="acarreoV" value="10" onchange="calculate()"> Elevador ($10/rollo)</label><span class="cost-val">Dinámico</span></div>
+            <div class="cost-check"><label><input type="radio" name="acarreoV" value="50" onchange="calculate()"> Escaleras ($50/piso/rollo)</label><span class="cost-val">Dinámico</span></div>
+            
+            <label style="margin-top:15px;">Modificadores de Ejecución</label>
+            <label class="cost-check"><input type="checkbox" id="altoDetalle" onchange="calculate()"> <b>ALTO DETALLE (+30% MO y Tiempo)</b></label>
+            <label class="cost-check"><input type="checkbox" id="trabajoNocturno" onchange="calculate()"> <b>TRABAJO NOCTURNO (+20% MO)</b></label>
+        </div>
+    </div>
+
+    <h3>2. Trabajos Previos y Gestión de Escombro</h3>
+    <div class="grid">
+        <div class="section">
+            <label>Retiros Requeridos:</label>
+            <div class="cost-check"><label><input type="checkbox" class="mo-item" data-cost="60" data-vol="0.04" onchange="calculate()"> Retiro Loceta</label><b>$60/$m^2$</b></div>
+            <div class="cost-check"><label><input type="checkbox" class="mo-item" data-cost="40" data-vol="0.01" onchange="calculate()"> Retiro Acrílico+Malla</label><b>$40/$m^2$</b></div>
+            <div class="cost-check"><label><input type="checkbox" class="mo-item" data-cost="50" data-vol="0.015" onchange="calculate()"> Retiro Prefabricado</label><b>$50/$m^2$</b></div>
+            <div class="cost-check"><label><input type="checkbox" class="mo-item" data-cost="20" data-vol="0" onchange="calculate()"> Acarreo Escombro</label><b>$20/$m^2$</b></div>
+        </div>
+        <div class="section">
+            <div class="cost-check"><div>📦 Volumen Escombro:</div><b id="volText">0.00 m³</b></div>
+            <div class="cost-check"><div>🚛 Camión Sugerido:</div><b id="camionTipo">N/A</b></div>
+            <div class="cost-check"><div>💰 Costo Camión:</div><span class="cost-val" id="camionCosto">$0.00</span></div>
+            <div class="cost-check" style="margin-top:10px;"><input type="checkbox" id="checkChaflan" onchange="calculate()"> Chaflanes (m lin)<input type="number" id="valChaflan" value="0" min="0" style="width:50px; margin-left:10px;" oninput="calculate()"><b>$50/m</b></div>
+        </div>
+    </div>
+
+    <h3>3. Ingeniería de Sistemas y Marcas</h3>
+    <div class="grid">
+        <div class="section">
+            <label>Marca:</label>
+            <select id="marca" onchange="calculate()">
+                <option value="itum">Itum</option>
+                <option value="fester">Fester</option>
+                <option value="imperquimia">Imperquimia</option>
+                <option value="arva">Arva</option>
+            </select>
+            <label style="margin-top:10px;">Modelo Prefabricado:</label>
+            <select id="modelo" onchange="calculate()">
+                <option value="4.0_POL" selected>4.0 Poliéster (10 años) - Estándar</option>
+                <option value="4.5_POL">4.5 Poliéster (12 años) - Alto Tráfico</option>
+                <option value="4.0_ESC">4.0 Poliéster Escolar (8 años)</option>
+                <option value="3.5_POL">3.5 Poliéster (7 años)</option>
+                <option value="3.5_FIB">3.5 Fibra Vidrio (6 años)</option>
+                <option value="3.0_FIB">3.0 Fibra Vidrio (4 años)</option>
+                <option value="4.0_ARE">4.0 Arenado (10 años)</option>
+                <option value="3.0_ARE">3.0 Arenado (7 años)</option>
+            </select>
+        </div>
+        <div class="section">
+            <label>Acrílicos y Primers:</label>
+            <select id="acrilico" onchange="calculate()">
+                <option value="0">Ninguno</option>
+                <option value="1590">Fibratado 10 Años ($1,590)</option>
+                <option value="1260">Fibratado 7 Años ($1,260)</option>
+                <option value="1200">Fibratado Ecológico 5 Años ($1,200)</option>
+                <option value="1070">Fibratado 5 Años ($1,070)</option>
+                <option value="1030">Tradicional 5 Años ($1,030)</option>
+                <option value="865">Fibratado 3 Años ($865)</option>
+                <option value="805">Tradicional 3 Años ($805)</option>
+            </select>
+            <label class="cost-check" style="margin-top:5px;"><input type="checkbox" id="soloPintura" onchange="calculate()"> Solo Estética (Rend. 57m²)</label>
+            <select id="primer" style="margin-top:10px;" onchange="calculate()">
+                <option value="1870" data-yield="60">Base Solventes (19L / 60m²)</option>
+                <option value="830" data-yield="120">Híbrido Base Agua (19L / 120m²)</option>
+            </select>
+            <select id="sellador" style="margin-top:10px;" onchange="calculate()">
+                <option value="180" data-yield="5">Poliuretano ($180 / 5m)</option>
+                <option value="380" data-yield="50">Cemento Plástico ($380 / 50m²)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="scale-container">
+        <div style="font-weight: bold; font-size: 14px;">NIVEL DE HERMETICIDAD MANTΟNET</div>
+        <div class="scale-bar"><div id="pointer" class="scale-pointer" style="left: 0%;"></div></div>
+        <div id="statusDesc" style="font-weight: bold; color: var(--oxford);">--</div>
+    </div>
+
+    <div class="insumos-box">
+        <div style="margin-bottom:12px; font-weight: bold;">📦 LISTA DE CARGA OPERATIVA:</div>
+        <div class="insumos-grid">
+            <div class="insumo-card"><span>Rollos</span><b id="outRollos">0</b></div>
+            <div class="insumo-card"><span>Gas LP</span><b id="outGas">0</b></div>
+            <div class="insumo-card"><span>Primer</span><b id="outPrimer">0</b></div>
+            <div class="insumo-card"><span>Acrílico</span><b id="outAcrilico">0</b></div>
+            <div class="insumo-card"><span>Sellador</span><b id="outSellador">0</b></div>
+            <div class="insumo-card"><span>Herram.</span><b id="outTools">0/0</b></div>
+        </div>
+    </div>
+
+    <button class="accordion">Ver Desglose Exacto de Costos</button>
+    <div class="panel">
+        <ul class="breakdown-list">
+            <li><span>Mano de Obra (Incluye retiros, modificadores y chaflanes)</span> <span id="bdMO">$0.00</span></li>
+            <li><span>Insumo: Rollos Prefabricados</span> <span id="bdManto">$0.00</span></li>
+            <li><span>Insumo: Primer</span> <span id="bdPrimer">$0.00</span></li>
+            <li><span>Insumo: Acrílico</span> <span id="bdAcrilico">$0.00</span></li>
+            <li><span>Insumo: Sellador</span> <span id="bdSellador">$0.00</span></li>
+            <li><span>Operativo: Recargas de Gas LP</span> <span id="bdGas">$0.00</span></li>
+            <li><span>Operativo: Desgaste de Herramientas</span> <span id="bdTools">$0.00</span></li>
+            <li><span>Logística: Viáticos y Comidas</span> <span id="bdViaticos">$0.00</span></li>
+            <li><span>Logística: Gasolina</span> <span id="bdGasolina">$0.00</span></li>
+            <li><span>Logística: Acarreo Vertical (Material en Obra)</span> <span id="bdAV">$0.00</span></li>
+            <li><span>Servicio: Camión para Escombro</span> <span id="bdCamion">$0.00</span></li>
+        </ul>
+    </div>
+
+    <div class="summary-panel">
+        <div style="font-size:12px; line-height:1.6;">
+            Días de Obra Estimados: <b id="outDias" style="color:var(--mantored);">0</b><br>
+            Gasolina Proyectada: <b id="outGasolina" style="color:var(--mantored);">$0</b><br>
+            Fondo de Viáticos: <b id="outViaticos" style="color:var(--mantored);">$0</b>
+        </div>
+        <div style="text-align:right;">
+            <span>TOTAL DE INVERSIÓN:</span>
+            <div class="price" id="outTotal">$0.00</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const PRECIOS_PREFAB = {
+        "4.5_POL": { itum: 1550, fester: 4650, imperquimia: 3875, arva: 1705, score: 95 },
+        "4.0_POL": { itum: 1360, fester: 4080, imperquimia: 3400, arva: 1496, score: 85 },
+        "4.0_ESC": { itum: 1245, fester: 3735, imperquimia: 3112, arva: 1369, score: 75 },
+        "3.5_POL": { itum: 1210, fester: 3630, imperquimia: 3025, arva: 1331, score: 65 },
+        "3.5_FIB": { itum: 875,  fester: 2625, imperquimia: 2187, arva: 962,  score: 50 },
+        "3.0_FIB": { itum: 790,  fester: 2370, imperquimia: 1975, arva: 869,  score: 35 },
+        "4.0_ARE": { itum: 1470, fester: 4410, imperquimia: 3675, arva: 1617, score: 90 },
+        "3.0_ARE": { itum: 1190, fester: 3570, imperquimia: 2975, arva: 1309, score: 60 }
+    };
+
+    document.getElementById('currentDate').innerText = new Date().toLocaleDateString('es-MX');
+
+    // Lógica para abrir/cerrar el acordeón
+    const acc = document.querySelector(".accordion");
+    acc.addEventListener("click", function() {
+        this.classList.toggle("active");
+        const panel = this.nextElementSibling;
+        panel.classList.toggle("show");
+    });
+
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(amount);
+    };
+
+    function calculate() {
+        const area = parseFloat(document.getElementById('area').value) || 0;
+        const dist = parseFloat(document.getElementById('distancia').value) || 0;
+        const pisos = parseInt(document.getElementById('niveles').value) || 0;
+        const marca = document.getElementById('marca').value;
+        const modelo = document.getElementById('modelo').value;
+        
+        const esAltoDetalle = document.getElementById('altoDetalle').checked;
+        const esTrabajoNocturno = document.getElementById('trabajoNocturno').checked;
+
+        // 1. MANO DE OBRA Y ESCOMBRO
+        let moM2 = 110; // Aplicación base por m2
+        let volE = 0;
+        
+        document.querySelectorAll('.mo-item:checked').forEach(el => {
+            moM2 += parseFloat(el.dataset.cost);
+            volE += area * parseFloat(el.dataset.vol);
+        });
+
+        // Modificadores de ejecución
+        if(esAltoDetalle) moM2 *= 1.3;
+        if(esTrabajoNocturno) moM2 *= 1.2;
+        
+        let subtotalMO = area * moM2;
+        if(document.getElementById('checkChaflan').checked) {
+            subtotalMO += (parseFloat(document.getElementById('valChaflan').value) || 0) * 50;
+        }
+
+        // Camión de Escombro Automático
+        let costoCamion = 0; let tipoC = "N/A";
+        if(volE > 0) {
+            if(volE <= 3) { costoCamion = 3000; tipoC = "3 m³"; }
+            else if(volE <= 6) { costoCamion = 3600; tipoC = "6 m³"; }
+            else { costoCamion = 5900; tipoC = "14 m³"; }
+        }
+        document.getElementById('volText').innerText = volE.toFixed(2) + " m³";
+        document.getElementById('camionTipo').innerText = tipoC;
+        document.getElementById('camionCosto').innerText = "$" + costoCamion;
+
+        // 2. INSUMOS (8.8m2 netos por rollo considerando traslapes)
+        const rollos = area > 0 ? Math.ceil(area / 8.8) : 0;
+        const costoManto = rollos * PRECIOS_PREFAB[modelo][marca];
+
+        const selectPrimer = document.getElementById('primer');
+        const yieldPrimer = parseFloat(selectPrimer.options[selectPrimer.selectedIndex].dataset.yield);
+        const botesP = area > 0 ? Math.ceil(area / yieldPrimer) : 0;
+        const costoP = botesP * parseFloat(selectPrimer.value);
+
+        const aCosto = parseFloat(document.getElementById('acrilico').value);
+        const soloP = document.getElementById('soloPintura').checked;
+        const botesA = (aCosto > 0 && area > 0) ? Math.ceil(area / (soloP ? 57 : 19)) : 0;
+        const costoA = botesA * aCosto;
+
+        const selectSellador = document.getElementById('sellador');
+        const yieldSellador = parseFloat(selectSellador.options[selectSellador.selectedIndex].dataset.yield);
+        const sCant = area > 0 ? Math.ceil(area / yieldSellador) : 0;
+        const costoS = sCant * parseFloat(selectSellador.value);
+
+        // Gas y Herramientas
+        const cargasGas = Math.ceil(rollos / 5);
+        const costoGas = cargasGas * 200;
+        const tools = area > 0 ? (80 + 140) : 0;
+
+        // 3. LOGÍSTICA
+        let dias = area > 0 ? (1 + Math.ceil(rollos / 5)) : 0;
+        if(esAltoDetalle) dias = Math.ceil(dias * 1.3);
+        
+        const viaticos = dias * (250 + 200); 
+        
+        // Lógica Gasolina: (Distancia * 2 viajes ida/vuelta / 11 km/L rendimiento) * 24 MXN/L * dias
+        const gasolina = ((dist * 2) / 11) * 24 * dias;
+        
+        let costoAV = 0;
+        const tasaV = parseFloat(document.querySelector('input[name="acarreoV"]:checked').value);
+        if(tasaV == 10) costoAV = rollos * 10;
+        else if(tasaV == 50) {
+            let pisosAcarreo = pisos > 0 ? pisos : 1; 
+            costoAV = rollos * pisosAcarreo * 50;
+        }
+
+        // 4. TOTAL FINAL
+        const total = subtotalMO + costoManto + costoP + costoA + costoS + costoGas + tools + viaticos + gasolina + costoAV + costoCamion;
+
+        // OUTPUTS GLOBALES
+        document.getElementById('outRollos').innerText = rollos;
+        document.getElementById('outGas').innerText = cargasGas;
+        document.getElementById('outPrimer').innerText = botesP;
+        document.getElementById('outAcrilico').innerText = botesA;
+        document.getElementById('outSellador').innerText = sCant;
+        document.getElementById('outTools').innerText = area > 0 ? "1/1" : "0/0";
+        document.getElementById('outDias').innerText = dias;
+        document.getElementById('outGasolina').innerText = "$" + Math.round(gasolina);
+        document.getElementById('outViaticos').innerText = "$" + viaticos;
+        document.getElementById('outTotal').innerText = formatCurrency(total);
+
+        // OUTPUTS DESGLOSE (Acordeón)
+        document.getElementById('bdMO').innerText = formatCurrency(subtotalMO);
+        document.getElementById('bdManto').innerText = formatCurrency(costoManto);
+        document.getElementById('bdPrimer').innerText = formatCurrency(costoP);
+        document.getElementById('bdAcrilico').innerText = formatCurrency(costoA);
+        document.getElementById('bdSellador').innerText = formatCurrency(costoS);
+        document.getElementById('bdGas').innerText = formatCurrency(costoGas);
+        document.getElementById('bdTools').innerText = formatCurrency(tools);
+        document.getElementById('bdViaticos').innerText = formatCurrency(viaticos);
+        document.getElementById('bdGasolina').innerText = formatCurrency(gasolina);
+        document.getElementById('bdAV').innerText = formatCurrency(costoAV);
+        document.getElementById('bdCamion').innerText = formatCurrency(costoCamion);
+
+        // Actualizar Gráfica
+        const score = area > 0 ? PRECIOS_PREFAB[modelo].score : 0;
+        document.getElementById('pointer').style.left = score + "%";
+        const d = document.getElementById('statusDesc');
+        if(score > 85) { d.innerText = "MÁXIMA HERMETICIDAD ✅"; d.style.color = "var(--accent)"; }
+        else if(score > 55) { d.innerText = "ESTÁNDAR MANTΟNET 🙂"; d.style.color = "var(--warning)"; }
+        else { d.innerText = "PROTECCIÓN BÁSICA ⚠️"; d.style.color = "var(--danger)"; }
+    }
+
+    // Inicializar
+    calculate();
+</script>
+</body>
+</html>
