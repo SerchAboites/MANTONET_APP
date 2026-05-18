@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANTONET - Panel de Analítica Unificado</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600;700&display=swap');
+
+        /* ========================================================
+           ESTILOS BASE: ENFOQUE ESCRITORIO
+           ======================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Josefin Sans', sans-serif;
+            background-color: #666666;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: #3a3a3a;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            margin-top: 20px;
+        }
+
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { font-size: 32px; font-weight: 700; color: #ffffff; }
+        header p { color: #9ca3af; font-size: 18px; margin-top: 5px; }
+
+        .tab-navigator { display: flex; justify-content: center; gap: 12px; margin-bottom: 25px; border-bottom: 2px solid #4b5563; padding-bottom: 15px; flex-wrap: wrap; }
+        .tab-btn { background-color: #4b5563; color: white; border: none; padding: 12px 24px; border-radius: 10px; font-family: 'Josefin Sans', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s ease; }
+        .tab-btn.active-tab { background-color: #C51E1F; box-shadow: 0 4px 12px rgba(197, 30, 31, 0.4); }
+
+        .controls-header { display: flex; justify-content: space-between; align-items: center; background-color: #2c2c2c; padding: 15px 25px; border-radius: 15px; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
+        .time-filters button, .nav-filters button { background-color: #4b5563; color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: 'Josefin Sans', sans-serif; font-weight: 600; transition: 0.2s; }
+        .time-filters button.active, .time-filters button:hover, .nav-filters button:hover { background-color: #C51E1F; }
+        #current-period-label { font-size: 20px; font-weight: 700; min-width: 220px; text-align: center; display: inline-block; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background-color: #2c2c2c; padding: 20px; border-radius: 15px; text-align: center; border-left: 5px solid #C51E1F; }
+        .kpi-card h3 { font-size: 16px; color: #d1d5db; margin-bottom: 10px; font-weight: 400; }
+        .kpi-card .value { font-size: 34px; font-weight: 700; color: #ffffff; margin-top: 5px; }
+        .kpi-card .highlight { color: #ff5252; }
+
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; }
+        .chart-container { background-color: #2c2c2c; padding: 20px; border-radius: 15px; height: 450px; display: flex; flex-direction: column; }
+        .chart-container h2 { font-size: 18px; margin-bottom: 15px; text-align: center; color: #e5e7eb; }
+        .canvas-wrapper { position: relative; flex-grow: 1; width: 100%; height: 100%; }
+
+        .ai-panel { background-color: #2c2c2c; border-radius: 15px; padding: 25px; display: flex; flex-direction: column; gap: 20px; }
+        .ai-btn { background-color: #C51E1F; color: white; border: none; padding: 14px 28px; border-radius: 10px; font-family: 'Josefin Sans', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; transition: 0.3s; align-self: center; }
+        .ai-btn:hover { background-color: #a32a2a; box-shadow: 0 4px 15px rgba(197, 30, 31, 0.4); }
+        .ai-output { background-color: #1e1e1e; border-radius: 10px; padding: 20px; min-height: 250px; font-size: 16px; line-height: 1.6; color: #e5e7eb; border: 1px solid #4b5563; white-space: pre-line; word-break: break-word; }
+
+        .hidden { display: none !important; }
+
+        /* ========================================================
+           DISEÑO DEL MODAL DE CARGA (AESTHETIC & CENTRADO)
+           ======================================================== */
+        #loader-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background-color: rgba(0, 0, 0, 0.85); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+            padding: 20px; 
+        }
+        
+        .loader-box {
+            background-color: #3a3a3a;
+            border-radius: 20px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            border: 2px solid #C51E1F;
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .spinner { 
+            width: 60px; 
+            height: 60px; 
+            border: 6px solid #4b5563; 
+            border-top-color: #ffffff; 
+            border-radius: 50%; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 25px; 
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ========================================================
+           CAPA DE CONTROL MÓVIL
+           ======================================================== */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { padding: 15px; border-radius: 15px; margin-top: 5px; }
+            header h1 { font-size: 24px; }
+            header p { font-size: 14px; }
+
+            .tab-navigator { gap: 6px; padding-bottom: 10px; margin-bottom: 15px; }
+            .tab-btn { padding: 10px 12px; font-size: 13px; border-radius: 8px; flex: 1; text-align: center; }
+
+            .controls-header { padding: 12px; gap: 12px; border-radius: 10px; margin-bottom: 15px; }
+            .nav-filters { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+            #current-period-label { width: 100%; text-align: center; font-size: 18px; margin-bottom: 2px; order: 1; }
+            .nav-filters button#btn-prev { order: 2; flex: 1; max-width: 130px; }
+            .nav-filters button#btn-next { order: 3; flex: 1; max-width: 130px; }
+
+            .time-filters { width: 100%; display: flex; justify-content: space-between; gap: 4px; }
+            .time-filters button { padding: 6px 10px; font-size: 12px; flex: 1; text-align: center; }
+
+            .kpi-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
+            .kpi-card { padding: 12px; border-radius: 10px; text-align: left; }
+            .kpi-card .value { font-size: 24px; }
+
+            .charts-grid { grid-template-columns: 1fr; gap: 15px; }
+            .chart-container { height: 350px !important; padding: 12px; border-radius: 12px; }
+            .chart-container h2 { font-size: 14px; margin-bottom: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loader-overlay">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <p style="font-size: 20px; color: #ffffff; font-weight: 700;" id="loader-text">Sincronizando Sistema ERP...</p>
+            <p style="font-size: 15px; color: #9ca3af; margin-top: 8px;">Conectando con base de datos segura</p>
+        </div>
+    </div>
+
+    <div class="container hidden" id="dashboard-content">
+        <header>
+            <h1>Mantonet Business Intelligence</h1>
+            <p>Control unificado de tráfico digital e intenciones comerciales</p>
+        </header>
+
+        <div class="tab-navigator">
+            <button id="tab-web" class="tab-btn">Análisis Web</button>
+            <button id="tab-conv" class="tab-btn">Análisis Conversiones</button>
+            <button id="tab-ia" class="tab-btn">Auditoría IA</button>
+        </div>
+
+        <div class="controls-header">
+            <div class="nav-filters">
+                <button id="btn-prev">&lt; Anterior</button>
+                <span id="current-period-label">Cargando periodo...</span>
+                <button id="btn-next">Siguiente &gt;</button>
+            </div>
+            <div class="time-filters">
+                <button id="btn-week">Semana</button>
+                <button id="btn-month">Mes</button>
+                <button id="btn-year">Año</button>
+                <button id="btn-global" class="active">Global</button>
+            </div>
+        </div>
+
+        <div id="section-web">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Visitas Totales (Tráfico)</h3>
+                    <div class="value" id="web-kpi-total">0</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Landing Más Buscada</h3>
+                    <div class="value highlight" id="web-kpi-top-page" style="font-size: 22px;">---</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Origen de Entrada Principal</h3>
+                    <div class="value" id="web-kpi-top-source" style="font-size: 24px;">---</div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-container" style="grid-column: 1 / -1;">
+                    <h2>Historial Cronológico de Tráfico Web</h2>
+                    <div class="canvas-wrapper"><canvas id="webLineChart"></canvas></div>
+                </div>
+                <div class="chart-container">
+                    <h2>Tráfico Adaptable por Subpáginas</h2>
+                    <div class="canvas-wrapper"><canvas id="webBarChart"></canvas></div>
+                </div>
+                <div class="chart-container">
+                    <h2>Canal de Adquisición</h2>
+                    <div class="canvas-wrapper"><canvas id="webDoughnutChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-conv" class="hidden">
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <h3>Propuestas Comerciales</h3>
+                    <div class="value" id="conv-kpi-total">0</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Zona Geográfica Líder</h3>
+                    <div class="value highlight" id="conv-kpi-top-location" style="font-size: 22px;">---</div>
+                </div>
+                <div class="kpi-card">
+                    <h3>Especialidad Más Cotizada</h3>
+                    <div class="value" id="conv-kpi-top-job" style="font-size: 22px;">---</div>
+                </div>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-container" style="grid-column: 1 / -1;">
+                    <h2>SUMATORIA TOTAL: Volumen de Solicitudes por Tipo de Servicio</h2>
+                    <div class="canvas-wrapper"><canvas id="convBarServicesChart"></canvas></div>
+                </div>
+                <div class="chart-container" style="grid-column: 1 / -1;">
+                    <h2>CRUCE CRONOLÓGICO: Tráfico Web vs Propuestas Enviadas</h2>
+                    <div class="canvas-wrapper"><canvas id="convLineChart"></canvas></div>
+                </div>
+                <div class="chart-container" style="grid-column: 1 / -1;">
+                    <h2>Distribución Operativa por Especialidad</h2>
+                    <div class="canvas-wrapper"><canvas id="convDoughnutChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-ia" class="hidden">
+            <div class="ai-panel">
+                <h2>Consultoría Avanzada con Gemini Flash</h2>
+                <p style="color: #9ca3af;">El sistema compilará estadísticamente el histórico total de tus bases de datos de tráfico y propuestas y las enviará directamente al servidor de Google AI Studio para un diagnóstico en tiempo real.</p>
+                <button id="btn-run-ai" class="ai-btn">Ejecutar Auditoría con IA</button>
+                <div id="ai-report" class="ai-output">Presiona el botón superior para compilar los datos estructurados y desplegar el informe de rendimiento...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // URL del Backend
+        const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzqbjWplbGomv3PK-TxjrTz5OWbUiHho-lZ6op6jXznuPpoPvsjLAiA_Jjp9zPXOqavQ/exec';
+        
+        // API KEY DE GEMINI PROPORCIONADA POR EL USUARIO
+        const GEMINI_API_KEY = 'AIzaSyARVb4W5vQsMhMOrQ6nn5n1Sx6r577Lx0w'; 
+
+        Chart.defaults.color = '#9ca3af';
+        Chart.defaults.font.family = "'Josefin Sans', sans-serif";
+
+        let dataVisitas = [];
+        let dataPropuestas = [];
+        let currentTab = 'web'; 
+        let viewMode = 'global'; 
+        let currentRefDate = new Date(); 
+        
+        let activeCharts = { webLine: null, webBar: null, webDoughnut: null, convBarServices: null, convLine: null, convDoughnut: null };
+        const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+        // TOOL VECTORIAL: RESPONSIVE
+        const whiteLabelsPlugin = {
+            id: 'whiteLabelsPlugin',
+            afterDatasetsDraw(chart) {
+                const { ctx } = chart; ctx.save();
+                ctx.fillStyle = '#ffffff'; 
+                ctx.font = chart.width < 450 ? 'bold 10px "Josefin Sans", sans-serif' : 'bold 12px "Josefin Sans", sans-serif';
+                
+                chart.data.datasets.forEach((dataset, i) => {
+                    const meta = chart.getDatasetMeta(i);
+                    meta.data.forEach((element, index) => {
+                        const val = dataset.data[index]; if (!val || val === 0) return;
+
+                        if (chart.config.options.indexAxis === 'y') {
+                            ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                            ctx.fillText(val, element.x + 8, element.y);
+                        } else {
+                            ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+                            ctx.fillText(val, element.x, element.y - 8);
+                        }
+                    });
+                });
+                ctx.restore();
+            }
+        };
+
+        // ARQUITECTURA ANTI-STRETCH DE ROTACIÓN (MOBILE BUG FIX)
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                Object.values(activeCharts).forEach(chart => {
+                    if (chart) { chart.resize(); chart.update('none'); }
+                });
+            }
+        });
+        resizeObserver.observe(document.body);
+
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                Object.values(activeCharts).forEach(chart => {
+                    if (chart) { chart.resize(); chart.update(); }
+                });
+            }, 200); 
+        });
+
+        // UTILIDADES Y FORMATEADORES
+        function normalizarLlaves(arrayRaw) {
+            return arrayRaw.map(row => {
+                let nRow = {};
+                for (let k in row) {
+                    let cleanKey = k.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    nRow[cleanKey] = row[k];
+                }
+                return nRow;
+            });
+        }
+
+        function formatearNombrePagina(slug) {
+            if(!slug) return 'Desconocido';
+            return slug.replace(/_/g, ' ').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function categorizarTrabajo(textoRaw) {
+            if (!textoRaw) return 'Mantenimiento General';
+            let t = String(textoRaw).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (t.includes('imper')) return 'Impermeabilización';
+            if (t.includes('electr') || t.includes('red') || t.includes('cable')) return 'Electricidad';
+            if (t.includes('plom') || t.includes('tuberi') || t.includes('desague') || t.includes('hidro')) return 'Plomería';
+            if (t.includes('carpinter') || t.includes('mueble') || t.includes('madera')) return 'Carpintería';
+            if (t.includes('cancel') || t.includes('ventana') || t.includes('puerta')) return 'Cancelería';
+            if (t.includes('tablaroca') || t.includes('pintur') || t.includes('muro') || t.includes('acabado') || t.includes('piso')) return 'Pintura y Acabados';
+            return 'Mantenimiento General';
+        }
+
+        function limpiarZonaGeografica(zonaRaw) {
+            if (!zonaRaw) return 'Otros';
+            let z = String(zonaRaw).trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            if (z.includes('satelite')) return 'Satélite';
+            if (z.includes('tlalnepantla')) return 'Tlalnepantla';
+            if (z.includes('naucalpan')) return 'Naucalpan';
+            if (z.includes('sayavedra') || z.includes('esmeralda') || z.includes('condado')) return 'Sayavedra / C. Esmeralda';
+            if (z.includes('valle')) return 'Col. Del Valle';
+            if (z.includes('xochimilco')) return 'Xochimilco';
+            return zonaRaw.trim().charAt(0).toUpperCase() + zonaRaw.trim().slice(1);
+        }
+
+        function parseDate(dateVal) {
+            if(!dateVal) return null;
+            let dateStr = String(dateVal);
+            if (dateStr.includes('/')) {
+                let parts = dateStr.split(' ')[0].split('/');
+                if(parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+            }
+            let parsed = new Date(dateStr);
+            return !isNaN(parsed) ? parsed : null;
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            configurarFiltrosYTabs();
+            // Inicia la UI en la pestaña correcta
+            alternarModulos('web', { target: document.getElementById('tab-web') }); 
+            await cargarPaquetesDeDatos();
+        });
+
+        async function cargarPaquetesDeDatos() {
+            try {
+                const pVisitas = fetchTextPayload('obtenerVisitas');
+                const pPropuestas = fetchTextPayload('obtenerPropuestas');
+                const [resVisitas, resPropuestas] = await Promise.all([pVisitas, pPropuestas]);
+
+                dataVisitas = normalizarLlaves(resVisitas);
+                dataPropuestas = normalizarLlaves(resPropuestas);
+
+                if (dataVisitas.length > 0) {
+                    let d = parseDate(dataVisitas[dataVisitas.length - 1].fecha);
+                    if (d) currentRefDate = d;
+                }
+
+                document.getElementById('loader-overlay').classList.add('hidden');
+                document.getElementById('dashboard-content').classList.remove('hidden');
+
+                actualizarDashboard();
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loader-text').innerHTML = `<span style="color:#ff5252; font-size: 16px;">Error de sincronización: ${error.message}</span>`;
+            }
+        }
+
+        async function fetchTextPayload(actionName) {
+            const res = await fetch(APP_SCRIPT_URL, {
+                method: 'POST', mode: 'cors', redirect: 'follow',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: actionName })
+            });
+            const text = await res.text();
+            
+            // PROTECCIÓN CONTRA ERROR DE PARSEO (404/HTML de Google)
+            if(text.trim().startsWith('<')) {
+                 throw new Error("El servidor de Google rechazó la conexión o respondió con HTML. Verifica que el Apps Script fue implementado con una 'Nueva Versión'.");
+            }
+            
+            return JSON.parse(text).data;
+        }
+
+        // ==========================================
+        // MANEJO DE UI (TABS Y BOTONES)
+        // ==========================================
+        function configurarFiltrosYTabs() {
+            document.getElementById('tab-web').onclick = (e) => alternarModulos('web', e);
+            document.getElementById('tab-conv').onclick = (e) => alternarModulos('conv', e);
+            document.getElementById('tab-ia').onclick = (e) => alternarModulos('ia', e);
+            
+            document.getElementById('btn-week').onclick = (e) => cambiarEscala('week', e);
+            document.getElementById('btn-month').onclick = (e) => cambiarEscala('month', e);
+            document.getElementById('btn-year').onclick = (e) => cambiarEscala('year', e);
+            document.getElementById('btn-global').onclick = (e) => cambiarEscala('global', e);
+            
+            document.getElementById('btn-prev').onclick = () => desplazarTiempo(-1);
+            document.getElementById('btn-next').onclick = () => desplazarTiempo(1);
+            
+            document.getElementById('btn-run-ai').onclick = () => ejecutarAuditoriaIA();
+        }
+
+        function alternarModulos(modulo, event) {
+            currentTab = modulo;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-tab'));
+            if(event) event.target.classList.add('active-tab');
+
+            document.getElementById('section-web').classList.add('hidden');
+            document.getElementById('section-conv').classList.add('hidden');
+            document.getElementById('section-ia').classList.add('hidden');
+
+            if (modulo === 'web') {
+                document.getElementById('section-web').classList.remove('hidden');
+            } else if (modulo === 'conv') {
+                document.getElementById('section-conv').classList.remove('hidden');
+            } else {
+                document.getElementById('section-ia').classList.remove('hidden');
+            }
+            actualizarDashboard();
+        }
+
+        function cambiarEscala(modo, event) {
+            viewMode = modo;
+            document.querySelectorAll('.time-filters button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            actualizarDashboard();
+        }
+
+        function desplazarTiempo(dir) {
+            if (viewMode === 'global') return;
+            if (viewMode === 'month') currentRefDate.setMonth(currentRefDate.getMonth() + dir);
+            else if (viewMode === 'year') currentRefDate.setFullYear(currentRefDate.getFullYear() + dir);
+            else if (viewMode === 'week') currentRefDate.setDate(currentRefDate.getDate() + (dir * 7));
+            actualizarDashboard();
+        }
+
+        function calcularLimitesDeTiempo() {
+            let start = new Date(currentRefDate); let end = new Date(currentRefDate);
+            const bPrev = document.getElementById('btn-prev'); const bNext = document.getElementById('btn-next');
+
+            if (viewMode === 'global') {
+                start = new Date(0); end = new Date(2999, 11, 31);
+                document.getElementById('current-period-label').innerText = "Historial Histórico Macro";
+                bPrev.style.opacity = '0'; bPrev.style.pointerEvents = 'none';
+                bNext.style.opacity = '0'; bNext.style.pointerEvents = 'none';
+            } else {
+                bPrev.style.opacity = '1'; bPrev.style.pointerEvents = 'auto';
+                bNext.style.opacity = '1'; bNext.style.pointerEvents = 'auto';
+
+                if (viewMode === 'month') {
+                    start.setDate(1); end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+                    document.getElementById('current-period-label').innerText = `${monthNames[start.getMonth()]} ${start.getFullYear()}`;
+                } else if (viewMode === 'year') {
+                    start.setMonth(0, 1); end.setMonth(11, 31);
+                    document.getElementById('current-period-label').innerText = `Año ${start.getFullYear()}`;
+                } else if (viewMode === 'week') {
+                    let day = start.getDay() || 7; start.setDate(start.getDate() - day + 1);
+                    end = new Date(start); end.setDate(end.getDate() + 6);
+                    document.getElementById('current-period-label').innerText = `${start.getDate()} ${monthNames[start.getMonth()].substring(0,3)} - ${end.getDate()} ${monthNames[end.getMonth()].substring(0,3)} ${end.getFullYear()}`;
+                }
+            }
+            start.setHours(0,0,0,0); end.setHours(23,59,59,999);
+            return { start, end };
+        }
+
+        // ==========================================
+        // RE-RENDERIZADO DE GRÁFICAS SEGÚN LA PESTAÑA
+        // ==========================================
+        function actualizarDashboard() {
+            if(dataVisitas.length === 0 && dataPropuestas.length === 0) return;
+
+            const limites = calcularLimitesDeTiempo();
+            const filtradosVisitas = dataVisitas.filter(row => { let d = parseDate(row.fecha); return d && d >= limites.start && d <= limites.end; });
+            const filtradosPropuestas = dataPropuestas.filter(row => { let d = parseDate(row.fecha); return d && d >= limites.start && d <= limites.end; });
+
+            if (currentTab === 'web') {
+                procesarYRenderizarWeb(filtradosVisitas, limites);
+            } else if (currentTab === 'conv') {
+                procesarYRenderizarConversiones(filtradosVisitas, filtradosPropuestas, limites);
+            }
+        }
+
+        function limpiarGraficaVieja(identificador) {
+            if (activeCharts[identificador]) { activeCharts[identificador].destroy(); activeCharts[identificador] = null; }
+        }
+
+        function procesarYRenderizarWeb(vDatos, limites) {
+            limpiarGraficaVieja('webLine'); limpiarGraficaVieja('webBar'); limpiarGraficaVieja('webDoughnut');
+
+            let total = 0, conteoPaginas = {}, conteoOrigen = {};
+            vDatos.forEach(row => {
+                total += Number(row.conteo || 1);
+                let p = row.pagina || 'Desconocido'; conteoPaginas[p] = (conteoPaginas[p] || 0) + 1;
+                let o = row.origen || 'Desconocido'; conteoOrigen[o] = (conteoOrigen[o] || 0) + 1;
+            });
+
+            document.getElementById('web-kpi-total').textContent = total;
+            let topP = Object.keys(conteoPaginas).length ? Object.keys(conteoPaginas).reduce((a, b) => conteoPaginas[a] > conteoPaginas[b] ? a : b) : 'N/A';
+            document.getElementById('web-kpi-top-page').textContent = topP !== 'N/A' ? formatearNombrePagina(topP) : 'N/A';
+            document.getElementById('web-kpi-top-source').textContent = Object.keys(conteoOrigen).length ? Object.keys(conteoOrigen).reduce((a, b) => conteoOrigen[a] > conteoOrigen[b] ? a : b) : 'N/A';
+
+            let labelsLine = [], dataLine = [];
+            if (viewMode === 'global') {
+                let counts = {};
+                vDatos.forEach(row => {
+                    let d = parseDate(row.fecha);
+                    if(d) { let k = `${monthNames[d.getMonth()].substring(0,3)} ${d.getFullYear().toString().substring(2)}`; counts[k] = (counts[k] || 0) + 1; }
+                });
+                labelsLine = Object.keys(counts); dataLine = Object.values(counts);
+            } else if (viewMode === 'year') {
+                labelsLine = monthNames.map(m => m.substring(0,3)); dataLine = new Array(12).fill(0);
+                vDatos.forEach(row => { let d = parseDate(row.fecha); if(d) dataLine[d.getMonth()] += Number(row.conteo || 1); });
+            } else {
+                let counts = {}; let temp = new Date(limites.start);
+                while(temp <= limites.end) { let k = `${temp.getDate()}/${temp.getMonth()+1}`; counts[k] = 0; temp.setDate(temp.getDate() + 1); }
+                vDatos.forEach(row => { let d = parseDate(row.fecha); if(d) { let k = `${d.getDate()}/${d.getMonth()+1}`; if(counts[k] !== undefined) counts[k] += Number(row.conteo || 1); } });
+                labelsLine = Object.keys(counts); dataLine = Object.values(counts);
+            }
+
+            activeCharts.webLine = new Chart(document.getElementById('webLineChart'), {
+                type: 'line',
+                data: { labels: labelsLine, datasets: [{ label: 'Visitas Web (Tráfico)', data: dataLine, borderColor: '#C51E1F', backgroundColor: 'rgba(197, 30, 31, 0.1)', borderWidth: 3, pointBackgroundColor: '#ffffff', tension: 0.2, fill: true }] },
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: { right: 35, top: 15 } }, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#4b5563' } }, x: { grid: { display: false } } } },
+                plugins: [whiteLabelsPlugin]
+            });
+
+            if (total === 0) return;
+
+            const sortPag = Object.entries(conteoPaginas).sort((a,b) => b[1] - a[1]);
+            const baseColors = ['#C51E1F', '#A32A2A', '#E53935', '#D32F2F', '#B71C1C', '#FF5252', '#FF1744'];
+
+            activeCharts.webBar = new Chart(document.getElementById('webBarChart'), {
+                type: 'bar',
+                data: { labels: sortPag.map(i => formatearNombrePagina(i[0])), datasets: [{ data: sortPag.map(i => i[1]), backgroundColor: sortPag.map((_,idx) => baseColors[idx % baseColors.length]), borderRadius: 5 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 35 } }, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: '#4b5563' } }, y: { grid: { display: false }, ticks: { color: '#ffffff', font: { weight: '600' } } } } },
+                plugins: [whiteLabelsPlugin]
+            });
+
+            activeCharts.webDoughnut = new Chart(document.getElementById('webDoughnutChart'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(conteoOrigen), datasets: [{ data: Object.values(conteoOrigen), backgroundColor: ['#C51E1F', '#4b5563', '#ffffff'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#ffffff', padding: 15 } } }, cutout: '65%' }
+            });
+        }
+
+        function procesarYRenderizarConversiones(vDatos, pDatos, limites) {
+            limpiarGraficaVieja('convBarServices'); limpiarGraficaVieja('convLine'); limpiarGraficaVieja('convDoughnut');
+
+            // --- GRÁFICA COMPARATIVA DE DOBLE LÍNEA ---
+            let labelsLine = []; let dataVisitasArr = []; let dataPropuestasArr = [];
+
+            if (viewMode === 'global') {
+                let countsVis = {}, countsProp = {};
+                let todasLasFechas = [...vDatos, ...pDatos].map(row => parseDate(row.fecha)).filter(d => d !== null);
+                if (todasLasFechas.length > 0) {
+                    let minD = new Date(Math.min(...todasLasFechas));
+                    let maxD = new Date(Math.max(...todasLasFechas));
+                    let temp = new Date(minD.getFullYear(), minD.getMonth(), 1);
+                    while(temp <= maxD) {
+                        let k = `${monthNames[temp.getMonth()].substring(0,3)} ${temp.getFullYear().toString().substring(2)}`;
+                        countsVis[k] = 0; countsProp[k] = 0;
+                        temp.setMonth(temp.getMonth() + 1);
+                    }
+                }
+                vDatos.forEach(row => { let d = parseDate(row.fecha); if(d) { let k = `${monthNames[d.getMonth()].substring(0,3)} ${d.getFullYear().toString().substring(2)}`; if(countsVis[k] !== undefined) countsVis[k] += Number(row.conteo || 1); } });
+                pDatos.forEach(row => { let d = parseDate(row.fecha); if(d) { let k = `${monthNames[d.getMonth()].substring(0,3)} ${d.getFullYear().toString().substring(2)}`; if(countsProp[k] !== undefined) countsProp[k] += 1; } });
+                labelsLine = Object.keys(countsVis); dataVisitasArr = Object.values(countsVis); dataPropuestasArr = Object.values(countsProp);
+            } else if (viewMode === 'year') {
+                labelsLine = monthNames.map(m => m.substring(0,3)); dataVisitasArr = new Array(12).fill(0); dataPropuestasArr = new Array(12).fill(0);
+                vDatos.forEach(row => { let d = parseDate(row.fecha); if(d) dataVisitasArr[d.getMonth()] += Number(row.conteo || 1); });
+                pDatos.forEach(row => { let d = parseDate(row.fecha); if(d) dataPropuestasArr[d.getMonth()] += 1; });
+            } else {
+                let countsVis = {}, countsProp = {}; let temp = new Date(limites.start);
+                while(temp <= limites.end) { let k = `${temp.getDate()}/${temp.getMonth()+1}`; countsVis[k] = 0; countsProp[k] = 0; temp.setDate(temp.getDate() + 1); }
+                vDatos.forEach(row => { let d = parseDate(row.fecha); if(d) { let k = `${d.getDate()}/${d.getMonth()+1}`; if(countsVis[k] !== undefined) countsVis[k] += Number(row.conteo || 1); } });
+                pDatos.forEach(row => { let d = parseDate(row.fecha); if(d) { let k = `${d.getDate()}/${d.getMonth()+1}`; if(countsProp[k] !== undefined) countsProp[k] += 1; } });
+                labelsLine = Object.keys(countsVis); dataVisitasArr = Object.values(countsVis); dataPropuestasArr = Object.values(countsProp);
+            }
+
+            activeCharts.convLine = new Chart(document.getElementById('convLineChart'), {
+                type: 'line',
+                data: {
+                    labels: labelsLine,
+                    datasets: [
+                        { label: 'Visitas Web (Tráfico)', data: dataVisitasArr, borderColor: '#C51E1F', backgroundColor: 'rgba(197, 30, 31, 0.1)', borderWidth: 3, pointBackgroundColor: '#ffffff', tension: 0.2, fill: true },
+                        { label: 'Propuestas Enviadas', data: dataPropuestasArr, borderColor: '#FFCC00', backgroundColor: 'rgba(255, 204, 0, 0.1)', borderWidth: 3, pointBackgroundColor: '#ffffff', tension: 0.2, fill: true }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, layout: { padding: { right: 35, top: 15 } }, plugins: { legend: { display: true, labels: { color: '#ffffff', font: { weight: '600' } } } }, scales: { y: { beginAtZero: true, grid: { color: '#4b5563' } }, x: { grid: { display: false } } } },
+                plugins: [whiteLabelsPlugin]
+            });
+
+            // --- CÁLCULO DE KPIs Y OTRAS GRÁFICAS ---
+            let total = pDatos.length;
+            document.getElementById('conv-kpi-total').textContent = total;
+
+            let conteoZonas = {}, conteoTrabajos = {};
+            pDatos.forEach(row => {
+                let z = limpiarZonaGeografica(row.lugar); let e = categorizarTrabajo(row.trabajo);
+                conteoZonas[z] = (conteoZonas[z] || 0) + 1; conteoTrabajos[e] = (conteoTrabajos[e] || 0) + 1;
+            });
+
+            document.getElementById('conv-kpi-top-location').textContent = Object.keys(conteoZonas).length ? Object.keys(conteoZonas).reduce((a,b) => conteoZonas[a] > conteoZonas[b] ? a : b) : 'N/A';
+            document.getElementById('conv-kpi-top-job').textContent = Object.keys(conteoTrabajos).length ? Object.keys(conteoTrabajos).reduce((a,b) => conteoTrabajos[a] > conteoTrabajos[b] ? a : b) : 'N/A';
+
+            const sortTrabajos = Object.entries(conteoTrabajos).sort((a, b) => b[1] - a[1]);
+            const labelsBar = sortTrabajos.map(item => item[0]);
+            const dataBar = sortTrabajos.map(item => item[1]);
+
+            const coloresEsp = { 'Impermeabilización': '#C51E1F', 'Electricidad': '#E57373', 'Plomería': '#FF8A65', 'Pintura y Acabados': '#49A6E9', 'Carpintería': '#34D399', 'Cancelería': '#ffffff', 'Mantenimiento General': '#FBBF24' };
+            const backgroundColors = labelsBar.map(label => coloresEsp[label] || '#ffcc00');
+
+            activeCharts.convBarServices = new Chart(document.getElementById('convBarServicesChart'), {
+                type: 'bar',
+                data: { labels: labelsBar, datasets: [{ data: dataBar, backgroundColor: backgroundColors, borderRadius: 6 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, layout: { padding: { right: 35 } }, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: '#4b5563' }, ticks: { precision: 0 } }, y: { grid: { display: false }, ticks: { color: '#ffffff', font: { weight: '600', size: 12 } } } } },
+                plugins: [whiteLabelsPlugin]
+            });
+
+            if (total === 0) return;
+
+            activeCharts.convDoughnut = new Chart(document.getElementById('convDoughnutChart'), {
+                type: 'doughnut',
+                data: { labels: Object.keys(conteoTrabajos), datasets: [{ data: Object.values(conteoTrabajos), backgroundColor: Object.keys(conteoTrabajos).map(k => coloresEsp[k] || '#ffcc00'), borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#ffffff', padding: 12, font: { size: 11 } } } }, cutout: '65%' }
+            });
+        }
+
+        // ========================================================
+        // ENLACE DIRECTO REAL CON EL API DE GEMINI 
+        // ========================================================
+        async function ejecutarAuditoriaIA() {
+            const outBlock = document.getElementById('ai-report');
+            outBlock.innerHTML = "Compilando registros históricos...\nEstructurando payload analítico...\nConectando con Google AI Studio (gemini-flash-latest)...";
+            
+            try {
+                let pagSummary = "";
+                let pCounts = {}; dataVisitas.forEach(r => pCounts[r.pagina] = (pCounts[r.pagina] || 0) + 1);
+                Object.entries(pCounts).forEach(([k,v]) => { pagSummary += `- ${k}: ${v} visitas\n`; });
+
+                let propSummary = "";
+                let tCounts = {}; dataPropuestas.forEach(r => tCounts[categorizarTrabajo(r.trabajo)] = (tCounts[categorizarTrabajo(r.trabajo)] || 0) + 1);
+                Object.entries(tCounts).forEach(([k,v]) => { propSummary += `- Especialidad ${k}: ${v} cotizaciones\n`; });
+
+                let zonaSummary = "";
+                let zCounts = {}; dataPropuestas.forEach(r => zCounts[limpiarZonaGeografica(r.lugar)] = (zCounts[r.lugar] || 0) + 1);
+                Object.entries(zCounts).forEach(([k,v]) => { zonaSummary += `- Zona ${k}: ${v} propuestas\n`; });
+
+                const promptText = `Eres un auditor comercial experto analizando la empresa "Mantonet" (mantenimiento y acabados). 
+                Analiza estas métricas globales acumuladas:
+
+                MÉTRICAS DE TRÁFICO WEB:
+                - Visitas Totales: ${dataVisitas.length}
+                - Desglose por subpáginas:
+                ${pagSummary}
+
+                MÉTRICAS DE CONVERSIÓN COMERCIAL:
+                - Propuestas Enviadas: ${dataPropuestas.length}
+                - Demanda por servicio técnico:
+                ${propSummary}
+                - Distribución geográfica:
+                ${zonaSummary}
+
+                Genera un informe estructurado que incluya:
+                1. Diagnóstico general del tráfico web y landings fuertes.
+                2. Análisis del rendimiento comercial (Servicios vs zonas).
+                3. Correlación estratégica entre tráfico y propuestas.
+                4. Conclusiones y 3 recomendaciones clave para optimizar captación.
+                
+                No utilices lenguaje robótico. Sé directo, brillante y profesional.`;
+
+                // URL CORREGIDA: Apuntando exactamente al modelo funcional que descubriste: gemini-flash-latest
+                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+
+                const resJson = await response.json();
+                
+                if(resJson.candidates && resJson.candidates[0].content.parts[0].text) {
+                    outBlock.innerHTML = resJson.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error(resJson.error ? resJson.error.message : "La API no retornó el formato de texto esperado.");
+                }
+
+            } catch (error) {
+                console.error(error);
+                outBlock.innerHTML = `<span style="color:#ff5252;">Error de conexión con IA Studio: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html>
