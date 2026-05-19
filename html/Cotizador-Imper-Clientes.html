@@ -306,7 +306,7 @@
                 document.getElementById('pub-precio-final').innerText = new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(calculoInternoFinal);
 
                 const msjWa = `Hola Mantonet. Coticé en su web un proyecto de ${payload.m2}m² con el sistema: ${payload.sistema} en el CP ${payload.cp} (${payload.zona}). Mi estimado fue de ${document.getElementById('pub-precio-final').innerText}. Deseo coordinar la visita de un ingeniero para la validación física de la losa.`;
-                document.getElementById('enlace-wa').href = `https://wa.me/525500000000?text=${encodeURIComponent(msjWa)}`; 
+                document.getElementById('enlace-wa').href = `https://wa.me/525519148472?text=${encodeURIComponent(stringMensaje)}`;
             } else {
                 errorMsg.innerText = resData.mensaje; errorMsg.style.display = 'block';
                 btn.innerText = "Desbloquear Cotización"; btn.disabled = false;
