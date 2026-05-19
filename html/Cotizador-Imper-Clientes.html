@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador de Alta Hermeticidad | Mantonet</title>
+    <style>
+        :root {
+            --oxford: #34495e; 
+            --mantored: #c0392b; 
+            --white: #ffffff; 
+            --bg: #2c3e50; 
+            --accent: #27ae60; 
+            --warning: #f1c40f; 
+            --danger: #e74c3c;
+            --light-panel: #f8f9fa;
+        }
+        
+        body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif; background-color: var(--bg); color: var(--oxford); margin: 0; padding: 15px; font-size: 13px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .container { width: 100%; max-width: 700px; background: var(--white); padding: 30px; border-top: 12px solid var(--mantored); box-shadow: 0 15px 50px rgba(0,0,0,0.4); border-radius: 4px; box-sizing: border-box; }
+        header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid var(--oxford); padding-bottom: 12px; margin-bottom: 20px; }
+        
+        .logo { font-weight: 900; font-size: 28px; letter-spacing: -1px; color: var(--oxford); }
+        .logo span { color: var(--mantored); }
+        h3 { background: var(--oxford); color: white; padding: 8px 12px; font-size: 11px; text-transform: uppercase; border-left: 6px solid var(--mantored); margin-top: 20px; letter-spacing: 0.5px; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+        .section { border: 1px solid #eef2f5; padding: 15px; border-radius: 4px; background: #fff; }
+        label { display: block; font-weight: bold; font-size: 11px; margin-bottom: 5px; text-transform: uppercase; opacity: 0.9; }
+        input[type="number"], input[type="email"], input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 3px; font-size: 13px; box-sizing: border-box; margin-bottom: 12px; }
+        
+        .cost-check { display: flex; align-items: center; background: var(--light-panel); padding: 10px; border: 1px solid #e2e8f0; margin-bottom: 6px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .cost-check input { margin-right: 10px; transform: scale(1.1); }
+
+        .scale-container { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 6px; text-align: center; background: #fafafa; }
+        .scale-bar { height: 20px; width: 100%; background: linear-gradient(to right, #e74c3c 0%, #f1c40f 50%, #27ae60 100%); border-radius: 10px; position: relative; margin: 12px 0; border: 1px solid #ccc; }
+        .scale-pointer { position: absolute; top: -6px; width: 6px; height: 32px; background: var(--oxford); transition: left 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 2px solid white; box-shadow: 0 0 6px rgba(0,0,0,0.3); border-radius: 2px; }
+
+        .btn-principal { background-color: var(--mantored); color: var(--white); border: none; padding: 15px; width: 100%; font-size: 16px; font-weight: bold; border-radius: 4px; cursor: pointer; transition: background 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-principal:hover { background-color: #a02b20; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.95); justify-content: center; align-items: center; z-index: 2000; }
+        .modal-content { background: var(--white); padding: 30px; border-radius: 6px; max-width: 420px; width: 85%; text-align: center; border-top: 10px solid var(--mantored); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .modal-content h2 { margin-top: 0; font-size: 20px; color: var(--oxford); }
+
+        #resultado-container { display: none; margin-top: 20px; border: 2px solid var(--oxford); border-radius: 4px; background: #ecf0f1; padding: 20px; text-align: center; }
+        .price { font-size: 42px; font-weight: bold; color: var(--oxford); margin: 10px 0; letter-spacing: -1px; }
+        .btn-whatsapp { background-color: #25D366; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 14px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
+
+        /* Estilos Backdoor */
+        .accordion-oculto { background-color: #ecf0f1; color: var(--oxford); cursor: pointer; padding: 12px; width: 100%; border: 2px solid var(--oxford); text-align: left; outline: none; font-size: 13px; font-weight: bold; transition: 0.4s; border-radius: 4px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .accordion-oculto:hover { background-color: #d0d3d4; }
+        .accordion-oculto:after { content: '\002B'; color: var(--mantored); font-weight: bold; font-size: 16px; }
+        .accordion-oculto.active:after { content: "\2212"; }
+        .panel-oculto { padding: 0 15px; background-color: white; display: none; border-left: 2px solid var(--oxford); border-right: 2px solid var(--oxford); border-bottom: 2px solid var(--oxford); border-radius: 0 0 4px 4px; }
+        .panel-oculto.show { display: block; }
+        .breakdown-list-public { list-style: none; padding: 10px 0; margin: 0; }
+        .breakdown-list-public li { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ccc; font-size: 12px; }
+        .breakdown-list-public li:last-child { border-bottom: none; }
+        .breakdown-list-public li span:last-child { font-weight: bold; color: var(--mantored); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo">MANT<span>O</span>NET</div>
+        <div style="text-align:right; font-size:11px; line-height: 1.4;">
+            <strong>SOLUCIONES TÉCNICAS DE HERMETICIDAD</strong><br>
+            Módulo Público de Pre-Cotización v3.0
+        </div>
+    </header>
+
+    <h3>1. Datos e Infraestructura de la Obra</h3>
+    <div class="grid">
+        <div class="section">
+            <label>Área de Losa a Intervenir (m²)</label>
+            <input type="number" id="pub-area" placeholder="Ej. 120" min="1" oninput="runScaleLogic()">
+            
+            <label style="margin-top: 5px;">Código Postal de la Obra (5 dígitos)</label>
+            <input type="number" id="pub-cp" placeholder="Ej. 57000" min="10000" max="99999">
+        </div>
+        <div class="section">
+            <label>Estado Estructural / Recubrimiento Existente</label>
+            <select id="pub-estado">
+                <option value="0">Losa Limpia / En Hueso (Sin Retiros)</option>
+                <option value="40">Requiere retiro de impermeabilizante acrílico viejo (+$40/m²)</option>
+                <option value="50">Requiere retiro de manto prefabricado dañado (+$50/m²)</option>
+                <option value="60">Requiere demolición de loceta o entortado suelto (+$60/m²)</option>
+            </select>
+        </div>
+    </div>
+
+    <h3>2. Ingeniería de Sistemas Solicitada</h3>
+    <div class="grid">
+        <div class="section">
+            <label>Tecnología de Aislamiento Cohesivo</label>
+            <select id="pub-sistema" onchange="runScaleLogic()">
+                <option value="acrilico_5" data-score="55">Acrílico Fibratado Alta Densidad (Garantía 5 Años)</option>
+                <option value="prefab_10" data-score="85" selected>Manto Prefabricado Poliéster 4.0mm (Garantía 10 Años)</option>
+                <option value="prefab_12" data-score="95">Manto Prefabricado Poliéster 4.5mm (Garantía 12 Años)</option>
+            </select>
+        </div>
+        <div class="section">
+            <label>Modificadores Críticos de Superficie</label>
+            <label class="cost-check"><input type="checkbox" id="pub-filtracion"> Fisuras y Filtraciones Activas Detectadas</label>
+            <label class="cost-check"><input type="checkbox" id="pub-encharcamiento"> Zonas de Encharcamientos Severos</label>
+        </div>
+    </div>
+
+    <div class="scale-container">
+        <div style="font-weight: bold; font-size: 12px; letter-spacing: 0.5px;">PROYECCIÓN DEL ÍNDICE DE HERMETICIDAD MANTΟNET</div>
+        <div class="scale-bar"><div id="pointer" class="scale-pointer" style="left: 85%;"></div></div>
+        <div id="statusDesc" style="font-weight: bold; color: var(--warning);">ESTÁNDAR MANTΟNET 🙂</div>
+    </div>
+
+    <button id="btn-procesar-precios" class="btn-principal">Procesar Ingeniería de Costos</button>
+
+    <div id="resultado-container">
+        <span style="font-size:13px; font-weight:bold; color: var(--oxford); letter-spacing: 0.5px;">PRESUPUESTO ESTIMADO DE INVERSIÓN:</span>
+        <div class="price" id="pub-precio-final">$0.00</div>
+        <p style="font-size: 11px; color: #555; line-height: 1.5; margin: 0 0 15px 0;">*El cálculo algorítmico automatizado incluye suministro de materiales estructurales, mano de obra certificada bajo la NOM, equipo de seguridad industrial, viáticos logísticos calculados por zona y gestión base de escombro.</p>
+        <a href="#" id="enlace-wa" class="btn-whatsapp" target="_blank">Agendar Rectificación Física en Obra</a>
+        
+        <button type="button" class="accordion-oculto" id="btn-desglose-ingenieria">Auditoría Técnica del Costo</button>
+        <div class="panel-oculto" id="panel-desglose-ingenieria">
+            <ul class="breakdown-list-public">
+                <li><span>Mano de Obra y Material Base:</span> <span id="aud-mo-mat">$0.00</span></li>
+                <li><span>Logística: Gasolina Proyectada:</span> <span id="aud-gasolina">$0.00</span></li>
+                <li><span>Logística: Fondo de Viáticos:</span> <span id="aud-viaticos">$0.00</span></li>
+                <li><span>Operativo: Insumos (Gas LP / Herramientas):</span> <span id="aud-insumos">$0.00</span></li>
+                <li><span>Días de Avance Calculados:</span> <span id="aud-dias" style="color: var(--oxford) !important;">0 días</span></li>
+                <li><span>Distancia Mapeada desde Viveros:</span> <span id="aud-distancia" style="color: var(--oxford) !important;">0 KM</span></li>
+                <li style="border-top: 1px solid var(--oxford); margin-top: 5px; padding-top: 5px; font-weight: bold;">
+                    <span style="color: var(--oxford);">Margen Bruto, Impuestos y Mitigación (1.40):</span> <span id="aud-utilidad-tags">$0.00</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="modal-lead">
+    <div class="modal-content">
+        <h2>Cálculo Estructural Finalizado</h2>
+        <p style="font-size: 13px; line-height: 1.5; color: #555;">Hemos procesado el volumen de materiales, el desgaste de herramientas pesadas y las variables logísticas específicas para tu zona.</p>
+        <p style="font-size: 13px; font-weight: bold; color: var(--oxford); margin-top: 15px; margin-bottom: 5px;">Completa tus datos de contacto para liberar el desglose presupuestal y recibir el informe técnico por correo.</p>
+        
+        <input type="text" id="input-contacto" placeholder="Número de WhatsApp (10 dígitos)" maxlength="15">
+        <input type="email" id="input-email" placeholder="Correo Electrónico (Para envío de cotización)" style="width: 100%; padding: 12px; border: 2px solid #cbd5e1; border-radius: 4px; font-size: 15px; box-sizing: border-box; text-align: center; margin-bottom: 15px;">
+        
+        <button id="btn-desbloquear" class="btn-principal">Desbloquear Cotización</button>
+        <p id="error-msg" style="color: var(--danger); font-size: 12px; display: none; font-weight: bold; margin-top: 10px;"></p>
+    </div>
+</div>
+
+<script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyk53RCggKP3u1JdaS0CBoaAFGezyHo_mwr0YhnhtnKXX57S3HX7Quz58dd_mGXwEQoYw/exec"; 
+    const INGENIERIA_PASSWORD = "Mantonet2026"; 
+    
+    // DB Lógica y Geográfica (Origen: Viveros de la Loma 54080)
+    const SPECIFIC_CP_DB = {
+        "54080": { dist: 1, zona: "Tlalnepantla Centro (Sede Viveros)" },
+        "54050": { dist: 4, zona: "Viveros de la Loma / Tlalnepantla" },
+        "53100": { dist: 8, zona: "Ciudad Satélite / Naucalpan" },
+        "52930": { dist: 18, zona: "Zona Esmeralda / Atizapán" },
+        "54500": { dist: 23, zona: "Condado de Sayavedra" }
+    };
+    const PREFIX_CDMX_DB = {
+        "01": { dist: 32, zona: "Álvaro Obregón (CDMX Sur-Poniente)" }, "02": { dist: 12, zona: "Azcapotzalco (CDMX Norte)" },
+        "03": { dist: 24, zona: "Benito Juárez (Narvarte/Del Valle)" }, "04": { dist: 34, zona: "Coyoacán (CDMX Sur)" },
+        "05": { dist: 30, zona: "Cuajimalpa (Santa Fe)" }, "06": { dist: 20, zona: "Cuauhtémoc (Roma/Condesa)" },
+        "07": { dist: 16, zona: "Gustavo A. Madero (GAM)" }, "08": { dist: 26, zona: "Iztacalco (CDMX Oriente)" },
+        "09": { dist: 38, zona: "Iztapalapa (CDMX Oriente)" }, "10": { dist: 36, zona: "Magdalena Contreras (CDMX Sur)" },
+        "11": { dist: 18, zona: "Miguel Hidalgo (Polanco/Lomas)" }, "12": { dist: 58, zona: "Milpa Alta (CDMX Extremo Sur)" },
+        "13": { dist: 52, zona: "Tláhuac (CDMX Sur-Oriente)" }, "14": { dist: 38, zona: "Tlalpan (CDMX Sur)" },
+        "15": { dist: 22, zona: "Venustiano Carranza (Aeropuerto)" }, "16": { dist: 46, zona: "Xochimilco (CDMX Sur)" }
+    };
+    const PREFIX_EDOMEX_DB = {
+        "53": { dist: 12, zona: "Naucalpan de Juárez" }, "540": { dist: 4, zona: "Tlalnepantla Poniente" },
+        "541": { dist: 12, zona: "Tlalnepantla Oriente" }, "529": { dist: 16, zona: "Atizapán de Zaragoza" },
+        "544": { dist: 25, zona: "Nicolás Romero" }, "546": { dist: 34, zona: "Teoloyucan / Coyotepec" },
+        "547": { dist: 18, zona: "Cuautitlán Izcalli" }, "548": { dist: 22, zona: "Cuautitlán Centro" },
+        "549": { dist: 16, zona: "Tultitlán" }, "550": { dist: 28, zona: "Ecatepec Centro" },
+        "554": { dist: 24, zona: "Ecatepec Poniente" }, "557": { dist: 22, zona: "Coacalco de Berriozábal" },
+        "556": { dist: 42, zona: "Zumpango / Tecámac" }, "57": { dist: 36, zona: "Nezahualcóyotl (Neza)" },
+        "56": { dist: 54, zona: "Texcoco / Chimalhuacán / Chalco" }, "50": { dist: 74, zona: "Toluca / Lerma" },
+        "51": { dist: 78, zona: "Toluca Región Poniente" }
+    };
+
+    let calculoInternoFinal = 0;
+    let metadataZona = "Zona Metropolitana General";
+    let distanciaKMCalculada = 30;
+    
+    let auditoriaInternaMemoria = {}; 
+    let desgloseDesbloqueado = false; 
+
+    function runScaleLogic() {
+        const select = document.getElementById('pub-sistema');
+        const score = parseInt(select.options[select.selectedIndex].dataset.score) || 0;
+        const areaInput = parseFloat(document.getElementById('pub-area').value) || 0;
+        const pointer = document.getElementById('pointer');
+        const desc = document.getElementById('statusDesc');
+        
+        if(areaInput === 0) { pointer.style.left = "0%"; desc.innerText = "--"; desc.style.color = "var(--oxford)"; return; }
+
+        pointer.style.left = score + "%";
+        if(score > 85) { desc.innerText = "MÁXIMA HERMETICIDAD ESTRUCTURAL ✅"; desc.style.color = "var(--accent)"; }
+        else if(score === 85) { desc.innerText = "ESTÁNDAR LOGÍSTICO MANTΟNET 🙂"; desc.style.color = "var(--warning)"; }
+        else { desc.innerText = "PROTECCIÓN BÁSICA REQUERIDA ⚠️"; desc.style.color = "var(--danger)"; }
+    }
+
+    document.getElementById('btn-procesar-precios').addEventListener('click', () => {
+        const area = parseFloat(document.getElementById('pub-area').value);
+        const cp = document.getElementById('pub-cp').value.trim();
+        const sistema = document.getElementById('pub-sistema').value;
+        const estadoRetiro = parseFloat(document.getElementById('pub-estado').value);
+
+        if (!area || area <= 0) { alert("Determina un área en m² válida."); return; }
+        if (cp.length !== 5) { alert("El Código Postal de 5 dígitos es obligatorio para procesar el cálculo."); return; }
+
+        distanciaKMCalculada = 30;
+        metadataZona = "Municipio Externo EdoMex";
+        const prefijo2 = cp.substring(0, 2);
+        const prefijo3 = cp.substring(0, 3);
+
+        if (SPECIFIC_CP_DB[cp]) { distanciaKMCalculada = SPECIFIC_CP_DB[cp].dist; metadataZona = SPECIFIC_CP_DB[cp].zona; }
+        else if (PREFIX_EDOMEX_DB[prefijo3]) { distanciaKMCalculada = PREFIX_EDOMEX_DB[prefijo3].dist; metadataZona = PREFIX_EDOMEX_DB[prefijo3].zona; }
+        else if (PREFIX_EDOMEX_DB[prefijo2]) { distanciaKMCalculada = PREFIX_EDOMEX_DB[prefijo2].dist; metadataZona = PREFIX_EDOMEX_DB[prefijo2].zona; }
+        else if (PREFIX_CDMX_DB[prefijo2]) { distanciaKMCalculada = PREFIX_CDMX_DB[prefijo2].dist; metadataZona = PREFIX_CDMX_DB[prefijo2].zona; }
+
+        let precioBaseMaterialYMO = 110; 
+        if (sistema === "acrilico_5") precioBaseMaterialYMO += 85; 
+        if (sistema === "prefab_10") precioBaseMaterialYMO += 155; 
+        if (sistema === "prefab_12") precioBaseMaterialYMO += 176;
+
+        let costoDirectoBase = area * (precioBaseMaterialYMO + estadoRetiro);
+        const rollos = Math.ceil(area / 8.8);
+        const diasObra = area > 0 ? (1 + Math.ceil(rollos / 5)) : 0;
+
+        const costoGasolina = ((distanciaKMCalculada * 2) / 11) * 24 * diasObra;
+        const costoViaticos = diasObra * 450; 
+        const desgasteHerramientas = 220; 
+        const cargasGasLP = Math.ceil(rollos / 5) * 200;
+
+        const costoOperativoPuro = costoDirectoBase + costoGasolina + costoViaticos + desgasteHerramientas + cargasGasLP;
+        
+        // CALIBRACIÓN CORPORATIVA DE COLCHÓN AL 1.40 SOLICITADA POR LA DIRECCIÓN
+        const subtotalConUtilidad = costoOperativoPuro * 1.40;
+        let totalAmortizado = subtotalConUtilidad * 1.185;
+
+        if (document.getElementById('pub-filtracion').checked) totalAmortizado += (area * 25);
+        if (document.getElementById('pub-encharcamiento').checked) totalAmortizado += (area * 35);
+
+        calculoInternoFinal = Math.round(totalAmortizado);
+
+        auditoriaInternaMemoria = {
+            moMat: costoDirectoBase,
+            gasolina: costoGasolina,
+            viaticos: costoViaticos,
+            insumos: desgasteHerramientas + cargasGasLP,
+            dias: diasObra,
+            dist: distanciaKMCalculada,
+            utilidadFiscom: calculoInternoFinal - costoOperativoPuro
+        };
+
+        document.getElementById('modal-lead').style.display = 'flex';
+    });
+
+    document.getElementById('btn-desbloquear').addEventListener('click', async () => {
+        const contacto = document.getElementById('input-contacto').value.trim();
+        const email = document.getElementById('input-email').value.trim();
+        const btn = document.getElementById('btn-desbloquear');
+        const errorMsg = document.getElementById('error-msg');
+
+        // Validaciones UX básicas
+        if (contacto.length < 10) { errorMsg.innerText = "Error: El número de WhatsApp debe ser a 10 dígitos."; errorMsg.style.display = 'block'; return; }
+        if (email.length < 5 || !email.includes("@")) { errorMsg.innerText = "Error: Ingresa un correo electrónico estructurado correctamente."; errorMsg.style.display = 'block'; return; }
+
+        btn.innerText = "Despachando Presupuesto...";
+        btn.disabled = true; errorMsg.style.display = 'none';
+
+        const payload = {
+            contacto: contacto,
+            email: email,
+            m2: document.getElementById('pub-area').value,
+            sistema: document.getElementById('pub-sistema').options[document.getElementById('pub-sistema').selectedIndex].text,
+            total: calculoInternoFinal,
+            cp: document.getElementById('pub-cp').value.trim(),
+            zona: metadataZona,
+            distancia: distanciaKMCalculada
+        };
+
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            });
+            const resData = await response.json();
+
+            if (resData.status === "success") {
+                document.getElementById('modal-lead').style.display = 'none';
+                document.getElementById('btn-procesar-precios').style.display = 'none';
+                
+                document.getElementById('resultado-container').style.display = 'block';
+                document.getElementById('pub-precio-final').innerText = new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(calculoInternoFinal);
+
+                const msjWa = `Hola Mantonet. Coticé en su web un proyecto de ${payload.m2}m² con el sistema: ${payload.sistema} en el CP ${payload.cp} (${payload.zona}). Mi estimado fue de ${document.getElementById('pub-precio-final').innerText}. Deseo coordinar la visita de un ingeniero para la validación física de la losa.`;
+                document.getElementById('enlace-wa').href = `https://wa.me/525500000000?text=${encodeURIComponent(msjWa)}`; 
+            } else {
+                errorMsg.innerText = resData.mensaje; errorMsg.style.display = 'block';
+                btn.innerText = "Desbloquear Cotización"; btn.disabled = false;
+            }
+        } catch (error) {
+            errorMsg.innerText = "Fallo de conexión con el servidor. Intenta nuevamente."; errorMsg.style.display = 'block';
+            btn.innerText = "Desbloquear Cotización"; btn.disabled = false;
+        }
+    });
+
+    // SISTEMA BACKDOOR DE AUDITORÍA
+    document.getElementById('btn-desglose-ingenieria').addEventListener('click', function() {
+        const panel = document.getElementById('panel-desglose-ingenieria');
+        
+        if (desgloseDesbloqueado) { this.classList.toggle("active"); panel.classList.toggle("show"); return; }
+
+        const intentoPassword = prompt("Mantonet ERP - Ingrese contraseña de seguridad para auditar métricas financieras:");
+        
+        if (intentoPassword === INGENIERIA_PASSWORD) {
+            desgloseDesbloqueado = true;
+            const fxCurrency = (val) => new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(val);
+            
+            document.getElementById('aud-mo-mat').innerText = fxCurrency(auditoriaInternaMemoria.moMat);
+            document.getElementById('aud-gasolina').innerText = fxCurrency(auditoriaInternaMemoria.gasolina);
+            document.getElementById('aud-viaticos').innerText = fxCurrency(auditoriaInternaMemoria.viaticos);
+            document.getElementById('aud-insumos').innerText = fxCurrency(auditoriaInternaMemoria.insumos);
+            document.getElementById('aud-utilidad-tags').innerText = fxCurrency(auditoriaInternaMemoria.utilidadFiscom);
+            document.getElementById('aud-dias').innerText = auditoriaInternaMemoria.dias + " días de obra";
+            document.getElementById('aud-distancia').innerText = auditoriaInternaMemoria.dist + " KM (Ida)";
+            
+            this.classList.add("active"); panel.classList.add("show");
+        } else if (intentoPassword !== null) {
+            alert("Acceso denegado. Intento registrado en bitácora.");
+        }
+    });
+</script>
+</body>
+</html>
