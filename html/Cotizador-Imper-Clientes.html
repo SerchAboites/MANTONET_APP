@@ -47,7 +47,6 @@
         .price { font-size: 42px; font-weight: bold; color: var(--oxford); margin: 10px 0; letter-spacing: -1px; }
         .btn-whatsapp { background-color: #25D366; color: white; text-decoration: none; padding: 12px 25px; border-radius: 4px; display: inline-block; font-weight: bold; font-size: 14px; margin-top: 10px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(37,211,102,0.3); }
 
-        /* Estilos Backdoor */
         .accordion-oculto { background-color: #ecf0f1; color: var(--oxford); cursor: pointer; padding: 12px; width: 100%; border: 2px solid var(--oxford); text-align: left; outline: none; font-size: 13px; font-weight: bold; transition: 0.4s; border-radius: 4px; margin-top: 20px; display: flex; justify-content: space-between; align-items: center; }
         .accordion-oculto:hover { background-color: #d0d3d4; }
         .accordion-oculto:after { content: '\002B'; color: var(--mantored); font-weight: bold; font-size: 16px; }
@@ -154,10 +153,10 @@
 </div>
 
 <script>
+    // REEMPLAZA ESTA CADENA POR TU URL GENERADA AL PUBLICAR LA WEB APP EN GOOGLE APPS SCRIPT
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyk53RCggKP3u1JdaS0CBoaAFGezyHo_mwr0YhnhtnKXX57S3HX7Quz58dd_mGXwEQoYw/exec"; 
     const INGENIERIA_PASSWORD = "Mantonet2026"; 
     
-    // DB Lógica y Geográfica (Origen: Viveros de la Loma 54080)
     const SPECIFIC_CP_DB = {
         "54080": { dist: 1, zona: "Tlalnepantla Centro (Sede Viveros)" },
         "54050": { dist: 4, zona: "Viveros de la Loma / Tlalnepantla" },
@@ -216,7 +215,7 @@
         const estadoRetiro = parseFloat(document.getElementById('pub-estado').value);
 
         if (!area || area <= 0) { alert("Determina un área en m² válida."); return; }
-        if (cp.length !== 5) { alert("El Código Postal de 5 dígitos es obligatorio para procesar el cálculo."); return; }
+        if (cp.length !== 5) { alert("El Código Postal de 5 dígitos es estrictamente obligatorio para calcular el flete logístico."); return; }
 
         distanciaKMCalculada = 30;
         metadataZona = "Municipio Externo EdoMex";
@@ -244,7 +243,7 @@
 
         const costoOperativoPuro = costoDirectoBase + costoGasolina + costoViaticos + desgasteHerramientas + cargasGasLP;
         
-        // CALIBRACIÓN CORPORATIVA DE COLCHÓN AL 1.40 SOLICITADA POR LA DIRECCIÓN
+        // CALIBRACIÓN CON COLCHÓN AL 1.40 (MANTENIMIENTO DEL MARGEN OPERATIVO)
         const subtotalConUtilidad = costoOperativoPuro * 1.40;
         let totalAmortizado = subtotalConUtilidad * 1.185;
 
@@ -272,11 +271,10 @@
         const btn = document.getElementById('btn-desbloquear');
         const errorMsg = document.getElementById('error-msg');
 
-        // Validaciones UX básicas
         if (contacto.length < 10) { errorMsg.innerText = "Error: El número de WhatsApp debe ser a 10 dígitos."; errorMsg.style.display = 'block'; return; }
-        if (email.length < 5 || !email.includes("@")) { errorMsg.innerText = "Error: Ingresa un correo electrónico estructurado correctamente."; errorMsg.style.display = 'block'; return; }
+        if (email.length < 5 || !email.includes("@")) { errorMsg.innerText = "Error: Ingresa un correo electrónico válido."; errorMsg.style.display = 'block'; return; }
 
-        btn.innerText = "Despachando Presupuesto...";
+        btn.innerText = "Registrando Presupuesto...";
         btn.disabled = true; errorMsg.style.display = 'none';
 
         const payload = {
@@ -302,17 +300,21 @@
                 document.getElementById('modal-lead').style.display = 'none';
                 document.getElementById('btn-procesar-precios').style.display = 'none';
                 
-                document.getElementById('resultado-container').style.display = 'block';
-                document.getElementById('pub-precio-final').innerText = new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(calculoInternoFinal);
+                const contenedorPrecio = document.getElementById('resultado-container');
+                const campoPrecio = document.getElementById('pub-precio-final');
+                
+                contenedorPrecio.style.display = 'block';
+                campoPrecio.innerText = new Intl.NumberFormat('es-MX', {style: 'currency', currency: 'MXN'}).format(calculoInternoFinal);
 
-                const msjWa = `Hola Mantonet. Coticé en su web un proyecto de ${payload.m2}m² con el sistema: ${payload.sistema} en el CP ${payload.cp} (${payload.zona}). Mi estimado fue de ${document.getElementById('pub-precio-final').innerText}. Deseo coordinar la visita de un ingeniero para la validación física de la losa.`;
-                document.getElementById('enlace-wa').href = `https://wa.me/525519148472?text=${encodeURIComponent(stringMensaje)}`;
+                // ENLACE CORREGIDO CON TU NÚMERO CORPORATIVO REAL 5519148472 (MÉXICO +52)
+                const msjWa = `Hola Mantonet. Coticé en su web un proyecto de ${payload.m2}m² con el sistema: ${payload.sistema} en el CP ${payload.cp} (${payload.zona}). Mi estimado fue de ${campoPrecio.innerText}. Deseo coordinar la visita de un ingeniero para la validación física de la losa.`;
+                document.getElementById('enlace-wa').href = `https://wa.me/525519148472?text=${encodeURIComponent(msjWa)}`; 
             } else {
                 errorMsg.innerText = resData.mensaje; errorMsg.style.display = 'block';
                 btn.innerText = "Desbloquear Cotización"; btn.disabled = false;
             }
         } catch (error) {
-            errorMsg.innerText = "Fallo de conexión con el servidor. Intenta nuevamente."; errorMsg.style.display = 'block';
+            errorMsg.innerText = "Fallo de conexión. Intenta nuevamente."; errorMsg.style.display = 'block';
             btn.innerText = "Desbloquear Cotización"; btn.disabled = false;
         }
     });
