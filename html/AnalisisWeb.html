@@ -252,9 +252,6 @@
         // URL del Backend
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzqbjWplbGomv3PK-TxjrTz5OWbUiHho-lZ6op6jXznuPpoPvsjLAiA_Jjp9zPXOqavQ/exec';
         
-        // API KEY DE GEMINI PROPORCIONADA POR EL USUARIO
-        const GEMINI_API_KEY = 'AIzaSyARVb4W5vQsMhMOrQ6nn5n1Sx6r577Lx0w'; 
-
         Chart.defaults.color = '#9ca3af';
         Chart.defaults.font.family = "'Josefin Sans', sans-serif";
 
@@ -293,7 +290,7 @@
             }
         };
 
-        // ARQUITECTURA ANTI-STRETCH DE ROTACIÓN (MOBILE BUG FIX)
+        // ARQUITECTURA ANTI-STRETCH DE ROTACIÓN
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 Object.values(activeCharts).forEach(chart => {
@@ -365,7 +362,6 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             configurarFiltrosYTabs();
-            // Inicia la UI en la pestaña correcta
             alternarModulos('web', { target: document.getElementById('tab-web') }); 
             await cargarPaquetesDeDatos();
         });
@@ -402,7 +398,6 @@
             });
             const text = await res.text();
             
-            // PROTECCIÓN CONTRA ERROR DE PARSEO (404/HTML de Google)
             if(text.trim().startsWith('<')) {
                  throw new Error("El servidor de Google rechazó la conexión o respondió con HTML. Verifica que el Apps Script fue implementado con una 'Nueva Versión'.");
             }
@@ -410,9 +405,6 @@
             return JSON.parse(text).data;
         }
 
-        // ==========================================
-        // MANEJO DE UI (TABS Y BOTONES)
-        // ==========================================
         function configurarFiltrosYTabs() {
             document.getElementById('tab-web').onclick = (e) => alternarModulos('web', e);
             document.getElementById('tab-conv').onclick = (e) => alternarModulos('conv', e);
@@ -492,9 +484,6 @@
             return { start, end };
         }
 
-        // ==========================================
-        // RE-RENDERIZADO DE GRÁFICAS SEGÚN LA PESTAÑA
-        // ==========================================
         function actualizarDashboard() {
             if(dataVisitas.length === 0 && dataPropuestas.length === 0) return;
 
@@ -575,7 +564,6 @@
         function procesarYRenderizarConversiones(vDatos, pDatos, limites) {
             limpiarGraficaVieja('convBarServices'); limpiarGraficaVieja('convLine'); limpiarGraficaVieja('convDoughnut');
 
-            // --- GRÁFICA COMPARATIVA DE DOBLE LÍNEA ---
             let labelsLine = []; let dataVisitasArr = []; let dataPropuestasArr = [];
 
             if (viewMode === 'global') {
@@ -619,7 +607,6 @@
                 plugins: [whiteLabelsPlugin]
             });
 
-            // --- CÁLCULO DE KPIs Y OTRAS GRÁFICAS ---
             let total = pDatos.length;
             document.getElementById('conv-kpi-total').textContent = total;
 
@@ -656,11 +643,11 @@
         }
 
         // ========================================================
-        // ENLACE DIRECTO REAL CON EL API DE GEMINI 
+        // NUEVA INTEGRACIÓN SEGURA: TRIANGULACIÓN POR APPS SCRIPT
         // ========================================================
         async function ejecutarAuditoriaIA() {
             const outBlock = document.getElementById('ai-report');
-            outBlock.innerHTML = "Compilando registros históricos...\nEstructurando payload analítico...\nConectando con Google AI Studio (gemini-flash-latest)...";
+            outBlock.innerHTML = "Compilando registros históricos...\nEstructurando payload analítico...\nConectando con Google AI Studio vía servidor seguro...";
             
             try {
                 let pagSummary = "";
@@ -698,28 +685,36 @@
                 
                 No utilices lenguaje robótico. Sé directo, brillante y profesional.`;
 
-                // URL CORREGIDA: Apuntando exactamente al modelo funcional que descubriste: gemini-flash-latest
-                const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
-                
-                const response = await fetch(endpoint, {
+                // Petición al mismo Apps Script pero con la acción 'ejecutarAuditoriaIA'
+                const response = await fetch(APP_SCRIPT_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }]
+                    mode: 'cors',
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ 
+                        action: 'ejecutarAuditoriaIA',
+                        prompt: promptText 
                     })
                 });
 
-                const resJson = await response.json();
+                const textRes = await response.text();
                 
-                if(resJson.candidates && resJson.candidates[0].content.parts[0].text) {
-                    outBlock.innerHTML = resJson.candidates[0].content.parts[0].text;
+                // Protección si Google responde con HTML (404 / Error de permisos)
+                if(textRes.trim().startsWith('<')) {
+                    throw new Error("El servidor rechazó la conexión. Verifica que publicaste el Apps Script como 'Nueva Versión'.");
+                }
+
+                const resJson = JSON.parse(textRes);
+                
+                if(resJson.status === 'success' && resJson.data) {
+                    outBlock.innerHTML = resJson.data;
                 } else {
-                    throw new Error(resJson.error ? resJson.error.message : "La API no retornó el formato de texto esperado.");
+                    throw new Error(resJson.message || "Error al procesar la respuesta de la IA.");
                 }
 
             } catch (error) {
                 console.error(error);
-                outBlock.innerHTML = `<span style="color:#ff5252;">Error de conexión con IA Studio: ${error.message}</span>`;
+                outBlock.innerHTML = `<span style="color:#ff5252;">Error de conexión: ${error.message}</span>`;
             }
         }
     </script>
