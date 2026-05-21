@@ -49,6 +49,11 @@
         .time-filters button.active, .time-filters button:hover, .nav-filters button:hover { background-color: #C51E1F; }
         #current-period-label { font-size: 20px; font-weight: 700; min-width: 220px; text-align: center; display: inline-block; }
 
+        /* Estilos Locales de la Nueva Gráfica Independiente */
+        .local-chart-controls { background-color: #1e1e1e; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border: 1px solid #4b5563; }
+        .nav-filters-btn { background-color: #4b5563; color: white; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-family: 'Josefin Sans', sans-serif; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        .nav-filters-btn.active-loc, .nav-filters-btn:hover { background-color: #C51E1F; }
+
         .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .kpi-card { background-color: #2c2c2c; padding: 20px; border-radius: 15px; text-align: center; border-left: 5px solid #C51E1F; }
         .kpi-card h3 { font-size: 16px; color: #d1d5db; margin-bottom: 10px; font-weight: 400; }
@@ -68,44 +73,11 @@
         .hidden { display: none !important; }
 
         /* ========================================================
-           DISEÑO DEL MODAL DE CARGA (AESTHETIC & CENTRADO)
+           DISEÑO DEL MODAL DE CARGA
            ======================================================== */
-        #loader-overlay { 
-            position: fixed; 
-            inset: 0; 
-            background-color: rgba(0, 0, 0, 0.85); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
-            padding: 20px; 
-        }
-        
-        .loader-box {
-            background-color: #3a3a3a;
-            border-radius: 20px;
-            padding: 40px 30px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            border: 2px solid #C51E1F;
-            max-width: 450px;
-            width: 100%;
-            text-align: center;
-        }
-
-        .spinner { 
-            width: 60px; 
-            height: 60px; 
-            border: 6px solid #4b5563; 
-            border-top-color: #ffffff; 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
-            margin-bottom: 25px; 
-        }
+        #loader-overlay { position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .loader-box { background-color: #3a3a3a; border-radius: 20px; padding: 40px 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 20px 50px rgba(0,0,0,0.8); border: 2px solid #C51E1F; max-width: 450px; width: 100%; text-align: center; }
+        .spinner { width: 60px; height: 60px; border: 6px solid #4b5563; border-top-color: #ffffff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         /* ========================================================
@@ -116,26 +88,22 @@
             .container { padding: 15px; border-radius: 15px; margin-top: 5px; }
             header h1 { font-size: 24px; }
             header p { font-size: 14px; }
-
             .tab-navigator { gap: 6px; padding-bottom: 10px; margin-bottom: 15px; }
             .tab-btn { padding: 10px 12px; font-size: 13px; border-radius: 8px; flex: 1; text-align: center; }
-
             .controls-header { padding: 12px; gap: 12px; border-radius: 10px; margin-bottom: 15px; }
             .nav-filters { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
             #current-period-label { width: 100%; text-align: center; font-size: 18px; margin-bottom: 2px; order: 1; }
             .nav-filters button#btn-prev { order: 2; flex: 1; max-width: 130px; }
             .nav-filters button#btn-next { order: 3; flex: 1; max-width: 130px; }
-
             .time-filters { width: 100%; display: flex; justify-content: space-between; gap: 4px; }
             .time-filters button { padding: 6px 10px; font-size: 12px; flex: 1; text-align: center; }
-
             .kpi-grid { grid-template-columns: 1fr; gap: 10px; margin-bottom: 20px; }
             .kpi-card { padding: 12px; border-radius: 10px; text-align: left; }
             .kpi-card .value { font-size: 24px; }
-
             .charts-grid { grid-template-columns: 1fr; gap: 15px; }
             .chart-container { height: 350px !important; padding: 12px; border-radius: 12px; }
             .chart-container h2 { font-size: 14px; margin-bottom: 8px; }
+            .local-chart-controls { justify-content: center; text-align: center; }
         }
     </style>
 </head>
@@ -203,7 +171,29 @@
                     <h2>Canal de Adquisición</h2>
                     <div class="canvas-wrapper"><canvas id="webDoughnutChart"></canvas></div>
                 </div>
-            </div>
+
+                <div class="chart-container" style="grid-column: 1 / -1; height: 550px; margin-top: 20px;">
+                    <h2>Evolución Comparativa de Tráfico por Landings</h2>
+                    
+                    <div class="local-chart-controls">
+                        <div class="nav-filters" style="display: flex; align-items: center; gap: 10px;">
+                            <button id="btn-lp-prev" class="nav-filters-btn">&lt;</button>
+                            <span id="lp-period-label" style="font-size: 17px; font-weight: 700; color: #fff; min-width: 140px; text-align: center;">Cargando...</span>
+                            <button id="btn-lp-next" class="nav-filters-btn">&gt;</button>
+                        </div>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <button id="btn-lp-hour" class="nav-filters-btn active-loc">Por Hora</button>
+                            <button id="btn-lp-day" class="nav-filters-btn">Por Día</button>
+                            <button id="btn-lp-month" class="nav-filters-btn">Por Mes</button>
+                            <button id="btn-lp-year" class="nav-filters-btn">Por Año</button>
+                        </div>
+                    </div>
+                    
+                    <div class="canvas-wrapper">
+                        <canvas id="webPagesLineChart"></canvas>
+                    </div>
+                </div>
+                </div>
         </div>
 
         <div id="section-conv" class="hidden">
@@ -249,22 +239,27 @@
     </div>
 
     <script>
-        // URL del Backend
+        // URL DEL BACKEND (Apps Script)
         const APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzqbjWplbGomv3PK-TxjrTz5OWbUiHho-lZ6op6jXznuPpoPvsjLAiA_Jjp9zPXOqavQ/exec';
         
         Chart.defaults.color = '#9ca3af';
         Chart.defaults.font.family = "'Josefin Sans', sans-serif";
 
+        // Variables Globales
         let dataVisitas = [];
         let dataPropuestas = [];
         let currentTab = 'web'; 
         let viewMode = 'global'; 
         let currentRefDate = new Date(); 
         
-        let activeCharts = { webLine: null, webBar: null, webDoughnut: null, convBarServices: null, convLine: null, convDoughnut: null };
+        // Variables Independientes para la Gráfica de Landings
+        let lpRefDate = new Date(); 
+        let lpViewMode = 'hour'; // hour, day, month, year
+        
+        let activeCharts = { webLine: null, webBar: null, webDoughnut: null, convBarServices: null, convLine: null, convDoughnut: null, webPagesLine: null };
         const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
-        // TOOL VECTORIAL: RESPONSIVE
+        // PLUGIN DE NÚMEROS BLANCOS
         const whiteLabelsPlugin = {
             id: 'whiteLabelsPlugin',
             afterDatasetsDraw(chart) {
@@ -282,7 +277,8 @@
                             ctx.fillText(val, element.x + 8, element.y);
                         } else {
                             ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-                            ctx.fillText(val, element.x, element.y - 8);
+                            // Ajuste para la gráfica de líneas múltiples (para que no se amontonen tanto)
+                            ctx.fillText(val, element.x, element.y - 10);
                         }
                     });
                 });
@@ -290,7 +286,6 @@
             }
         };
 
-        // ARQUITECTURA ANTI-STRETCH DE ROTACIÓN
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
                 Object.values(activeCharts).forEach(chart => {
@@ -308,7 +303,7 @@
             }, 200); 
         });
 
-        // UTILIDADES Y FORMATEADORES
+        // FORMATEADORES
         function normalizarLlaves(arrayRaw) {
             return arrayRaw.map(row => {
                 let nRow = {};
@@ -349,12 +344,19 @@
             return zonaRaw.trim().charAt(0).toUpperCase() + zonaRaw.trim().slice(1);
         }
 
+        // PARSEO DE FECHA CORREGIDO (AHORA SÍ LEE LAS HORAS)
         function parseDate(dateVal) {
             if(!dateVal) return null;
             let dateStr = String(dateVal);
             if (dateStr.includes('/')) {
-                let parts = dateStr.split(' ')[0].split('/');
-                if(parts.length === 3) return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                let parts = dateStr.split(' ');
+                let dParts = parts[0].split('/');
+                let tParts = parts[1] ? parts[1].split(':') : [0,0,0];
+                if(dParts.length === 3) {
+                    let parsed = new Date(parseInt(dParts[2]), parseInt(dParts[1]) - 1, parseInt(dParts[0]));
+                    parsed.setHours(parseInt(tParts[0]), parseInt(tParts[1]), parseInt(tParts[2]||0));
+                    return parsed;
+                }
             }
             let parsed = new Date(dateStr);
             return !isNaN(parsed) ? parsed : null;
@@ -362,6 +364,7 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
             configurarFiltrosYTabs();
+            configurarControlesLanding(); // Configura la gráfica independiente
             alternarModulos('web', { target: document.getElementById('tab-web') }); 
             await cargarPaquetesDeDatos();
         });
@@ -377,13 +380,18 @@
 
                 if (dataVisitas.length > 0) {
                     let d = parseDate(dataVisitas[dataVisitas.length - 1].fecha);
-                    if (d) currentRefDate = d;
+                    if (d) {
+                        currentRefDate = new Date(d);
+                        lpRefDate = new Date(d); // La gráfica local también inicia en el último día de datos
+                    }
                 }
 
                 document.getElementById('loader-overlay').classList.add('hidden');
                 document.getElementById('dashboard-content').classList.remove('hidden');
 
                 actualizarDashboard();
+                renderizarGraficaLandings(); // Dibuja la independiente
+
             } catch (error) {
                 console.error(error);
                 document.getElementById('loader-text').innerHTML = `<span style="color:#ff5252; font-size: 16px;">Error de sincronización: ${error.message}</span>`;
@@ -397,14 +405,13 @@
                 body: JSON.stringify({ action: actionName })
             });
             const text = await res.text();
-            
-            if(text.trim().startsWith('<')) {
-                 throw new Error("El servidor de Google rechazó la conexión o respondió con HTML. Verifica que el Apps Script fue implementado con una 'Nueva Versión'.");
-            }
-            
+            if(text.trim().startsWith('<')) throw new Error("Error: Google respondió con HTML.");
             return JSON.parse(text).data;
         }
 
+        // ==========================================
+        // LÓGICA DASHBOARD PRINCIPAL
+        // ==========================================
         function configurarFiltrosYTabs() {
             document.getElementById('tab-web').onclick = (e) => alternarModulos('web', e);
             document.getElementById('tab-conv').onclick = (e) => alternarModulos('conv', e);
@@ -417,7 +424,6 @@
             
             document.getElementById('btn-prev').onclick = () => desplazarTiempo(-1);
             document.getElementById('btn-next').onclick = () => desplazarTiempo(1);
-            
             document.getElementById('btn-run-ai').onclick = () => ejecutarAuditoriaIA();
         }
 
@@ -430,13 +436,10 @@
             document.getElementById('section-conv').classList.add('hidden');
             document.getElementById('section-ia').classList.add('hidden');
 
-            if (modulo === 'web') {
-                document.getElementById('section-web').classList.remove('hidden');
-            } else if (modulo === 'conv') {
-                document.getElementById('section-conv').classList.remove('hidden');
-            } else {
-                document.getElementById('section-ia').classList.remove('hidden');
-            }
+            if (modulo === 'web') document.getElementById('section-web').classList.remove('hidden');
+            else if (modulo === 'conv') document.getElementById('section-conv').classList.remove('hidden');
+            else document.getElementById('section-ia').classList.remove('hidden');
+            
             actualizarDashboard();
         }
 
@@ -486,22 +489,164 @@
 
         function actualizarDashboard() {
             if(dataVisitas.length === 0 && dataPropuestas.length === 0) return;
-
             const limites = calcularLimitesDeTiempo();
             const filtradosVisitas = dataVisitas.filter(row => { let d = parseDate(row.fecha); return d && d >= limites.start && d <= limites.end; });
             const filtradosPropuestas = dataPropuestas.filter(row => { let d = parseDate(row.fecha); return d && d >= limites.start && d <= limites.end; });
 
-            if (currentTab === 'web') {
-                procesarYRenderizarWeb(filtradosVisitas, limites);
-            } else if (currentTab === 'conv') {
-                procesarYRenderizarConversiones(filtradosVisitas, filtradosPropuestas, limites);
-            }
+            if (currentTab === 'web') procesarYRenderizarWeb(filtradosVisitas, limites);
+            else if (currentTab === 'conv') procesarYRenderizarConversiones(filtradosVisitas, filtradosPropuestas, limites);
         }
 
         function limpiarGraficaVieja(identificador) {
             if (activeCharts[identificador]) { activeCharts[identificador].destroy(); activeCharts[identificador] = null; }
         }
 
+        // ==========================================
+        // LÓGICA DE GRÁFICA INDEPENDIENTE (LANDINGS)
+        // ==========================================
+        function configurarControlesLanding() {
+            document.getElementById('btn-lp-hour').onclick = (e) => cambiarEscalaLanding('hour', e);
+            document.getElementById('btn-lp-day').onclick = (e) => cambiarEscalaLanding('day', e);
+            document.getElementById('btn-lp-month').onclick = (e) => cambiarEscalaLanding('month', e);
+            document.getElementById('btn-lp-year').onclick = (e) => cambiarEscalaLanding('year', e);
+            
+            document.getElementById('btn-lp-prev').onclick = () => desplazarTiempoLanding(-1);
+            document.getElementById('btn-lp-next').onclick = () => desplazarTiempoLanding(1);
+        }
+
+        function cambiarEscalaLanding(escala, event) {
+            lpViewMode = escala;
+            ['btn-lp-hour', 'btn-lp-day', 'btn-lp-month', 'btn-lp-year'].forEach(id => document.getElementById(id).classList.remove('active-loc'));
+            event.target.classList.add('active-loc');
+            renderizarGraficaLandings();
+        }
+
+        function desplazarTiempoLanding(dir) {
+            if (lpViewMode === 'year') return; 
+            if (lpViewMode === 'hour') lpRefDate.setDate(lpRefDate.getDate() + dir);
+            else if (lpViewMode === 'day') lpRefDate.setMonth(lpRefDate.getMonth() + dir);
+            else if (lpViewMode === 'month') lpRefDate.setFullYear(lpRefDate.getFullYear() + dir);
+            renderizarGraficaLandings();
+        }
+
+        function calcularLimitesLanding() {
+            let start = new Date(lpRefDate);
+            let end = new Date(lpRefDate);
+            let label = "";
+            const bPrev = document.getElementById('btn-lp-prev'); 
+            const bNext = document.getElementById('btn-lp-next');
+
+            if (lpViewMode === 'hour') {
+                label = `${start.getDate()} ${monthNames[start.getMonth()]} ${start.getFullYear()}`;
+                bPrev.style.opacity = '1'; bNext.style.opacity = '1'; bPrev.style.pointerEvents = 'auto'; bNext.style.pointerEvents = 'auto';
+            } else if (lpViewMode === 'day') {
+                start.setDate(1); end = new Date(start.getFullYear(), start.getMonth() + 1, 0);
+                label = `${monthNames[start.getMonth()]} ${start.getFullYear()}`;
+                bPrev.style.opacity = '1'; bNext.style.opacity = '1'; bPrev.style.pointerEvents = 'auto'; bNext.style.pointerEvents = 'auto';
+            } else if (lpViewMode === 'month') {
+                start.setMonth(0, 1); end.setMonth(11, 31);
+                label = `Año ${start.getFullYear()}`;
+                bPrev.style.opacity = '1'; bNext.style.opacity = '1'; bPrev.style.pointerEvents = 'auto'; bNext.style.pointerEvents = 'auto';
+            } else if (lpViewMode === 'year') {
+                start = new Date(0); end = new Date(2999, 11, 31);
+                label = "Histórico Global";
+                bPrev.style.opacity = '0'; bNext.style.opacity = '0'; bPrev.style.pointerEvents = 'none'; bNext.style.pointerEvents = 'none';
+            }
+
+            start.setHours(0,0,0,0); end.setHours(23,59,59,999);
+            document.getElementById('lp-period-label').innerText = label;
+            return { start, end };
+        }
+
+        function renderizarGraficaLandings() {
+            limpiarGraficaVieja('webPagesLine');
+            if (dataVisitas.length === 0) return;
+
+            const limites = calcularLimitesLanding();
+            const vDatos = dataVisitas.filter(row => {
+                let d = parseDate(row.fecha);
+                return d && d >= limites.start && d <= limites.end;
+            });
+
+            const paginasUnicas = [...new Set(vDatos.map(d => formatearNombrePagina(d.pagina)))].filter(p => p !== 'Desconocido');
+            
+            let groupedData = {};
+            paginasUnicas.forEach(p => groupedData[p] = {});
+
+            // Rellenar etiquetas fijas para orden perfecto
+            let labels = [];
+            if (lpViewMode === 'hour') {
+                for(let i=0; i<24; i++) labels.push(`${i.toString().padStart(2,'0')}:00`);
+            } else if (lpViewMode === 'day') {
+                let temp = new Date(limites.start);
+                while(temp <= limites.end) {
+                    labels.push(`${temp.getDate()}/${temp.getMonth()+1}`);
+                    temp.setDate(temp.getDate()+1);
+                }
+            } else if (lpViewMode === 'month') {
+                labels = monthNames.map(m => m.substring(0,3));
+            } else if (lpViewMode === 'year') {
+                if(vDatos.length > 0) {
+                    let minYear = Math.min(...vDatos.map(r => parseDate(r.fecha).getFullYear()));
+                    let maxYear = Math.max(...vDatos.map(r => parseDate(r.fecha).getFullYear()));
+                    for(let i=minYear; i<=maxYear; i++) labels.push(i.toString());
+                }
+            }
+
+            // Iniciar contadores en 0
+            paginasUnicas.forEach(p => labels.forEach(l => groupedData[p][l] = 0));
+
+            // Poblar con datos
+            vDatos.forEach(row => {
+                let d = parseDate(row.fecha);
+                let page = formatearNombrePagina(row.pagina);
+                if(page === 'Desconocido' || !d) return;
+
+                let key = "";
+                if (lpViewMode === 'hour') key = `${d.getHours().toString().padStart(2,'0')}:00`;
+                else if (lpViewMode === 'day') key = `${d.getDate()}/${d.getMonth()+1}`;
+                else if (lpViewMode === 'month') key = monthNames[d.getMonth()].substring(0,3);
+                else if (lpViewMode === 'year') key = d.getFullYear().toString();
+
+                if(groupedData[page] && groupedData[page][key] !== undefined) {
+                    groupedData[page][key] += Number(row.conteo || 1);
+                }
+            });
+
+            const baseColors = ['#C51E1F', '#49A6E9', '#34D399', '#FBBF24', '#A855F7', '#EC4899', '#ffffff'];
+            let datasets = paginasUnicas.map((pageName, idx) => {
+                return {
+                    label: pageName,
+                    data: labels.map(label => groupedData[pageName][label]),
+                    borderColor: baseColors[idx % baseColors.length],
+                    backgroundColor: baseColors[idx % baseColors.length],
+                    borderWidth: 2,
+                    pointBackgroundColor: '#ffffff',
+                    pointRadius: 4,
+                    tension: 0.2,
+                    fill: false
+                };
+            });
+
+            activeCharts.webPagesLine = new Chart(document.getElementById('webPagesLineChart'), {
+                type: 'line',
+                data: { labels: labels, datasets: datasets },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    layout: { padding: { right: 15, top: 25 } },
+                    plugins: { legend: { display: true, position: 'top', labels: { color: '#ffffff', boxWidth: 12, padding: 15 } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#4b5563' }, ticks: { color: '#9ca3af', precision: 0 } },
+                        x: { grid: { display: false }, ticks: { color: '#9ca3af' } }
+                    }
+                },
+                plugins: [whiteLabelsPlugin]
+            });
+        }
+
+        // ==========================================
+        // RENDER DE GRÁFICAS VIEJAS
+        // ==========================================
         function procesarYRenderizarWeb(vDatos, limites) {
             limpiarGraficaVieja('webLine'); limpiarGraficaVieja('webBar'); limpiarGraficaVieja('webDoughnut');
 
@@ -642,9 +787,6 @@
             });
         }
 
-        // ========================================================
-        // NUEVA INTEGRACIÓN SEGURA: TRIANGULACIÓN POR APPS SCRIPT
-        // ========================================================
         async function ejecutarAuditoriaIA() {
             const outBlock = document.getElementById('ai-report');
             outBlock.innerHTML = "Compilando registros históricos...\nEstructurando payload analítico...\nConectando con Google AI Studio vía servidor seguro...";
@@ -664,53 +806,32 @@
 
                 const promptText = `Eres un auditor comercial experto analizando la empresa "Mantonet" (mantenimiento y acabados). 
                 Analiza estas métricas globales acumuladas:
-
                 MÉTRICAS DE TRÁFICO WEB:
                 - Visitas Totales: ${dataVisitas.length}
-                - Desglose por subpáginas:
-                ${pagSummary}
-
+                - Desglose por subpáginas:\n${pagSummary}
                 MÉTRICAS DE CONVERSIÓN COMERCIAL:
                 - Propuestas Enviadas: ${dataPropuestas.length}
-                - Demanda por servicio técnico:
-                ${propSummary}
-                - Distribución geográfica:
-                ${zonaSummary}
-
+                - Demanda por servicio técnico:\n${propSummary}
+                - Distribución geográfica:\n${zonaSummary}
                 Genera un informe estructurado que incluya:
                 1. Diagnóstico general del tráfico web y landings fuertes.
                 2. Análisis del rendimiento comercial (Servicios vs zonas).
                 3. Correlación estratégica entre tráfico y propuestas.
                 4. Conclusiones y 3 recomendaciones clave para optimizar captación.
-                
                 No utilices lenguaje robótico. Sé directo, brillante y profesional.`;
 
-                // Petición al mismo Apps Script pero con la acción 'ejecutarAuditoriaIA'
                 const response = await fetch(APP_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    redirect: 'follow',
+                    method: 'POST', mode: 'cors', redirect: 'follow',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ 
-                        action: 'ejecutarAuditoriaIA',
-                        prompt: promptText 
-                    })
+                    body: JSON.stringify({ action: 'ejecutarAuditoriaIA', prompt: promptText })
                 });
 
                 const textRes = await response.text();
-                
-                // Protección si Google responde con HTML (404 / Error de permisos)
-                if(textRes.trim().startsWith('<')) {
-                    throw new Error("El servidor rechazó la conexión. Verifica que publicaste el Apps Script como 'Nueva Versión'.");
-                }
+                if(textRes.trim().startsWith('<')) throw new Error("El servidor rechazó la conexión.");
 
                 const resJson = JSON.parse(textRes);
-                
-                if(resJson.status === 'success' && resJson.data) {
-                    outBlock.innerHTML = resJson.data;
-                } else {
-                    throw new Error(resJson.message || "Error al procesar la respuesta de la IA.");
-                }
+                if(resJson.status === 'success' && resJson.data) outBlock.innerHTML = resJson.data;
+                else throw new Error(resJson.message || "Error al procesar la respuesta de la IA.");
 
             } catch (error) {
                 console.error(error);
