@@ -104,6 +104,7 @@
             .chart-container { height: 350px !important; padding: 12px; border-radius: 12px; }
             .chart-container h2 { font-size: 14px; margin-bottom: 8px; }
             .local-chart-controls { justify-content: center; text-align: center; }
+            #landings-chart { height: 600px !important; }
         }
     </style>
 </head>
@@ -172,7 +173,7 @@
                     <div class="canvas-wrapper"><canvas id="webDoughnutChart"></canvas></div>
                 </div>
 
-                <div class="chart-container" style="grid-column: 1 / -1; height: 550px; margin-top: 20px;">
+                <div id="landings-chart" class="chart-container" style="grid-column: 1 / -1; height: 550px; margin-top: 20px;">
                     <h2>Evolución Comparativa de Tráfico por Landings</h2>
                     
                     <div class="local-chart-controls">
