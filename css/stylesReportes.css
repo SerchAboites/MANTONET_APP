@@ -13,7 +13,7 @@ body {
     font-family: sans-serif;
     background-color: #666666; /* Gris base del body */
     color: #ffffff;
-    font-size: 16px;
+    font-size: 18px; /* Subimos un poco la base para PC */
 }
 
 a {
@@ -21,14 +21,14 @@ a {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #C51E1F; /* Cambiado al rojo del brand */
+    background-color: #C51E1F; /* Rojo del brand */
     color: white;
-    min-height: 50px; /* Reducido para no ser tan gigante en desktop */
+    min-height: 50px;
     margin-top: 20px;
-    font-size: 16px;
-    font-weight: 500;
+    font-size: 18px;
+    font-weight: bold;
     border-radius: 8px;
-    padding: 10px;
+    padding: 10px 20px;
     transition: background-color 0.3s;
 }
 
@@ -36,15 +36,15 @@ a:hover {
     background-color: #a32a2a;
 }
 
-/* --- Clases de Utilidad (para JS) --- */
+/* --- Clases de Utilidad --- */
 .hidden {
     display: none !important;
 }
 
 /* --- Animación de Carga --- */
 #loader-video {
-    width: 160px;
-    height: 160px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
     border-radius: 50%;
 }
@@ -52,7 +52,7 @@ a:hover {
 #loader-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.75);
+    background-color: rgba(0, 0, 0, 0.85);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -61,19 +61,20 @@ a:hover {
 }
 
 #loader-overlay p {
-    margin-top: 16px;
-    font-size: 18px;
+    margin-top: 15px;
+    font-size: 20px;
     color: #ffffff;
+    font-weight: bold;
 }
 
 /* --- Contenedor Principal --- */
 .container {
     display: flex;
-    padding: 30px;
+    padding: 40px 20px;
     align-items: center;
     flex-direction: column;
-    width: 70%;
-    max-width: 900px; /* Evita que crezca demasiado en pantallas ultra anchas */
+    width: 100%;
+    max-width: 1000px; /* Más ancho en PC para aprovechar la pantalla */
 }
 
 /* --- Cabecera y Logo --- */
@@ -81,10 +82,10 @@ a:hover {
     background-color: #3a3a3a;
     width: 100%;
     margin-bottom: 30px;
-    border-radius: 12px; /* Unificado el borde con el form */
+    border-radius: 12px;
     padding: 30px;
     text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 header {
@@ -93,30 +94,31 @@ header {
 }
 
 header h1 {
-    font-size: 36px;
+    font-size: 38px;
     font-weight: 700;
     color: #ffffff;
 }
 
 header p {
     color: #9ca3af;
+    font-size: 18px;
 }
 
-/* --- Pestañas (Tabs) unificadas con el diseño --- */
+/* --- Pestañas (Tabs) --- */
 .tabs-container {
     display: flex;
-    background: #3a3a3a; /* Mismo gris del contenedor principal */
+    background: #3a3a3a;
     border-radius: 8px;
-    padding: 5px;
-    margin-bottom: 20px;
-    width: 100%; /* Para que mida igual que el form */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    margin-bottom: 25px;
+    width: 100%;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
 .tab {
     flex: 1;
-    padding: 12px 10px;
-    font-size: 16px;
+    padding: 15px 10px;
+    font-size: 18px;
     border: none;
     background: transparent;
     border-radius: 6px;
@@ -136,24 +138,25 @@ header p {
 }
 
 .tab.active {
-    background: #2c2c2c; /* Gris ligeramente más oscuro para dar profundidad */
-    color: #C51E1F; /* Resalte con tu Rojo Brand */
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+    background: #2c2c2c;
+    color: #C51E1F;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
 
 /* --- Banner de Edición --- */
 #banner-edicion {
-    background: #C51E1F !important; /* Rojo en lugar del amarillo que pediste quitar */
+    background: #C51E1F !important;
     color: #ffffff !important;
     width: 100%;
+    font-size: 18px;
 }
 
-/* --- Formulario (Desktop por defecto) --- */
+/* --- Formulario (Desktop) --- */
 #incidencia-form {
     background-color: #3a3a3a;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -161,27 +164,25 @@ header p {
 }
 
 #incidencia-form > div {
-    margin-bottom: 20px;
+    margin-bottom: 25px;
 }
 
 #incidencia-form > div:last-child {
     margin-bottom: 0;
 }
 
-/* Grid para campos (2 columnas) */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
+    gap: 25px;
 }
 
-/* Estilos de inputs, selects, textareas */
 label {
     display: block;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
     color: #d1d5db;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 input[type="datetime-local"],
@@ -192,41 +193,37 @@ textarea {
     width: 100%;
     background-color: #2c2c2c;
     border: 1px solid #4b5563;
-    border-radius: 6px;
-    padding: 10px;
+    border-radius: 8px;
+    padding: 14px; /* Más espacio interior para verse mejor en PC */
     color: #ffffff;
     outline: none;
     transition: all 0.2s ease-in-out;
-    font-size: 16px;
+    font-size: 18px; /* Letra más grande en los campos */
 }
 
-input[type="datetime-local"]:focus,
-input[type="date"]:focus,
-input[type="text"]:focus,
-select:focus,
-textarea:focus {
-    --ring-color: #C51E1F;
+input:focus, select:focus, textarea:focus {
     border-color: #C51E1F;
-    box-shadow: 0 0 0 2px var(--ring-color);
+    box-shadow: 0 0 0 2px #C51E1F;
 }
 
 textarea {
-    min-height: 120px;
+    min-height: 140px;
     resize: vertical;
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
+    cursor: pointer;
 }
 
-/* --- Sección de Cámara --- */
+/* --- Cámara --- */
 #camera-container {
     width: 100%;
     aspect-ratio: 1 / 1;
     background-color: #2c2c2c;
     border: 2px dashed #4b5563;
-    border-radius: 6px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -236,131 +233,75 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 #camera-preview {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Mejorado para no cortar la foto anterior al editar */
+    object-fit: contain;
     cursor: pointer;
 }
 
 #camera-placeholder {
-    color: #6b7280;
+    color: #9ca3af;
+    font-size: 18px;
 }
 
-video::-webkit-media-controls {
-    display: none !important;
-}
-
-video#camera-stream {
-    object-fit: cover;
-}
+video::-webkit-media-controls { display: none !important; }
+video#camera-stream { object-fit: cover; }
 
 .camera-buttons {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     flex-wrap: wrap;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
-/* --- Estilos de Botones Generales --- */
+/* --- Botones --- */
 .btn {
     width: 100%;
     font-weight: bold;
-    padding: 12px;
-    border-radius: 6px;
+    padding: 15px; /* Más altos en PC para no verse aplastados */
+    border-radius: 8px;
     border: none;
     cursor: pointer;
     text-align: center;
     transition: background-color 0.3s ease;
-    font-size: 16px;
+    font-size: 18px;
 }
 
-/* Botón Primario (Rojo) */
-.btn-primary {
-    background-color: #C51E1F;
-    color: #ffffff;
-}
+.btn-primary { background-color: #C51E1F; color: #ffffff; }
+.btn-primary:hover { background-color: #a32a2a; }
 
-.btn-primary:hover {
-    background-color: #a32a2a;
-}
-
-.btn-primary:focus {
-    outline: 2px solid #C51E1F;
-    outline-offset: 2px;
-}
-
-/* Botones Secundarios (Gris) */
-.btn-secondary,
-#open-camera-btn,
-#select-gallery-btn,
-#retake-photo-btn {
+.btn-secondary, #open-camera-btn, #select-gallery-btn, #retake-photo-btn {
     flex: 1;
     background-color: #4b5563;
     color: #ffffff;
-    padding: 10px;
 }
-
-#open-camera-btn:hover,
-#select-gallery-btn:hover,
-#retake-photo-btn:hover {
+.btn-secondary:hover, #open-camera-btn:hover, #select-gallery-btn:hover, #retake-photo-btn:hover {
     background-color: #374151;
 }
 
-/* Botón Captura (Rojo) */
-#capture-photo-btn {
-    flex: 1;
-    background-color: #C51E1F;
-    color: #ffffff;
-}
+#capture-photo-btn { flex: 1; background-color: #C51E1F; color: #ffffff; }
 #capture-photo-btn:hover { background-color: #a32a2a; }
 
-/* Selector de Cámara */
-#camera-select {
-    width: 100%;
-    flex-basis: 100%;
-    margin-bottom: 8px;
-    background-color: #374151;
-}
+#camera-select { width: 100%; flex-basis: 100%; margin-bottom: 10px; background-color: #374151; }
 
-/* --- Sección de Reporte Final --- */
+/* --- Reporte --- */
 .report-section {
-    margin-top: 20px;
+    margin-top: 30px;
     background-color: #3a3a3a;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
     text-align: center;
     width: 100%;
 }
 
-.report-section h2 {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
+.report-section h2 { font-size: 24px; font-weight: 700; margin-bottom: 15px; }
+.report-section p { color: #9ca3af; margin-bottom: 20px; font-size: 18px; }
+#generate-report-btn { background-color: #C51E1F; color: #ffffff; }
 
-.report-section p {
-    color: #9ca3af;
-    margin-bottom: 15px;
-}
-
-/* Botón Generar Reporte */
-#generate-report-btn {
-    background-color: #C51E1F; /* Unificado con el brand */
-    color: #ffffff;
-}
-#generate-report-btn:hover { background-color: #a32a2a; }
-
-
-/* =========================================
-   VISTA DE HISTORIAL (LISTA CON IMAGEN IZQUIERDA)
-   ========================================= */
-
-#vista-historial {
-    width: 100%;
-}
-
+/* --- Historial (Lista Izquierda) --- */
+#vista-historial { width: 100%; }
 .grid-historial {
     display: flex;
-    flex-direction: column; /* Cambiado a lista vertical */
+    flex-direction: column;
     gap: 15px;
     margin-bottom: 20px;
     width: 100%;
@@ -369,209 +310,121 @@ video#camera-stream {
 .miniatura-card {
     background: #3a3a3a;
     border: 1px solid #4b5563;
-    border-radius: 8px;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     cursor: pointer;
     transition: transform 0.2s;
-    display: flex; /* Flex para alinear imagen y texto */
+    display: flex;
     align-items: center;
     text-align: left;
 }
 
-.miniatura-card:hover {
-    transform: scale(1.02);
-    border-color: #C51E1F;
-}
+.miniatura-card:hover { transform: scale(1.02); border-color: #C51E1F; }
 
 .miniatura-card img {
-    width: 100px; /* Ancho fijo para la imagen */
-    height: 100px;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
     border-right: 1px solid #4b5563;
 }
 
 .miniatura-card > div:first-child {
-    /* Estilo por si no hay imagen (el div de "Sin Foto") */
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     flex-shrink: 0;
     border-right: 1px solid #4b5563;
 }
 
-.miniatura-info {
-    padding: 15px;
-    flex: 1; /* Ocupa el resto del espacio */
-}
-
-.miniatura-info h4 {
-    margin: 0 0 5px 0;
-    font-size: 16px;
-    color: #ffffff;
-}
-
-.miniatura-info p {
-    margin: 0 0 5px 0;
-    font-size: 14px;
-    color: #9ca3af;
-}
-
-/* --- Lógica visual de estatus en miniatura --- */
-/* (El color del texto de estatus se inyecta desde JS, pero podemos darle base) */
-.miniatura-info p:last-child {
-    margin-bottom: 0;
-    font-size: 13px;
-    text-transform: uppercase;
-}
+.miniatura-info { padding: 15px 20px; flex: 1; }
+.miniatura-info h4 { margin: 0 0 5px 0; font-size: 18px; color: #ffffff; }
+.miniatura-info p { margin: 0 0 5px 0; font-size: 15px; color: #9ca3af; }
+.miniatura-info p:last-child { margin-bottom: 0; font-size: 14px; text-transform: uppercase; }
 
 
 /* =========================================
-   MEDIA QUERY PARA MÓVILES (Tu Configuración)
+   MEDIA QUERY PARA MÓVILES (Con valores lógicos)
    ========================================= */
-
 @media (max-width: 1080px) and (-webkit-min-device-pixel-ratio: 1.8),
 (max-width: 1080px) and (min-resolution: 1.8dppx) {
 
-    body {
-        font-size: 40px; /* Base escalada para móvil */
-    }
-
-    p { font-size: 40px; }
-    
-    .report-section h2 { font-size: 55px; }
-
-    /* Contenedor Principal a 100% */
+    /* El contenedor usa el 100% del ancho del celular */
     .container {
-        width: 100%;
-        padding: 40px;
+        padding: 20px 15px;
     }
 
     .container-logo {
-        border-radius: 30px;
-        padding: 50px;
-        margin-bottom: 40px;
+        padding: 20px;
+        margin-bottom: 20px;
     }
 
     header h1 {
-        font-size: 80px;
-        margin-top: 30px;
-        margin-bottom: 30px;
+        font-size: 26px; /* Ajustado para pantallas pequeñas */
+        margin-bottom: 10px;
     }
 
-    /* Pestañas grandes para dedos */
-    .tabs-container {
-        border-radius: 20px;
-        padding: 10px;
-        margin-bottom: 40px;
+    header p {
+        font-size: 16px;
     }
 
+    /* Pestañas */
     .tab {
-        padding: 30px 20px;
-        font-size: 45px;
-        border-radius: 15px;
+        padding: 12px;
+        font-size: 16px; /* Buen tamaño para tocar */
     }
 
-    /* Formulario y Reporte general (bordes y padding móvil) */
-    #incidencia-form,
-    .report-section,
-    .miniatura-card {
-        border-radius: 30px;
-        padding: 50px;
+    /* Formulario a 1 sola columna */
+    #incidencia-form {
+        padding: 20px;
     }
 
-    /* A 1 sola columna */
     .form-grid {
-        grid-template-columns: repeat(1, 1fr);
-        gap: 30px;
+        grid-template-columns: 1fr;
+        gap: 20px;
     }
 
-    #incidencia-form > div {
-        margin-bottom: 40px;
-    }
-
-    /* Inputs y textareas grandotes */
+    /* Campos optimizados para dedos */
     input[type="datetime-local"],
     input[type="date"],
     input[type="text"],
     select,
     textarea {
-        padding: 25px;
-        font-size: 45px;
-        border-radius: 20px;
-        min-height: 120px;
+        padding: 16px; /* Altura ideal para touch */
+        font-size: 16px; /* Evita que el iPhone haga zoom automático */
+        border-radius: 8px;
     }
 
     textarea {
-        min-height: 400px;
+        min-height: 150px; /* Suficiente espacio sin exagerar */
     }
 
-    label {
-        margin-top: 30px;
-        margin-bottom: 20px;
-        font-size: 45px;
-    }
-
-    /* Botones Gigantes */
+    /* Botones más amigables para el pulgar */
     .btn {
-        font-size: 45px;
-        margin-top: 30px;
-        border-radius: 20px;
-        min-height: 120px;
-        padding: 20px;
-    }
-    
-    a {
-        font-size: 45px;
-        min-height: 120px;
-        border-radius: 20px;
+        font-size: 16px;
+        padding: 18px; /* Más altos para tocarlos fácil */
+        border-radius: 8px;
     }
 
-    #camera-placeholder {
-        font-size: 45px;
-    }
-    
     .camera-buttons {
-        gap: 20px;
-        margin-top: 20px;
+        gap: 10px;
     }
 
-    /* Animación de Carga */
-    #loader-video {
-        width: 600px;
-        height: 600px;
-    }
-
-    #loader-overlay p {
-        font-size: 55px;
-        margin-top: 40px;
-    }
-    
-    /* Historial Móvil (Ajuste de la imagen izquierda) */
-    .grid-historial {
-        gap: 30px;
-    }
-    
-    .miniatura-card {
-        padding: 0; /* Quitamos el padding interno global de la tarjeta para que la imagen toque el borde */
-    }
-    
+    /* Ajuste en el historial */
     .miniatura-card img,
     .miniatura-card > div:first-child {
-        width: 250px; /* Imagen mucho más grande en móvil */
-        height: 300px;
+        width: 100px; /* Un poco más pequeño en móvil para dejar espacio al texto */
+        height: 100px;
     }
-    
+
     .miniatura-info {
-        padding: 40px;
+        padding: 12px;
     }
-    
+
     .miniatura-info h4 {
-        font-size: 50px;
-        margin-bottom: 15px;
+        font-size: 16px;
     }
-    
+
     .miniatura-info p {
-        font-size: 40px;
-        margin-bottom: 10px;
+        font-size: 14px;
     }
 }
