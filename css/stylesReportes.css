@@ -8,29 +8,32 @@
 body {
     display: flex;
     flex-direction: column;
-    text-align: center;
     align-items: center;
     justify-content: center;
     font-family: sans-serif;
-    background-color: #666666;
+    background-color: #666666; /* Gris base del body */
     color: #ffffff;
     font-size: 16px;
-    /* Base para consistencia */
 }
 
 a {
     text-decoration: none;
     display: flex;
-    text-align: center;
     align-items: center;
     justify-content: center;
-    background-color: #a32a2a;
+    background-color: #C51E1F; /* Cambiado al rojo del brand */
     color: white;
-    min-height: 100px;
-    margin-top: 50px;
-    font-size: 40px;
+    min-height: 50px; /* Reducido para no ser tan gigante en desktop */
+    margin-top: 20px;
+    font-size: 16px;
     font-weight: 500;
-    border-radius: 20px;
+    border-radius: 8px;
+    padding: 10px;
+    transition: background-color 0.3s;
+}
+
+a:hover {
+    background-color: #a32a2a;
 }
 
 /* --- Clases de Utilidad (para JS) --- */
@@ -41,9 +44,7 @@ a {
 /* --- Animación de Carga --- */
 #loader-video {
     width: 160px;
-    /* 10rem */
     height: 160px;
-    /* 10rem */
     object-fit: contain;
     border-radius: 50%;
 }
@@ -61,32 +62,38 @@ a {
 
 #loader-overlay p {
     margin-top: 16px;
-    /* 1rem */
     font-size: 18px;
-    /* 1.125rem */
     color: #ffffff;
 }
 
-/* --- Contenedor Principal y Cabecera (Desktop por defecto) --- */
+/* --- Contenedor Principal --- */
 .container {
     display: flex;
     padding: 30px;
     align-items: center;
-    text-align: center;
-    justify-content: center;
     flex-direction: column;
     width: 70%;
+    max-width: 900px; /* Evita que crezca demasiado en pantallas ultra anchas */
+}
+
+/* --- Cabecera y Logo --- */
+.container-logo {
+    background-color: #3a3a3a;
+    width: 100%;
+    margin-bottom: 30px;
+    border-radius: 12px; /* Unificado el borde con el form */
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 header {
     text-align: center;
-    margin-bottom: 32px;
-    /* 2rem */
+    margin-bottom: 20px;
 }
 
 header h1 {
     font-size: 36px;
-    /* 2.25rem (sm:text-4xl) */
     font-weight: 700;
     color: #ffffff;
 }
@@ -95,46 +102,86 @@ header p {
     color: #9ca3af;
 }
 
+/* --- Pestañas (Tabs) unificadas con el diseño --- */
+.tabs-container {
+    display: flex;
+    background: #3a3a3a; /* Mismo gris del contenedor principal */
+    border-radius: 8px;
+    padding: 5px;
+    margin-bottom: 20px;
+    width: 100%; /* Para que mida igual que el form */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tab {
+    flex: 1;
+    padding: 12px 10px;
+    font-size: 16px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-weight: bold;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab:hover {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab.active {
+    background: #2c2c2c; /* Gris ligeramente más oscuro para dar profundidad */
+    color: #C51E1F; /* Resalte con tu Rojo Brand */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* --- Banner de Edición --- */
+#banner-edicion {
+    background: #C51E1F !important; /* Rojo en lugar del amarillo que pediste quitar */
+    color: #ffffff !important;
+    width: 100%;
+}
+
 /* --- Formulario (Desktop por defecto) --- */
 #incidencia-form {
     background-color: #3a3a3a;
-    padding: 24px;
+    padding: 30px;
     border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     width: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     text-align: left;
 }
 
-#incidencia-form>div {
-    margin-bottom: 24px;
-    /* 1.5rem */
+#incidencia-form > div {
+    margin-bottom: 20px;
 }
 
-#incidencia-form>div:last-child {
+#incidencia-form > div:last-child {
     margin-bottom: 0;
 }
 
-/* Grid para campos (2 columnas por defecto para Desktop) */
+/* Grid para campos (2 columnas) */
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    /* md:grid-cols-2 */
-    gap: 24px;
-    /* 1.5rem (gap-6) */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
 }
 
 /* Estilos de inputs, selects, textareas */
 label {
     display: block;
     font-size: 14px;
-    /* 0.875rem */
     font-weight: 500;
     color: #d1d5db;
-    margin-bottom: 4px;
-    /* 0.25rem */
+    margin-bottom: 6px;
 }
 
 input[type="datetime-local"],
@@ -146,14 +193,11 @@ textarea {
     background-color: #2c2c2c;
     border: 1px solid #4b5563;
     border-radius: 6px;
-    /* 0.375rem */
-    padding: 8px;
-    /* 0.5rem (p-2) */
+    padding: 10px;
     color: #ffffff;
     outline: none;
     transition: all 0.2s ease-in-out;
     font-size: 16px;
-    /* 1rem - Asegura legibilidad */
 }
 
 input[type="datetime-local"]:focus,
@@ -167,8 +211,7 @@ textarea:focus {
 }
 
 textarea {
-    min-height: 128px;
-    /* 8rem */
+    min-height: 120px;
     resize: vertical;
 }
 
@@ -177,7 +220,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
 }
 
-
 /* --- Sección de Cámara --- */
 #camera-container {
     width: 100%;
@@ -185,7 +227,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     background-color: #2c2c2c;
     border: 2px dashed #4b5563;
     border-radius: 6px;
-    /* 0.375rem */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -195,7 +236,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator {
 #camera-preview {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain; /* Mejorado para no cortar la foto anterior al editar */
     cursor: pointer;
 }
 
@@ -211,28 +252,24 @@ video#camera-stream {
     object-fit: cover;
 }
 
-/* Contenedor de botones de cámara */
 .camera-buttons {
     display: flex;
-    gap: 16px;
-    /* 1rem */
+    gap: 10px;
     flex-wrap: wrap;
+    margin-top: 10px;
 }
 
-/* --- Estilos de Botones --- */
+/* --- Estilos de Botones Generales --- */
 .btn {
     width: 100%;
-    font-weight: 700;
-    padding: 12px 16px;
-    /* 0.75rem 1rem */
+    font-weight: bold;
+    padding: 12px;
     border-radius: 6px;
-    /* 0.375rem */
     border: none;
     cursor: pointer;
     text-align: center;
     transition: background-color 0.3s ease;
     font-size: 16px;
-    /* 1rem */
 }
 
 /* Botón Primario (Rojo) */
@@ -250,203 +287,170 @@ video#camera-stream {
     outline-offset: 2px;
 }
 
-/* Botón Secundario (Gris) */
-.btn-secondary {
-    background-color: #4b5563;
-    color: #ffffff;
-}
-
-.btn-secondary:hover {
-    background-color: #374151;
-}
-
-/* Estilo para el nuevo selector de cámara */
-#camera-select {
-    width: 100%;
-    flex-basis: 100%;
-    margin-bottom: 8px;
-    /* 0.5rem */
-    background-color: #374151;
-    border: 1px solid #4b5563;
-    color: #ffffff;
-    padding: 8px;
-    /* 0.5rem */
-    border-radius: 6px;
-    /* 0.375rem */
-    -moz-appearance: none;
-    -webkit-appearance: none;
-    appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23FFFFFF%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20128c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4l128-128c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.8-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E');
-    background-repeat: no-repeat;
-    background-position: right 0.7rem top 50%;
-    background-size: 0.65rem auto;
-}
-
-/* Botón de Captura (Rojo) */
-#capture-photo-btn {
-    flex: 1;
-    background-color: #C51E1F;
-    color: #ffffff;
-    padding: 8px 16px;
-    /* 0.5rem 1rem */
-}
-
-#capture-photo-btn:hover {
-    background-color: #a32a2a;
-}
-
-#capture-photo-btn.is-captured {
-    background-color: #16a085;
-    border-color: #16a085;
-    cursor: not-allowed;
-}
-
-#capture-photo-btn.is-captured:hover {
-    background-color: #16a085;
-}
-
-/* Botón Abrir Cámara (Gris) */
-#open-camera-btn {
-    flex: 1;
-    background-color: #4b5563;
-    color: #ffffff;
-    padding: 8px 16px;
-    /* 0.5rem 1rem */
-}
-
-#open-camera-btn:hover {
-    background-color: #374151;
-}
-
-/* Botón Galería (Gris) */
-#select-gallery-btn {
-    flex: 1;
-    background-color: #4b5563;
-    color: #ffffff;
-    padding: 8px 16px;
-    /* 0.5rem 1rem */
-}
-
-#select-gallery-btn:hover {
-    background-color: #374151;
-}
-
-/* Botón Reintentar (Gris) */
+/* Botones Secundarios (Gris) */
+.btn-secondary,
+#open-camera-btn,
+#select-gallery-btn,
 #retake-photo-btn {
     flex: 1;
     background-color: #4b5563;
     color: #ffffff;
-    padding: 8px 16px;
-    /* 0.5rem 1rem */
+    padding: 10px;
 }
 
+#open-camera-btn:hover,
+#select-gallery-btn:hover,
 #retake-photo-btn:hover {
     background-color: #374151;
 }
 
+/* Botón Captura (Rojo) */
+#capture-photo-btn {
+    flex: 1;
+    background-color: #C51E1F;
+    color: #ffffff;
+}
+#capture-photo-btn:hover { background-color: #a32a2a; }
+
+/* Selector de Cámara */
+#camera-select {
+    width: 100%;
+    flex-basis: 100%;
+    margin-bottom: 8px;
+    background-color: #374151;
+}
 
 /* --- Sección de Reporte Final --- */
 .report-section {
-    margin-top: 48px;
+    margin-top: 20px;
     background-color: #3a3a3a;
     padding: 24px;
     border-radius: 8px;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
+    width: 100%;
 }
 
 .report-section h2 {
     font-size: 20px;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 }
 
 .report-section p {
     color: #9ca3af;
-    margin-bottom: 16px;
-    /* 1rem */
+    margin-bottom: 15px;
 }
 
-/* Botón Generar Reporte (Rojo Oscuro) */
+/* Botón Generar Reporte */
 #generate-report-btn {
-    background-color: #691415;
+    background-color: #C51E1F; /* Unificado con el brand */
     color: #ffffff;
 }
-
-#generate-report-btn:hover {
-    background-color: #a32a2a;
-}
-
-/* Enlace Descargar Reporte (Verde) */
-#download-report-link {
-    display: inline-block;
-    text-decoration: none;
-    margin-top: 16px;
-    /* 1rem */
-    background-color: #16a34a;
-    color: #ffffff;
-}
-
-#download-report-link:hover {
-    background-color: #15803d;
-}
-
-.background-gray {
-    background: #3a3a3a;
-    width: 95%;
-    height: 95%;
-    padding: 5%;
-    border-radius: 5%;
-}
-
-.container-logo {
-background-color: #3a3a3a;
-width: 100%;
-margin-bottom: 30px;
-border-radius: 30px;
-padding: 40px;
-}
+#generate-report-btn:hover { background-color: #a32a2a; }
 
 
-/*
- * --- MEDIA QUERY PARA MÓVILES (Tu media query) ---
- * Se activa en pantallas de alta densidad menores a 1080px
- * Aquí ponemos los estilos para MÓVIL (1 columna, etc.)
- */
-@media (max-width: 1080px) and (-webkit-min-device-pixel-ratio: 1.8),
-(max-width: 1080px) and (min-resolution: 1.8dppx) {
+/* =========================================
+   VISTA DE HISTORIAL (LISTA CON IMAGEN IZQUIERDA)
+   ========================================= */
 
-    p {
-        font-size: 50px;
-    }
-
-
-    .report-section h2 {
-        font-size: 55px;
-    }
-
-    input,
-    select {
-        font-size: 45px;
-        min-height: 120px;
-        border-radius: 20px;
-    }
-
-    textarea {
-        min-height: 400px;
-    }
-
-    label {
-        margin-top: 50px;
-        margin-bottom: 20px;
-        font-size: 45px;
-    }
-
-/* --- Contenedor Principal y Cabecera (Desktop por defecto) --- */
-.container {
+#vista-historial {
     width: 100%;
 }
 
+.grid-historial {
+    display: flex;
+    flex-direction: column; /* Cambiado a lista vertical */
+    gap: 15px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.miniatura-card {
+    background: #3a3a3a;
+    border: 1px solid #4b5563;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex; /* Flex para alinear imagen y texto */
+    align-items: center;
+    text-align: left;
+}
+
+.miniatura-card:hover {
+    transform: scale(1.02);
+    border-color: #C51E1F;
+}
+
+.miniatura-card img {
+    width: 100px; /* Ancho fijo para la imagen */
+    height: 100px;
+    object-fit: cover;
+    border-right: 1px solid #4b5563;
+}
+
+.miniatura-card > div:first-child {
+    /* Estilo por si no hay imagen (el div de "Sin Foto") */
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    border-right: 1px solid #4b5563;
+}
+
+.miniatura-info {
+    padding: 15px;
+    flex: 1; /* Ocupa el resto del espacio */
+}
+
+.miniatura-info h4 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    color: #ffffff;
+}
+
+.miniatura-info p {
+    margin: 0 0 5px 0;
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+/* --- Lógica visual de estatus en miniatura --- */
+/* (El color del texto de estatus se inyecta desde JS, pero podemos darle base) */
+.miniatura-info p:last-child {
+    margin-bottom: 0;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+
+/* =========================================
+   MEDIA QUERY PARA MÓVILES (Tu Configuración)
+   ========================================= */
+
+@media (max-width: 1080px) and (-webkit-min-device-pixel-ratio: 1.8),
+(max-width: 1080px) and (min-resolution: 1.8dppx) {
+
+    body {
+        font-size: 40px; /* Base escalada para móvil */
+    }
+
+    p { font-size: 40px; }
+    
+    .report-section h2 { font-size: 55px; }
+
+    /* Contenedor Principal a 100% */
+    .container {
+        width: 100%;
+        padding: 40px;
+    }
+
+    .container-logo {
+        border-radius: 30px;
+        padding: 50px;
+        margin-bottom: 40px;
+    }
 
     header h1 {
         font-size: 80px;
@@ -454,67 +458,120 @@ padding: 40px;
         margin-bottom: 30px;
     }
 
-    #incidencia-form {
-        padding: 0px;
+    /* Pestañas grandes para dedos */
+    .tabs-container {
+        border-radius: 20px;
+        padding: 10px;
+        margin-bottom: 40px;
     }
 
-    /* Aquí está la magia: cambia a 1 columna en móvil */
+    .tab {
+        padding: 30px 20px;
+        font-size: 45px;
+        border-radius: 15px;
+    }
+
+    /* Formulario y Reporte general (bordes y padding móvil) */
+    #incidencia-form,
+    .report-section,
+    .miniatura-card {
+        border-radius: 30px;
+        padding: 50px;
+    }
+
+    /* A 1 sola columna */
     .form-grid {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-        gap: 16px;
-        /* 1rem - Menos gap */
+        grid-template-columns: repeat(1, 1fr);
+        gap: 30px;
     }
 
+    #incidencia-form > div {
+        margin-bottom: 40px;
+    }
+
+    /* Inputs y textareas grandotes */
     input[type="datetime-local"],
     input[type="date"],
     input[type="text"],
     select,
     textarea {
-        padding: 12px;
-        /* 0.75rem - Inputs más grandes para tap */
+        padding: 25px;
         font-size: 45px;
         border-radius: 20px;
+        min-height: 120px;
     }
 
-    .btn {
-        font-size: 40px;
+    textarea {
+        min-height: 400px;
+    }
+
+    label {
         margin-top: 30px;
-        border-radius: 15px;
-        min-height: 100px;
+        margin-bottom: 20px;
+        font-size: 45px;
     }
 
-    .report-section {
-        padding: 16px;
-        /* 1rem */
+    /* Botones Gigantes */
+    .btn {
+        font-size: 45px;
+        margin-top: 30px;
+        border-radius: 20px;
+        min-height: 120px;
+        padding: 20px;
+    }
+    
+    a {
+        font-size: 45px;
+        min-height: 120px;
+        border-radius: 20px;
     }
 
     #camera-placeholder {
         font-size: 45px;
     }
+    
+    .camera-buttons {
+        gap: 20px;
+        margin-top: 20px;
+    }
 
-    /* --- Animación de Carga --- */
+    /* Animación de Carga */
     #loader-video {
         width: 600px;
-
         height: 600px;
-
-        object-fit: contain;
-        border-radius: 50%;
     }
 
     #loader-overlay p {
-        font-size: 45px;
+        font-size: 55px;
+        margin-top: 40px;
     }
-
-    /* --- Formulario (Desktop por defecto) --- */
-    #incidencia-form {
-        border-radius: 30px;
-        padding: 50px;
+    
+    /* Historial Móvil (Ajuste de la imagen izquierda) */
+    .grid-historial {
+        gap: 30px;
     }
-
-    .report-section {
-        border-radius: 30px;
-        padding: 50px;
+    
+    .miniatura-card {
+        padding: 0; /* Quitamos el padding interno global de la tarjeta para que la imagen toque el borde */
     }
-
+    
+    .miniatura-card img,
+    .miniatura-card > div:first-child {
+        width: 250px; /* Imagen mucho más grande en móvil */
+        height: 300px;
+    }
+    
+    .miniatura-info {
+        padding: 40px;
+    }
+    
+    .miniatura-info h4 {
+        font-size: 50px;
+        margin-bottom: 15px;
+    }
+    
+    .miniatura-info p {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
 }
