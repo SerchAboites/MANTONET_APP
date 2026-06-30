@@ -46,17 +46,37 @@
         }
 
         header {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
+            /* Reducimos el margen inferior */
             border-bottom: 1px solid #333;
-            padding-bottom: 15px;
+            padding-bottom: 10px;
         }
 
         header p {
             color: var(--text-muted);
-            font-size: 16px;
-            margin: 10px 0 0 0;
+            font-size: 14px;
+            /* Un poco más pequeño para que sea elegante */
+            margin: 5px 0 0 0;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        #logoAnimado {
+            width: 100%;
+            height: 80px;
+            /* Reducido de 120px a 80px para que no domine la pantalla */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Asegura que nada se salga del área */
+        }
+
+        #logoAnimado img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            /* Mantiene la proporción sin estirarse */
         }
 
         /* --- ESTILOS DE BOTONES (ENLACES) --- */
@@ -159,14 +179,14 @@
     <div class="container">
 
         <header>
-            <div id="logoAnimado" style="width: 100%; height:120px; display:flex; align-items:center; justify-content:center;">
-                <img src="/img/LogoMantonet.svg" alt="Logo de Mantonet" height="100%">
+            <div id="logoAnimado">
+                <img src="/img/LogoMantonet.svg" alt="Logo de Mantonet">
             </div>
             <p>Portal de Herramientas</p>
         </header>
 
         <nav class="main-nav">
-            
+
             <div class="section-title">OPERACIONES</div>
             <a href="/html/MantoReportes.html" class="btn-menu btn-red">Manto Reportes</a>
             <a href="/html/CarpetasDeClientes.html" class="btn-menu btn-red">Carpetas de Clientes</a>
@@ -182,7 +202,7 @@
             <a href="html/admin-login.html" class="btn-menu btn-blue">Panel Administrativo</a>
             <a href="html/MantonetRedContactos.html" class="btn-menu">Formulario de Registro (Paso 1)</a>
             <a href="html/perfil-completo.html" class="btn-menu">Completar Perfil (Paso 2)</a>
-            
+
         </nav>
 
     </div>
@@ -192,7 +212,7 @@
         // Script básico para ocultar el loader automáticamente al cargar la página (opcional, si no lo hace ya tu main.js)
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader-overlay');
-            if(loader) {
+            if (loader) {
                 loader.classList.add('hidden');
             }
         });
