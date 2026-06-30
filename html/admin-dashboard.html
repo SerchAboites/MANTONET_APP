@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantonet | Dashboard Administrativo</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --accent-red: #d32f2f;
+            --accent-red-hover: #b71c1c;
+            --accent-blue: #2196F3;
+            --accent-green: #388E3C;
+            --accent-green-hover: #2e7d32;
+            --status-pending: #f57c00;
+            --status-review: #1976D2;
+            --status-approved: #388E3C;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            background-color: #000;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--accent-red);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background-color: #333;
+            color: white;
+        }
+
+        /* --- LAYOUT PRINCIPAL --- */
+        .main-content {
+            padding: 30px;
+            flex-grow: 1;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        /* --- GRID DE TARJETAS --- */
+        .grid-tecnicos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .card-tecnico {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #555;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .card-subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin: 5px 0 0 0;
+        }
+
+        .badge-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .status-pendiente_basico {
+            background-color: rgba(245, 124, 0, 0.2);
+            color: var(--status-pending);
+        }
+
+        .status-revision_final {
+            background-color: rgba(25, 118, 210, 0.2);
+            color: var(--status-review);
+        }
+
+        .status-aprobado {
+            background-color: rgba(56, 142, 60, 0.2);
+            color: var(--status-approved);
+        }
+
+        .card-body p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .btn-action {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-action:hover {
+            background-color: var(--accent-blue);
+        }
+
+        #loader {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px;
+        }
+
+        /* --- MODAL DE EXPEDIENTE --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            width: 90%;
+            max-width: 1100px;
+            height: 85vh;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+        }
+
+        .modal-header {
+            background-color: #000;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+        }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .btn-close-modal:hover {
+            color: white;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        /* Columna Izquierda: Información */
+        .modal-info-col {
+            width: 40%;
+            padding: 25px;
+            overflow-y: auto;
+            border-right: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .modal-info-col h4 {
+            margin: 0 0 15px 0;
+            color: var(--accent-blue);
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        .data-group {
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .data-group strong {
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* Botones de documentos */
+        .doc-tabs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-doc-tab {
+            background-color: #2c2c2c;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: left;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-doc-tab:hover {
+            border-color: var(--accent-blue);
+            background-color: #333;
+        }
+
+        .btn-doc-tab.active {
+            background-color: rgba(33, 150, 243, 0.1);
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+        }
+
+        /* Columna Derecha: Visor de documentos */
+        .modal-preview-col {
+            width: 60%;
+            background-color: #151515;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .viewer-placeholder {
+            color: #555;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .embedded-viewer {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: #151515;
+        }
+
+        .img-viewer {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Botones de acción finales */
+        .action-footer-btns {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-approve {
+            flex: 1;
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-approve:hover {
+            background-color: var(--accent-green-hover);
+        }
+
+        .btn-reject {
+            flex: 1;
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-reject:hover {
+            background-color: var(--accent-red-hover);
+        }
+
+        .btn-whatsapp-reminder {
+            width: 100%;
+            background-color: #25D366;
+            color: black;
+            border: none;
+            padding: 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .btn-whatsapp-reminder:hover {
+            background-color: #1ebd56;
+        }
+
+        .btn-delete {
+            width: 100%;
+            background-color: transparent;
+            color: #888;
+            border: 1px solid #555;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 13px;
+        }
+
+        .btn-delete:hover {
+            background-color: #441111;
+            color: #ff5555;
+            border-color: #ff5555;
+        }
+
+        /* --- ADAPTACIÓN MÓVIL --- */
+        @media (max-width: 800px) {
+            .navbar {
+                padding: 15px;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .header-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .grid-tecnicos {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                height: 90vh;
+            }
+
+            .modal-body {
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            .modal-info-col {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #333;
+                box-sizing: border-box;
+                overflow-y: visible;
+            }
+
+            .modal-preview-col {
+                width: 100%;
+                height: 400px;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar">
+        <h1>Mantonet Admin</h1>
+        <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
+    </nav>
+
+    <div class="main-content">
+        <div class="header-section">
+            <h2>Solicitudes de Especialistas</h2>
+        </div>
+
+        <div id="loader">Cargando base de datos...</div>
+
+        <div class="grid-tecnicos" id="contenedor-tecnicos"></div>
+    </div>
+
+    <!-- --- INTERFAZ DEL MODAL --- -->
+    <div class="modal-overlay" id="modal-expediente">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-nombre-titulo">Nombre del Técnico</h3>
+                <button class="btn-close-modal" onclick="cerrarModal()">×</button>
+            </div>
+            <div class="modal-body">
+
+                <!-- Columna Izquierda: Datos -->
+                <div class="modal-info-col">
+                    <div>
+                        <h4>Datos de Contacto</h4>
+                        <div class="data-group"><strong>Perfil:</strong><span id="m-perfil"></span></div>
+                        <div class="data-group"><strong>Teléfono:</strong><span id="m-telefono"></span></div>
+                        <div class="data-group"><strong>Correo:</strong><span id="m-correo"></span></div>
+                        <div class="data-group"><strong>Zona Cobertura:</strong><span id="m-zona"></span></div>
+                        <div class="data-group"><strong>Especialidades:</strong><span id="m-especialidades"></span>
+                        </div>
+
+                        <!-- Campos Avanzados (Paso 2) -->
+                        <div id="seccion-datos-avanzados" style="display:none;">
+                            <h4>Experiencia y Equipo</h4>
+                            <div class="data-group"><strong>Años de Experiencia:</strong><span
+                                    id="m-experiencia"></span></div>
+                            <div class="data-group"><strong>Garantía:</strong><span id="m-garantia"></span></div>
+                            <div class="data-group"><strong>Herramientas Propias:</strong><span
+                                    id="m-herramientas"></span></div>
+                            <div class="data-group"><strong>Detalle Certificaciones:</strong><span
+                                    id="m-desc-cert"></span></div>
+
+                            <h4>Documentación Adjunta</h4>
+                            <div class="doc-tabs-container">
+                                <button class="btn-doc-tab" id="btn-tab-ine"
+                                    onclick="cambiarDocumentoEnVisor('ine')"><span>📁 Identificación Oficial
+                                        (INE)</span> <span>➔</span></button>
+                                <button class="btn-doc-tab" id="btn-tab-trabajo"
+                                    onclick="cambiarDocumentoEnVisor('trabajo')"><span>📸 Muestra de Trabajo</span>
+                                    <span>➔</span></button>
+                                <button class="btn-doc-tab" id="btn-tab-cert"
+                                    onclick="cambiarDocumentoEnVisor('cert')"><span>📜 Documento Certificación</span>
+                                    <span>➔</span></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botoneras dinámicas en el pie de la columna -->
+                    <div style="margin-top: 20px;">
+                        <div id="wrapper-acciones-finales" style="display:none;">
+                            <div class="action-footer-btns">
+                                <button class="btn-approve" id="btn-aprobar-action">Aprobar</button>
+                                <button class="btn-reject" id="btn-rechazar-action">Rechazar</button>
+                            </div>
+                        </div>
+                        <div id="wrapper-recordatorio-pendiente" style="display:none;">
+                            <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Este usuario no ha
+                                completado el expediente (Paso 2).</p>
+                            <a id="link-whatsapp-remind" target="_blank" style="text-decoration: none;">
+                                <button class="btn-whatsapp-reminder">💬 Recordar por WhatsApp</button>
+                            </a>
+                        </div>
+
+                        <!-- Botón para eliminar permanentemente (Visible en ambos estados) -->
+                        <button class="btn-delete" id="btn-eliminar-action" onclick="eliminarPerfilCompleto()">🗑️
+                            Eliminar Perfil Definitivamente</button>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Visor de Archivos -->
+                <div class="modal-preview-col" id="visor-contenedor-principal">
+                    <div class="viewer-placeholder" id="visor-placeholder">
+                        <span style="font-size: 40px;">📄</span><br><br>
+                        Selecciona un documento de la lista de la izquierda para visualizarlo aquí en tiempo real.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        // Importamos deleteDoc
+        import { getFirestore, collection, getDocs, orderBy, query, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Importamos Storage para poder borrar los archivos
+        import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxFbPYP6fdmgacKzee6hr6omFxgqzO4iE",
+            authDomain: "mantonet-reportes.firebaseapp.com",
+            projectId: "mantonet-reportes",
+            storageBucket: "mantonet-reportes.firebasestorage.app",
+            messagingSenderId: "932956793036",
+            appId: "1:932956793036:web:39df56b23e86e71062fa69"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app); // Inicializamos Storage
+
+        window.tecnicosCache = {};
+        window.idTecnicoAbierto = "";
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) { cargarTecnicos(); } else { window.location.href = "admin-login.html"; }
+        });
+
+        window.cerrarSesion = function () {
+            signOut(auth).then(() => { window.location.href = "admin-login.html"; });
+        }
+
+        async function cargarTecnicos() {
+            const contenedor = document.getElementById('contenedor-tecnicos');
+            const loader = document.getElementById('loader');
+
+            try {
+                const q = query(collection(db, "proveedores"), orderBy("fecha_registro", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                loader.style.display = 'none';
+                contenedor.innerHTML = '';
+
+                if (querySnapshot.empty) {
+                    contenedor.innerHTML = '<p style="color:#a0a0a0;">No hay técnicos registrados.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((documento) => {
+                    const data = documento.data();
+                    const id = documento.id;
+
+                    window.tecnicosCache[id] = data;
+
+                    let fechaStr = "Sin fecha";
+                    if (data.fecha_registro) {
+                        fechaStr = data.fecha_registro.toDate().toLocaleDateString('es-MX');
+                    }
+
+                    let estatusClase = data.estatus || 'pendiente_basico';
+                    let estatusTexto = data.estatus === 'revision_final' ? 'En Revisión' :
+                        data.estatus === 'pendiente_basico' ? 'Registro Básico' :
+                            data.estatus === 'aprobado' ? 'Aprobado' : data.estatus;
+
+                    let borderLeftColor = estatusClase === 'revision_final' ? 'var(--status-review)' :
+                        estatusClase === 'aprobado' ? 'var(--status-approved)' : 'var(--status-pending)';
+
+                        const cardHTML = `
+                        <div class="card-tecnico" style="border-left-color: ${borderLeftColor}">
+                            <div>
+                                <div class="card-header">
+                                    <div>
+                                        <h3 class="card-title">${data.nombre || 'Sin Nombre'} ${data.apellidos || ''}</h3>
+                                        <p class="card-subtitle">${data.tipo_perfil || 'Técnico'}</p>
+                                    </div>
+                                    <span class="badge-status status-${estatusClase}">${estatusTexto}</span>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Tel:</strong> ${data.telefono || 'N/A'}</p>
+                                    <p><strong>CP:</strong> ${data.codigo_postal || 'N/A'}</p>
+                                    <p><strong>Zonas:</strong> ${(data.zonas_cobertura || []).join(', ') || 'N/A'}</p>
+                                    <p><strong>Especialidades:</strong> ${(data.especialidades || []).join(', ')}</p>
+                                    <p style="color: #666; font-size: 12px; margin-top: 10px;">Registrado: ${fechaStr}</p>
+                                </div>
+                            </div>
+                            <button class="btn-action" onclick="abrirExpediente('${id}')">Ver Expediente Completo</button>
+                        </div>
+                        `;
+                    contenedor.innerHTML += cardHTML;
+                });
+
+            } catch (error) {
+                console.error(error);
+                loader.innerText = "Hubo un error cargando la base de datos.";
+            }
+        }
+
+        // --- LÓGICA DE APERTURA DEL MODAL ---
+        window.abrirExpediente = function(id) {
+            window.idTecnicoAbierto = id;
+            const tecnico = window.tecnicosCache[id];
+            if(!tecnico) return;
+
+            // 1. Concatenamos nombre y apellido para el título si existen
+            const nombreCompleto = `${tecnico.nombre || ''} ${tecnico.apellidos || ''}`.trim();
+            document.getElementById('modal-nombre-titulo').innerText = nombreCompleto || "Expediente";
+            
+            // 2. Inyectar textos básicos
+            document.getElementById('m-perfil').innerText = " " + (tecnico.tipo_perfil || "N/A");
+            document.getElementById('m-telefono').innerText = " " + (tecnico.telefono || "N/A");
+            document.getElementById('m-correo').innerText = " " + (tecnico.correo || "N/A");
+            document.getElementById('m-zona').innerText = " " + (tecnico.zonas_cobertura ? tecnico.zonas_cobertura.join(', ') : "N/A");
+            document.getElementById('m-especialidades').innerText = " " + (tecnico.especialidades || []).join(', ');
+
+            // 3. Resetear visor a su estado por defecto vacío
+            resetearVisor();
+
+            // 4. Lógica del Mapa Gratuito incrustado
+            const cp = tecnico.codigo_postal;
+            const contenedorInfo = document.querySelector('.modal-info-col > div');
+            
+            // Eliminamos el mapa anterior si existía para que no se duplique al abrir otros perfiles
+            const viejoMapa = document.getElementById('mapa-cp-dinamico');
+            if(viejoMapa) viejoMapa.remove();
+
+            if (cp) {
+                // Generamos la URL de inserción de Google Maps
+                const urlMapa = `https://maps.google.com/maps?q=${cp},+Mexico&t=&z=13&ie=UTF8&iwloc=&output=embed`;
+                const mapaHTML = `
+                    <div id="mapa-cp-dinamico" style="margin-top: 20px; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #444;">
+                        <h4 style="margin: 0; padding: 10px; background-color: #2c2c2c; font-size: 13px; color: #fff;">📍 Zona de Cobertura Principal (CP: ${cp})</h4>
+                        <iframe width="100%" height="200" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${urlMapa}"></iframe>
+                    </div>
+                `;
+                // Insertamos el mapa justo debajo de los datos de contacto
+                contenedorInfo.insertAdjacentHTML('beforeend', mapaHTML);
+            }
+
+            // 5. Evaluar Estatus del Técnico (Flujos de la interfaz)
+            const secAvanzada = document.getElementById('seccion-datos-avanzados');
+            const wrapAcciones = document.getElementById('wrapper-acciones-finales');
+            const wrapRecordatorio = document.getElementById('wrapper-recordatorio-pendiente');
+
+            if (tecnico.estatus === "pendiente_basico") {
+                // Es registro incompleto: ocultamos paneles de archivos, mostramos WhatsApp Remind
+                secAvanzada.style.display = "none";
+                wrapAcciones.style.display = "none";
+                wrapRecordatorio.style.display = "block";
+
+                // Armar link de WhatsApp dinámico apuntando a "perfil-completo.html"
+                const urlBase = window.location.origin; 
+                const urlCompletaPasos = `${urlBase}/perfil-completo.html?id=${id}&nombre=${encodeURIComponent(nombreCompleto)}`;
+                
+                const mensajeWa = `Hola ${tecnico.nombre}, te saludamos de Mantonet. Notamos que iniciaste tu registro pero no terminaste de armar tu expediente profesional. Para que los clientes puedan ver tu perfil, por favor complétalo entrando a este enlace personalizado: ${urlCompletaPasos}`;
+                
+                // Limpiamos el número de caracteres extraños
+                const telLimpio = (tecnico.telefono || "").replace(/[^0-9]/g, '');
+                document.getElementById('link-whatsapp-remind').href = `https://wa.me/${telLimpio}?text=${encodeURIComponent(mensajeWa)}`;
+
+            } else {
+                // Tiene documentos: Mostramos la información avanzada y los botones de aprobar/rechazar
+                secAvanzada.style.display = "block";
+                wrapRecordatorio.style.display = "none";
+                wrapAcciones.style.display = "block";
+
+                // Llenar campos avanzados
+                document.getElementById('m-experiencia').innerText = " " + (tecnico.experiencia || "N/A");
+                document.getElementById('m-garantia').innerText = " " + (tecnico.garantia || "N/A");
+                document.getElementById('m-herramientas').innerText = " " + (tecnico.herramientas || "Ninguna declarada");
+                document.getElementById('m-desc-cert').innerText = " " + (tecnico.desc_certificaciones || "Ninguna");
+
+                // Configurar visibilidad de botones de archivos individuales según existan URLs en Firebase
+                ajustarBotonTabDoc('btn-tab-ine', tecnico.url_ine);
+                ajustarBotonTabDoc('btn-tab-trabajo', tecnico.url_trabajo_muestra);
+                ajustarBotonTabDoc('btn-tab-cert', tecnico.url_certificacion);
+            }
+
+            // 6. Desplegar Modal en pantalla con animación
+            document.getElementById('modal-expediente').classList.add('active');
+        }
+
+        window.cerrarModal = function () {
+            document.getElementById('modal-expediente').classList.remove('active');
+            resetearVisor();
+        }
+
+        function ajustarBotonTabDoc(idBoton, url) {
+            const btn = document.getElementById(idBoton);
+            if (url) {
+                btn.style.display = "flex";
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            } else {
+                btn.style.display = "none";
+            }
+        }
+
+        function resetearVisor() {
+            const contenedor = document.getElementById('visor-contenedor-principal');
+            contenedor.innerHTML = `
+                <div class="viewer-placeholder" id="visor-placeholder">
+                    <span style="font-size: 40px;">📄</span><br><br>
+                    Selecciona un documento de la lista de la izquierda para visualizarlo aquí en tiempo real.
+                </div>
+            `;
+            document.querySelectorAll('.btn-doc-tab').forEach(b => b.classList.remove('active'));
+        }
+
+        window.cambiarDocumentoEnVisor = function (tipoDoc) {
+            const tecnico = window.tecnicosCache[window.idTecnicoAbierto];
+            if (!tecnico) return;
+
+            let url = "";
+            if (tipoDoc === 'ine') url = tecnico.url_ine;
+            if (tipoDoc === 'trabajo') url = tecnico.url_trabajo_muestra;
+            if (tipoDoc === 'cert') url = tecnico.url_certificacion;
+
+            if (!url) return;
+
+            document.querySelectorAll('.btn-doc-tab').forEach(b => b.classList.remove('active'));
+            if (tipoDoc === 'ine') document.getElementById('btn-tab-ine').classList.add('active');
+            if (tipoDoc === 'trabajo') document.getElementById('btn-tab-trabajo').classList.add('active');
+            if (tipoDoc === 'cert') document.getElementById('btn-tab-cert').classList.add('active');
+
+            const contenedor = document.getElementById('visor-contenedor-principal');
+            const urlMinuscula = url.toLowerCase();
+
+            if (urlMinuscula.split('?')[0].endsWith('.pdf')) {
+                contenedor.innerHTML = `<iframe class="embedded-viewer" src="${url}"></iframe>`;
+            } else {
+                contenedor.innerHTML = `<img class="img-viewer" src="${url}" alt="Documentación Mantonet">`;
+            }
+        }
+
+        // --- ACCIONES DE EVALUACIÓN ---
+        async function cambiarEstatusFirebase(nuevoEstatus) {
+            if (!window.idTecnicoAbierto) return;
+            const confirmacion = confirm(`¿Estás seguro de cambiar el estatus de este perfil a: ${nuevoEstatus.toUpperCase()}?`);
+            if (!confirmacion) return;
+
+            try {
+                const docRef = doc(db, "proveedores", window.idTecnicoAbierto);
+                await updateDoc(docRef, { estatus: nuevoEstatus });
+                alert(`Perfil actualizado con éxito a: ${nuevoEstatus}`);
+                cerrarModal();
+                cargarTecnicos();
+            } catch (error) {
+                console.error("Error actualizando estatus: ", error);
+                alert("Ocurrió un error en Firestore.");
+            }
+        }
+
+        document.getElementById('btn-aprobar-action').onclick = () => cambiarEstatusFirebase('aprobado');
+        document.getElementById('btn-rechazar-action').onclick = () => cambiarEstatusFirebase('rechazado');
+
+        // --- NUEVA LÓGICA: ELIMINAR PERFIL Y ARCHIVOS ---
+        window.eliminarPerfilCompleto = async function () {
+            if (!window.idTecnicoAbierto) return;
+
+            const confirmacion = confirm("⚠️ ATENCIÓN: ¿Estás seguro de eliminar PERMANENTEMENTE este perfil y sus documentos? Esta acción no se puede deshacer.");
+            if (!confirmacion) return;
+
+            const tecnico = window.tecnicosCache[window.idTecnicoAbierto];
+            const btn = document.getElementById('btn-eliminar-action');
+            btn.innerText = "Eliminando información y archivos...";
+            btn.disabled = true;
+
+            try {
+                // 1. Array de URLs a eliminar
+                const urlsArchivos = [tecnico.url_ine, tecnico.url_trabajo_muestra, tecnico.url_certificacion];
+
+                // 2. Iterar y borrar de Firebase Storage si existen
+                for (const url of urlsArchivos) {
+                    if (url) {
+                        try {
+                            // En Storage v9, ref() puede aceptar directamente la URL de descarga
+                            const archivoRef = ref(storage, url);
+                            await deleteObject(archivoRef);
+                        } catch (e) {
+                            console.warn("El archivo ya no existe o hubo un error al borrar:", url);
+                        }
+                    }
+                }
+
+                // 3. Eliminar el documento de Firestore
+                await deleteDoc(doc(db, "proveedores", window.idTecnicoAbierto));
+
+                alert("Perfil y archivos eliminados correctamente de la base de datos.");
+                cerrarModal();
+                cargarTecnicos(); // Recarga la grilla para reflejar que ya no está
+
+            } catch (error) {
+                console.error("Error general al eliminar:", error);
+                alert("Hubo un error al intentar eliminar el perfil por completo.");
+            } finally {
+                btn.innerText = "🗑️ Eliminar Perfil Definitivamente";
+                btn.disabled = false;
+            }
+        }
+
+    </script>
+</body>
+
+</html>

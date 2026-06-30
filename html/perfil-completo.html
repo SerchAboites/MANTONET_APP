@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantonet | Completa tu Perfil</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --accent-red: #d32f2f;
+            --accent-blue: #2196F3;
+            --input-bg: #2c2c2c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        /* --- BARRA DE PROGRESO MANTONET --- */
+        .progress-container {
+            width: 100%;
+            background-color: #333;
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent-red);
+            width: 33.33%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        h2 { text-align: center; margin-bottom: 5px; }
+        p.subtitle { color: var(--text-muted); font-size: 14px; text-align: center; margin-bottom: 25px; }
+
+        label.pregunta {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            color: var(--text-main);
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] { display: none; }
+
+        .custom-file-upload {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: var(--input-bg);
+            border: 1px dashed var(--text-muted);
+            color: var(--text-muted);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .custom-file-upload:hover {
+            border-color: var(--accent-red);
+            background-color: #333;
+            color: var(--text-main);
+        }
+
+        .file-selected {
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+
+        button:hover { background-color: #1976D2; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+
+        .btn-back {
+            background-color: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+        }
+        .btn-back:hover { background-color: #333; }
+
+        .step { display: none; }
+        .step.active { display: block; }
+        #pantalla-exito { display: none; text-align: center; }
+        
+        /* Estilos de la barra de subida dinámica */
+        #upload-status-container {
+            display: none;
+            margin-bottom: 20px;
+            background-color: #222;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        #upload-status-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            text-align: left;
+        }
+        .upload-bar-bg {
+            width: 100%;
+            background-color: #333;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #upload-progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.2s linear;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container" id="main-container">
+        
+        <h2>Expediente Profesional</h2>
+        <p class="subtitle" id="step-description">Paso 1: Tu experiencia</p>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div id="step-1" class="step active">
+            <label class="pregunta" for="experiencia">¿Cuántos años de experiencia tienes?</label>
+            <select id="experiencia">
+                <option value="1 a 3 años">1 a 3 años</option>
+                <option value="3 a 5 años">3 a 5 años</option>
+                <option value="5 a 10 años">5 a 10 años</option>
+                <option value="Más de 10 años">Más de 10 años</option>
+            </select>
+
+            <label class="pregunta" for="garantia">¿Ofreces garantía en tus trabajos?</label>
+            <select id="garantia">
+                <option value="Sí, por escrito">Sí, doy garantía por escrito</option>
+                <option value="Sí, de palabra">Sí, garantía de palabra</option>
+                <option value="No ofrezco garantía">No ofrezco garantía</option>
+            </select>
+
+            <label class="pregunta" for="herramientas">¿Con qué herramientas o equipo propio cuentas?</label>
+            <textarea id="herramientas" rows="3" placeholder="Ej. Soldadora, andamios, escáner automotriz..."></textarea>
+
+            <button onclick="nextStep(1, 2)">Siguiente</button>
+        </div>
+
+        <div id="step-2" class="step">
+            <label class="pregunta">Identificación Oficial (INE / Pasaporte) *</label>
+            <label for="foto_ine" class="custom-file-upload" id="lbl_ine">📁 Clic aquí para seleccionar INE...</label>
+            <input type="file" id="foto_ine" accept="image/*,application/pdf" required onchange="actualizarNombreArchivo(this, 'lbl_ine')">
+
+            <label class="pregunta">Foto de un trabajo anterior (Recomendado)</label>
+            <label for="foto_trabajo" class="custom-file-upload" id="lbl_trabajo">📸 Clic aquí para subir foto de tu trabajo...</label>
+            <input type="file" id="foto_trabajo" accept="image/*" onchange="actualizarNombreArchivo(this, 'lbl_trabajo')">
+
+            <button onclick="nextStep(2, 3)">Siguiente</button>
+            <button class="btn-back" onclick="nextStep(2, 1)">Regresar</button>
+        </div>
+
+        <div id="step-3" class="step">
+            <label class="pregunta" for="desc_certificacion">¿Tienes certificaciones? Cuéntanos cuáles (Opcional)</label>
+            <input type="text" id="desc_certificacion" placeholder="Ej. Alturas DC-3, Electricidad básica...">
+
+            <label class="pregunta">Sube tu certificación principal (Opcional)</label>
+            <label for="foto_certificacion" class="custom-file-upload" id="lbl_certificacion">📜 Clic aquí para subir archivo...</label>
+            <input type="file" id="foto_certificacion" accept="image/*,application/pdf" onchange="actualizarNombreArchivo(this, 'lbl_certificacion')">
+
+            <div id="upload-status-container">
+                <p id="upload-status-text">Iniciando subida...</p>
+                <div class="upload-bar-bg">
+                    <div id="upload-progress-bar"></div>
+                </div>
+            </div>
+
+            <button id="btn-subir" onclick="guardarPerfilCompleto()">Subir Expediente y Finalizar</button>
+            <button class="btn-back" id="btn-regresar" onclick="nextStep(3, 2)">Regresar</button>
+        </div>
+
+        <div id="pantalla-exito">
+            <h2 style="color: #4CAF50;">¡Todo Listo!</h2>
+            <p class="subtitle">Hemos recibido tus documentos. Nuestro equipo validará tu perfil y te contactaremos por WhatsApp.</p>
+        </div>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Importamos uploadBytesResumable en lugar de uploadBytes
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxFbPYP6fdmgacKzee6hr6omFxgqzO4iE",
+            authDomain: "mantonet-reportes.firebaseapp.com",
+            projectId: "mantonet-reportes",
+            storageBucket: "mantonet-reportes.firebasestorage.app",
+            messagingSenderId: "932956793036",
+            appId: "1:932956793036:web:39df56b23e86e71062fa69",
+            measurementId: "G-GTM2DZ9Q5D"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Sacamos el ID y el Nombre de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tecnicoId = urlParams.get('id');
+        let nombreTecnico = urlParams.get('nombre') || "Tecnico_Desconocido"; 
+        
+        // Limpiamos el nombre para que no tenga espacios ni caracteres raros para el nombre del archivo
+        const nombreLimpio = nombreTecnico.replace(/[^a-zA-Z0-9]/g, '');
+
+        if (!tecnicoId) {
+            alert("Error: No se encontró tu perfil. Por favor, regístrate de nuevo.");
+            window.location.href = 'index.html';
+        }
+
+        window.nextStep = function(current, next) {
+            document.getElementById(`step-${current}`).classList.remove('active');
+            document.getElementById(`step-${next}`).classList.add('active');
+            
+            const progressBar = document.getElementById('progress-bar');
+            if (next === 1) progressBar.style.width = '33.33%';
+            if (next === 2) progressBar.style.width = '66.66%';
+            if (next === 3) progressBar.style.width = '100%';
+
+            const desc = document.getElementById('step-description');
+            if(next === 1) desc.innerText = "Paso 1: Tu experiencia";
+            if(next === 2) desc.innerText = "Paso 2: Evidencia visual";
+            if(next === 3) desc.innerText = "Paso 3: Certificaciones";
+        }
+
+        window.actualizarNombreArchivo = function(input, labelId) {
+            const label = document.getElementById(labelId);
+            if (input.files && input.files.length > 0) {
+                label.innerText = "✅ " + input.files[0].name;
+                label.classList.add('file-selected');
+            } else {
+                label.innerText = "📁 Clic aquí para seleccionar...";
+                label.classList.remove('file-selected');
+            }
+        }
+
+        // --- FUNCIÓN PARA GENERAR FECHA TIPO 20260629 ---
+        function obtenerFechaFormato() {
+            const hoy = new Date();
+            const yyyy = hoy.getFullYear();
+            const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoy.getDate()).padStart(2, '0');
+            return `${yyyy}${mm}${dd}`;
+        }
+
+        // --- FUNCIÓN DINÁMICA DE SUBIDA DE ARCHIVOS ---
+        // Envuelve la función de Firebase en una Promesa para poder usar "await"
+        function subirArchivoConProgreso(file, path, nombreVisual) {
+            return new Promise((resolve, reject) => {
+                const storageRef = ref(storage, path);
+                const uploadTask = uploadBytesResumable(storageRef, file);
+                
+                const statusText = document.getElementById('upload-status-text');
+                const progressBar = document.getElementById('upload-progress-bar');
+
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        // Calculamos el porcentaje
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressBar.style.width = progress + '%';
+                        statusText.innerText = `Subiendo ${nombreVisual}: ${Math.round(progress)}%`;
+                    }, 
+                    (error) => {
+                        console.error("Error al subir:", error);
+                        reject(error);
+                    }, 
+                    () => {
+                        // Cuando termina al 100%, obtenemos la URL pública
+                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            resolve(downloadURL);
+                        });
+                    }
+                );
+            });
+        }
+
+window.guardarPerfilCompleto = async function() {
+            const btnSubir = document.getElementById('btn-subir');
+            const btnRegresar = document.getElementById('btn-regresar');
+            const contenedorEstado = document.getElementById('upload-status-container');
+            
+            const fileIne = document.getElementById('foto_ine').files[0];
+            const fileTrabajo = document.getElementById('foto_trabajo').files[0];
+            const fileCert = document.getElementById('foto_certificacion').files[0];
+            
+            const experiencia = document.getElementById('experiencia').value;
+            const garantia = document.getElementById('garantia').value;
+            const herramientas = document.getElementById('herramientas').value;
+            const descCertificacion = document.getElementById('desc_certificacion').value.trim(); // .trim() quita espacios vacíos
+
+            // Validación 1: El INE es obligatorio
+            if (!fileIne) {
+                alert("Por favor, regresa al Paso 2 y sube tu Identificación Oficial para continuar.");
+                window.nextStep(3, 2);
+                return;
+            }
+
+            // NUEVA VALIDACIÓN: Si hay documento de certificación, exige la descripción
+            if (fileCert && descCertificacion === "") {
+                alert("Has adjuntado un documento de certificación. Por favor, escribe de qué trata (ej. 'Certificación en Alturas DC-3') en la caja de texto correspondiente.");
+                document.getElementById('desc_certificacion').focus();
+                return;
+            }
+
+            // Bloqueamos botones y mostramos la barra de carga
+            btnSubir.style.display = 'none';
+            btnRegresar.style.display = 'none';
+            contenedorEstado.style.display = 'block';
+
+            try {
+                let urlIne = "";
+                let urlTrabajo = "";
+                let urlCert = "";
+                
+                const fecha = obtenerFechaFormato();
+
+                // 1. Subir INE
+                const extIne = fileIne.name.split('.').pop(); // Obtenemos la extensión (pdf, jpg, etc)
+                const nombreIne = `INE_${nombreLimpio}_${fecha}.${extIne}`;
+                urlIne = await subirArchivoConProgreso(fileIne, `proveedores_docs/${tecnicoId}/${nombreIne}`, "Identificación (INE)");
+
+                // 2. Subir Trabajo (Si existe)
+                if (fileTrabajo) {
+                    const extTrabajo = fileTrabajo.name.split('.').pop();
+                    const nombreTrabajo = `TRABAJO_${nombreLimpio}_${fecha}.${extTrabajo}`;
+                    urlTrabajo = await subirArchivoConProgreso(fileTrabajo, `proveedores_docs/${tecnicoId}/${nombreTrabajo}`, "Foto de Trabajo");
+                }
+
+                // 3. Subir Certificación (Si existe)
+                if (fileCert) {
+                    const extCert = fileCert.name.split('.').pop();
+                    const nombreCert = `CERTIFICACION_${nombreLimpio}_${fecha}.${extCert}`;
+                    urlCert = await subirArchivoConProgreso(fileCert, `proveedores_docs/${tecnicoId}/${nombreCert}`, "Certificación");
+                }
+
+                // 4. Actualizar Firestore
+                document.getElementById('upload-status-text').innerText = "Guardando información en la base de datos...";
+                document.getElementById('upload-progress-bar').style.width = '100%';
+
+                const docRef = doc(db, "proveedores", tecnicoId);
+                await updateDoc(docRef, {
+                    experiencia: experiencia,
+                    garantia: garantia,
+                    herramientas: herramientas,
+                    desc_certificaciones: descCertificacion,
+                    url_ine: urlIne,
+                    url_trabajo_muestra: urlTrabajo || null,
+                    url_certificacion: urlCert || null,
+                    estatus: "revision_final"
+                });
+
+                // 5. Pantalla de Éxito
+                document.getElementById('step-3').classList.remove('active');
+                document.querySelector('.progress-container').style.display = 'none';
+                document.getElementById('step-description').style.display = 'none';
+                document.querySelector('h2').style.display = 'none';
+                document.getElementById('pantalla-exito').style.display = 'block';
+
+            } catch (error) {
+                alert("Hubo un error al subir los archivos. Revisa tu conexión e intenta de nuevo.");
+                // Restauramos botones si falla
+                btnSubir.style.display = 'block';
+                btnSubir.innerText = "Reintentar subida";
+                btnSubir.disabled = false;
+                btnRegresar.style.display = 'block';
+                contenedorEstado.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

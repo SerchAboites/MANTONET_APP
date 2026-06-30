@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantonet | Registro de Especialistas</title>
+    <style>
+        /* Diseño de la marca Mantonet (Modo Oscuro) */
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --accent-red: #d32f2f;
+            --accent-red-hover: #b71c1c;
+            --input-bg: #2c2c2c;
+            --accent-blue: #2196F3;
+            --accent-blue-hover: #1976D2;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            max-height: 95vh;
+            overflow-y: auto;
+            /* Para que se pueda scrollear si crecen los inputs */
+        }
+
+        h2 {
+            margin-bottom: 5px;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            color: var(--text-main);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-red);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-red);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: var(--accent-red-hover);
+        }
+
+        .btn-blue {
+            background-color: var(--accent-blue);
+        }
+
+        .btn-blue:hover {
+            background-color: var(--accent-blue-hover);
+        }
+
+        .btn-back {
+            background-color: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--text-muted);
+        }
+
+        .btn-back:hover {
+            background-color: #333;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .tag-checkbox {
+            display: none;
+        }
+
+        .tag-label {
+            background-color: var(--input-bg);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #444;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .tag-checkbox:checked+.tag-label {
+            background-color: var(--accent-red);
+            color: white;
+            border-color: var(--accent-red);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="form-container">
+        <h2>Únete a Mantonet</h2>
+        <p id="step-description">Comencemos con tus datos básicos</p>
+
+        <div id="step-1" class="step active">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="nombre" placeholder="Nombre(s)" required style="margin-bottom: 15px;">
+                <input type="text" id="apellidos" placeholder="Apellidos" required style="margin-bottom: 15px;">
+            </div>
+            <input type="tel" id="telefono" placeholder="Teléfono de contacto (WhatsApp)" required>
+            <input type="email" id="correo" placeholder="Correo electrónico" required>
+            <button onclick="nextStep(1, 2)">Siguiente</button>
+        </div>
+
+        <div id="step-2" class="step">
+            <select id="tipo_perfil">
+                <option value="independiente">Soy Técnico Independiente</option>
+                <option value="profesional">Profesional (Ingeniero / Arquitecto)</option>
+                <option value="empresa">Somos una Empresa</option>
+            </select>
+
+            <p style="margin-bottom: 10px; text-align: left; color: white;">¿Cuáles son tus especialidades? (Elige
+                varias)</p>
+
+            <div class="tags-container" id="contenedor-especialidades">
+                <input type="checkbox" id="esp-plomeria" class="tag-checkbox" value="Plomería">
+                <label for="esp-plomeria" class="tag-label">Plomería</label>
+
+                <input type="checkbox" id="esp-electricidad" class="tag-checkbox" value="Electricidad">
+                <label for="esp-electricidad" class="tag-label">Electricidad</label>
+
+                <input type="checkbox" id="esp-albanileria" class="tag-checkbox" value="Albañilería">
+                <label for="esp-albanileria" class="tag-label">Albañilería</label>
+
+                <input type="checkbox" id="esp-pintura" class="tag-checkbox" value="Pintura">
+                <label for="esp-pintura" class="tag-label">Pintura</label>
+
+                <input type="checkbox" id="esp-impermeabilizacion" class="tag-checkbox" value="Impermeabilización">
+                <label for="esp-impermeabilizacion" class="tag-label">Impermeabilización</label>
+
+                <input type="checkbox" id="esp-otro" class="tag-checkbox" value="Otro" onchange="mostrarInputOtro()">
+                <label for="esp-otro" class="tag-label">Otro</label>
+            </div>
+
+            <div id="contenedor-otros-inputs" style="display: none; margin-top: 15px;">
+                <p style="margin-bottom: 10px; text-align: left; color: var(--text-muted); font-size: 14px;">Escribe tus
+                    otras especialidades, una por una:</p>
+                <div id="lista-inputs-dinamicos">
+                    <div class="input-dinamico-wrapper" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" class="input-otro-dinamico" placeholder="Ej. Herrería, Aluminero, etc."
+                            style="margin-bottom: 0;">
+                    </div>
+                </div>
+                <button type="button" onclick="agregarInputOtro()" class="btn-back"
+                    style="margin-bottom: 15px; font-size: 14px; padding: 8px;">+ Agregar otra especialidad</button>
+            </div>
+
+            <button onclick="nextStep(2, 3)">Siguiente</button>
+            <button class="btn-back" onclick="nextStep(2, 1)">Regresar</button>
+        </div>
+
+        <div id="step-3" class="step">
+            <p style="margin-bottom: 10px; text-align: left; color: white;">¿Cuál es tu Código Postal principal?</p>
+            <input type="number" id="cp_principal" placeholder="Ej. 54000" required>
+
+            <p style="margin-bottom: 10px; text-align: left; color: var(--text-muted); font-size: 14px;">Escribe las
+                zonas, colonias o municipios que cubres (Una por una):</p>
+
+            <div id="lista-zonas-dinamicas">
+                <div class="input-dinamico-wrapper" style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" class="input-zona-dinamica" placeholder="Ej. Satélite, Azcapotzalco..."
+                        style="margin-bottom: 0;">
+                </div>
+            </div>
+
+            <button type="button" onclick="agregarInputZona()" class="btn-back"
+                style="margin-bottom: 25px; font-size: 14px; padding: 8px;">+ Agregar otra zona de cobertura</button>
+
+            <button onclick="submitData()">Finalizar Registro</button>
+            <button class="btn-back" onclick="nextStep(3, 2)">Regresar</button>
+        </div>
+
+        <div id="step-4" class="step">
+            <h2 style="color: #4CAF50;">¡Registro Exitoso!</h2>
+            <p>Ya estás en nuestra base de datos. Para que los clientes puedan verte, necesitamos un poco más de
+                información.</p>
+            <button class="btn-blue" onclick="irAlPanel()">Completar mi Perfil Ahora</button>
+            <button class="btn-back" onclick="cerrar()">Lo haré después</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxFbPYP6fdmgacKzee6hr6omFxgqzO4iE",
+            authDomain: "mantonet-reportes.firebaseapp.com",
+            projectId: "mantonet-reportes",
+            storageBucket: "mantonet-reportes.firebasestorage.app",
+            messagingSenderId: "932956793036",
+            appId: "1:932956793036:web:39df56b23e86e71062fa69",
+            measurementId: "G-GTM2DZ9Q5D"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.tecnicoId = "";
+
+        window.nextStep = function (current, next) {
+            document.getElementById(`step-${current}`).classList.remove('active');
+            document.getElementById(`step-${next}`).classList.add('active');
+
+            const desc = document.getElementById('step-description');
+            if (next === 2) desc.innerText = "¿A qué te dedicas?";
+            if (next === 3) desc.innerText = "¿En dónde trabajas?";
+            if (next === 4) desc.innerText = "";
+        }
+
+        // --- LÓGICA DE ESPECIALIDADES ---
+        window.mostrarInputOtro = function () {
+            const checkboxOtro = document.getElementById('esp-otro');
+            const contenedorOtros = document.getElementById('contenedor-otros-inputs');
+            if (checkboxOtro.checked) {
+                contenedorOtros.style.display = 'block';
+                document.querySelector('.input-otro-dinamico').focus();
+            } else {
+                contenedorOtros.style.display = 'none';
+            }
+        }
+
+        window.agregarInputOtro = function () {
+            const contenedor = document.getElementById('lista-inputs-dinamicos');
+            const div = document.createElement('div');
+            div.className = 'input-dinamico-wrapper';
+            div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
+            div.innerHTML = `
+                <input type="text" class="input-otro-dinamico" placeholder="Otra especialidad..." style="margin-bottom: 0;">
+                <button type="button" onclick="eliminarInput(this)" style="background-color: #444; width: auto; padding: 0 15px; margin-bottom: 0; color: #aaa;">X</button>
+            `;
+            contenedor.appendChild(div);
+        }
+
+        // --- LÓGICA DE ZONAS DINÁMICAS ---
+        window.agregarInputZona = function () {
+            const contenedor = document.getElementById('lista-zonas-dinamicas');
+            const div = document.createElement('div');
+            div.className = 'input-dinamico-wrapper';
+            div.style.cssText = 'display: flex; gap: 10px; margin-bottom: 10px;';
+            div.innerHTML = `
+                <input type="text" class="input-zona-dinamica" placeholder="Otra zona o municipio..." style="margin-bottom: 0;">
+                <button type="button" onclick="eliminarInput(this)" style="background-color: #444; width: auto; padding: 0 15px; margin-bottom: 0; color: #aaa;">X</button>
+            `;
+            contenedor.appendChild(div);
+        }
+
+        // Función genérica para borrar cajas de texto (sirve para zonas y especialidades)
+        window.eliminarInput = function (boton) {
+            boton.parentElement.remove();
+        }
+
+        // --- ENVÍO A FIREBASE ---
+        window.submitData = async function () {
+            const btn = document.querySelector('#step-3 button');
+            btn.innerText = "Guardando...";
+            btn.disabled = true;
+
+            // Procesar Especialidades
+            const checkboxes = document.querySelectorAll('.tag-checkbox:checked');
+            let listaEspecialidades = Array.from(checkboxes).map(cb => cb.value);
+
+            if (listaEspecialidades.includes("Otro")) {
+                listaEspecialidades = listaEspecialidades.filter(item => item !== "Otro");
+                const inputsDinamicos = document.querySelectorAll('.input-otro-dinamico');
+                inputsDinamicos.forEach(input => {
+                    const valorLimpio = input.value.trim();
+                    if (valorLimpio !== "") {
+                        listaEspecialidades.push(valorLimpio.charAt(0).toUpperCase() + valorLimpio.slice(1).toLowerCase());
+                    }
+                });
+            }
+
+            // Procesar Zonas Dinámicas
+            const inputsZonas = document.querySelectorAll('.input-zona-dinamica');
+            let listaZonas = [];
+            inputsZonas.forEach(input => {
+                const valorLimpio = input.value.trim();
+                if (valorLimpio !== "") {
+                    listaZonas.push(valorLimpio.charAt(0).toUpperCase() + valorLimpio.slice(1).toLowerCase());
+                }
+            });
+
+            const datos = {
+                nombre: document.getElementById('nombre').value,
+                apellidos: document.getElementById('apellidos').value.trim(),
+                telefono: document.getElementById('telefono').value,
+                correo: document.getElementById('correo').value,
+                tipo_perfil: document.getElementById('tipo_perfil').value,
+                especialidades: listaEspecialidades,
+                codigo_postal: document.getElementById('cp_principal').value, // El CP
+                zonas_cobertura: listaZonas, // El Array de zonas
+                estatus: "pendiente_basico",
+                fecha_registro: serverTimestamp()
+            };
+
+            try {
+                const docRef = await addDoc(collection(db, "proveedores"), datos);
+                window.tecnicoId = docRef.id;
+                window.nextStep(3, 4);
+            } catch (error) {
+                console.error("Error al guardar: ", error);
+                alert("Hubo un error al guardar. Verifica tu conexión e intenta de nuevo.");
+                btn.innerText = "Finalizar Registro";
+                btn.disabled = false;
+            }
+        }
+
+        window.irAlPanel = function () {
+            if (window.tecnicoId) {
+                const nombreTecnico = document.getElementById('nombre').value;
+                const nombreCodificado = encodeURIComponent(nombreTecnico);
+                window.location.href = `perfil-completo.html?id=${window.tecnicoId}&nombre=${nombreCodificado}`;
+            } else {
+                alert("Hubo un problema recuperando tu perfil. Intenta de nuevo.");
+            }
+        }
+
+        window.cerrar = function () {
+            alert("¡No hay problema! Te contactaremos pronto por WhatsApp.");
+            location.reload();
+        }
+    </script>
+</body>
+
+</html>

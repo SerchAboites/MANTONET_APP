@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantonet | Acceso Administrativo</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #f5f5f5;
+            --text-muted: #a0a0a0;
+            --accent-red: #d32f2f;
+            --input-bg: #2c2c2c;
+            --accent-blue: #2196F3;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .form-container {
+            background-color: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            border-top: 4px solid var(--accent-red);
+        }
+
+        h2 { margin-bottom: 5px; color: var(--text-main); }
+        p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            color: var(--text-main);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1976D2;
+        }
+
+        #error-msg {
+            color: var(--accent-red);
+            font-size: 14px;
+            margin-top: 15px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Mantonet Admin</h2>
+        <p>Panel de control exclusivo</p>
+
+        <input type="email" id="email" placeholder="Correo de administrador" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+        
+        <button id="btn-login" onclick="iniciarSesion()">Ingresar al Dashboard</button>
+        
+        <p id="error-msg">Credenciales incorrectas. Intenta de nuevo.</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxFbPYP6fdmgacKzee6hr6omFxgqzO4iE",
+            authDomain: "mantonet-reportes.firebaseapp.com",
+            projectId: "mantonet-reportes",
+            storageBucket: "mantonet-reportes.firebasestorage.app",
+            messagingSenderId: "932956793036",
+            appId: "1:932956793036:web:39df56b23e86e71062fa69",
+            measurementId: "G-GTM2DZ9Q5D"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.iniciarSesion = function() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('btn-login');
+            const errorMsg = document.getElementById('error-msg');
+
+            if(!email || !password) {
+                errorMsg.innerText = "Por favor llena todos los campos.";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            btn.innerText = "Verificando...";
+            btn.disabled = true;
+            errorMsg.style.display = "none";
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // ¡Éxito! Redirigimos al dashboard
+                    window.location.href = "admin-dashboard.html";
+                })
+                .catch((error) => {
+                    console.error("Error de autenticación:", error);
+                    errorMsg.innerText = "Credenciales incorrectas o usuario no encontrado.";
+                    errorMsg.style.display = "block";
+                    btn.innerText = "Ingresar al Dashboard";
+                    btn.disabled = false;
+                });
+        }
+    </script>
+</body>
+</html>
