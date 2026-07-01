@@ -374,8 +374,8 @@
             } catch (error) {
                 console.error("Error al guardar: ", error);
                 alert("Hubo un error al guardar. Verifica tu conexión e intenta de nuevo.");
-                btn.innerText = "Finalizar Registro";
-                btn.disabled = false;
+                btn.innerText = "Finalizar Registro"; // Restaura el texto
+                btn.disabled = false; // Vuelve a habilitar el botón
             }
         }
 
