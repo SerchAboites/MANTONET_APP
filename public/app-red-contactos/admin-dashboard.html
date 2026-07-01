@@ -504,6 +504,13 @@
                                     onclick="cambiarDocumentoEnVisor('cert')"><span>📜 Documento Certificación</span>
                                     <span>➔</span></button>
                             </div>
+
+
+                            <h4>Experiencia y Equipo</h4>
+                            <div class="data-group"><strong>Cobro de Visita:</strong><span id="m-visita"></span></div>
+                            <div class="data-group"><strong>Años de Experiencia:</strong><span
+                                    id="m-experiencia"></span></div>
+
                         </div>
                     </div>
 
@@ -648,6 +655,9 @@
             // 1. Concatenamos nombre y apellido para el título si existen
             const nombreCompleto = `${tecnico.nombre || ''} ${tecnico.apellidos || ''}`.trim();
             document.getElementById('modal-nombre-titulo').innerText = nombreCompleto || "Expediente";
+
+            let textoVisita = tecnico.cobra_visita === 'Sí' ? `Sí ($${tecnico.costo_visita} MXN)` : "No, es gratis";
+            document.getElementById('m-visita').innerText = " " + textoVisita;
 
             // 2. Inyectar textos básicos
             document.getElementById('m-perfil').innerText = " " + (tecnico.tipo_perfil || "N/A");

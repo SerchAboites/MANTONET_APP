@@ -81,21 +81,25 @@ form {
 }
 
 fieldset {
-  border: 1px solid var(--border-color);
-  padding: 20px;
-  border-radius: 8px;
+  border: none; /* Quitamos la línea que encierra todo */
+  padding: 10px 0 20px 0; /* Quitamos el relleno lateral para aprovechar el 100% del ancho */
+  margin: 0;
   display: flex;
   flex-direction: column;
   gap: 15px;
   width: 100%;
-  background: rgba(0,0,0,0.1);
+  background: transparent; /* Quitamos el fondo oscuro para que se funda con la tarjeta */
 }
 
 legend {
-  color: var(--text-muted);
-  font-size: 14px;
+  color: var(--text-main); /* Color más claro para que resalte como título */
+  font-size: 16px;
   font-weight: 600;
-  padding: 0 10px;
+  padding: 0;
+  margin-bottom: 15px;
+  width: 100%;
+  border-bottom: 1px solid var(--border-color); /* Solo una línea sutil inferior para dividir */
+  padding-bottom: 10px; /* Espacio entre el texto del legend y su línea inferior */
 }
 
 label {

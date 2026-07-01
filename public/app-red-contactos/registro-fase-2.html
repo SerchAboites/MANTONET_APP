@@ -239,6 +239,20 @@
             <textarea id="herramientas" rows="3"
                 placeholder="Ej. Soldadora, andamios, escáner automotriz..."></textarea>
 
+            <label class="pregunta" for="herramientas">¿Con qué herramientas o equipo propio cuentas?</label>
+            <textarea id="herramientas" rows="3"
+                placeholder="Ej. Soldadora, andamios, escáner automotriz..."></textarea>
+
+            <label class="pregunta" for="cobra_visita">¿Cobras la visita de revisión o cotización?</label>
+            <select id="cobra_visita" onchange="toggleCostoVisita()">
+                <option value="No, es gratis">No, la visita es gratis</option>
+                <option value="Sí">Sí, tiene costo</option>
+            </select>
+
+            <div id="contenedor-costo-visita" style="display: none;">
+                <label class="pregunta" for="costo_visita">¿Cuánto cobras por la visita? (MXN)</label>
+                <input type="number" id="costo_visita" placeholder="Ej. 250">
+            </div>
             <button onclick="nextStep(1, 2)">Siguiente</button>
         </div>
 
@@ -351,6 +365,23 @@
             }
         }
 
+        // NUEVA FUNCIÓN: Muestra u oculta el campo de costo dependiendo de la respuesta
+        window.toggleCostoVisita = function () {
+            const select = document.getElementById('cobra_visita');
+            const contenedor = document.getElementById('contenedor-costo-visita');
+            const inputCosto = document.getElementById('costo_visita');
+
+            if (select.value === 'Sí') {
+                contenedor.style.display = 'block';
+                inputCosto.focus(); // Enfoca automáticamente para mejor UX
+            } else {
+                contenedor.style.display = 'none';
+                inputCosto.value = ""; // Limpia el valor si se arrepienten y ponen "No"
+            }
+        }
+
+
+
         // --- FUNCIÓN PARA GENERAR FECHA TIPO 20260629 ---
         function obtenerFechaFormato() {
             const hoy = new Date();
@@ -405,6 +436,10 @@
             const herramientas = document.getElementById('herramientas').value;
             const descCertificacion = document.getElementById('desc_certificacion').value.trim(); // .trim() quita espacios vacíos
 
+            // NUEVO: Capturar valores de la visita
+            const cobraVisita = document.getElementById('cobra_visita').value;
+            const costoVisita = document.getElementById('costo_visita').value;
+
             // Validación 1: El INE es obligatorio (OCULTA TEMPORALMENTE)
             /*
             if (!fileIne) {
@@ -457,13 +492,19 @@
                 document.getElementById('upload-status-text').innerText = "Guardando información en la base de datos...";
                 document.getElementById('upload-progress-bar').style.width = '100%';
 
+                // 4. Actualizar Firestore
+                document.getElementById('upload-status-text').innerText = "Guardando información en la base de datos...";
+                document.getElementById('upload-progress-bar').style.width = '100%';
+
                 const docRef = doc(db, "proveedores", tecnicoId);
                 await updateDoc(docRef, {
                     experiencia: experiencia,
                     garantia: garantia,
                     herramientas: herramientas,
                     desc_certificaciones: descCertificacion,
-                    url_ine: urlIne || null, // <- Aseguramos que envíe null si está vacío
+                    cobra_visita: cobraVisita,                // NUEVO CAMPO
+                    costo_visita: costoVisita || "0",         // NUEVO CAMPO (Si está vacío, manda 0)
+                    url_ine: urlIne || null,
                     url_trabajo_muestra: urlTrabajo || null,
                     url_certificacion: urlCert || null,
                     estatus: "revision_final"
