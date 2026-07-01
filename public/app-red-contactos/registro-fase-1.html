@@ -239,7 +239,7 @@
             <button type="button" onclick="agregarInputZona()" class="btn-back"
                 style="margin-bottom: 25px; font-size: 14px; padding: 8px;">+ Agregar otra zona de cobertura</button>
 
-            <button onclick="submitData()">Finalizar Registro</button>
+            <button id="btn-finalizar-registro" onclick="submitData()">Finalizar Registro</button>
             <button class="btn-back" onclick="nextStep(3, 2)">Regresar</button>
         </div>
 
@@ -323,9 +323,9 @@
             boton.parentElement.remove();
         }
 
-        // --- ENVÍO A FIREBASE ---
         window.submitData = async function () {
-            const btn = document.querySelector('#step-3 button');
+            // AHORA SÍ SELECCIONAMOS EL BOTÓN CORRECTO
+            const btn = document.getElementById('btn-finalizar-registro');
             btn.innerText = "Guardando...";
             btn.disabled = true;
 
