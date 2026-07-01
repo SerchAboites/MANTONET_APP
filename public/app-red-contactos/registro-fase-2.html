@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mantonet | Dashboard Administrativo</title>
+    <title>Mantonet | Completa tu Perfil</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -12,532 +12,305 @@
             --text-main: #f5f5f5;
             --text-muted: #a0a0a0;
             --accent-red: #d32f2f;
-            --accent-red-hover: #b71c1c;
             --accent-blue: #2196F3;
-            --accent-green: #388E3C;
-            --accent-green-hover: #2e7d32;
-            --status-pending: #f57c00;
-            --status-review: #1976D2;
-            --status-approved: #388E3C;
+            --input-bg: #2c2c2c;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            margin: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
-        }
-
-        /* --- NAVBAR --- */
-        .navbar {
-            background-color: #000;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid var(--accent-red);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .navbar h1 {
             margin: 0;
-            font-size: 20px;
-        }
-
-        .btn-logout {
-            background-color: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--text-muted);
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-logout:hover {
-            background-color: #333;
-            color: white;
-        }
-
-        /* --- LAYOUT PRINCIPAL --- */
-        .main-content {
-            padding: 30px;
-            flex-grow: 1;
-        }
-
-        .header-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        /* --- GRID DE TARJETAS --- */
-        .grid-tecnicos {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .card-tecnico {
-            background-color: var(--card-bg);
-            border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            border-left: 4px solid #555;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            box-sizing: border-box;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 15px;
-        }
-
-        .card-title {
-            margin: 0;
-            font-size: 18px;
-            font-weight: bold;
-        }
-
-        .card-subtitle {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin: 5px 0 0 0;
-        }
-
-        .badge-status {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .status-pendiente_basico {
-            background-color: rgba(245, 124, 0, 0.2);
-            color: var(--status-pending);
-        }
-
-        .status-revision_final {
-            background-color: rgba(25, 118, 210, 0.2);
-            color: var(--status-review);
-        }
-
-        .status-aprobado {
-            background-color: rgba(56, 142, 60, 0.2);
-            color: var(--status-approved);
-        }
-
-        .card-body p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .btn-action {
-            width: 100%;
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn-action:hover {
-            background-color: var(--accent-blue);
-        }
-
-        #loader {
-            text-align: center;
-            color: var(--text-muted);
-            padding: 40px;
-        }
-
-        /* --- MODAL DE EXPEDIENTE --- */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-content {
+        .form-container {
             background-color: var(--card-bg);
-            width: 90%;
-            max-width: 1100px;
-            height: 85vh;
+            padding: 30px;
             border-radius: 12px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid #333;
-        }
-
-        .modal-header {
-            background-color: #000;
-            padding: 15px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-        }
-
-        .btn-close-modal {
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            font-size: 24px;
-            cursor: pointer;
-        }
-
-        .btn-close-modal:hover {
-            color: white;
-        }
-
-        .modal-body {
-            display: flex;
-            flex-grow: 1;
-            overflow: hidden;
-        }
-
-        /* Columna Izquierda: Información */
-        .modal-info-col {
-            width: 40%;
-            padding: 25px;
-            overflow-y: auto;
-            border-right: 1px solid #333;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .modal-info-col h4 {
-            margin: 0 0 15px 0;
-            color: var(--accent-blue);
-            border-bottom: 1px solid #333;
-            padding-bottom: 5px;
-        }
-
-        .data-group {
-            margin-bottom: 15px;
-            font-size: 14px;
-        }
-
-        .data-group strong {
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        /* Botones de documentos */
-        .doc-tabs-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-doc-tab {
-            background-color: #2c2c2c;
-            color: white;
-            border: 1px solid #444;
-            padding: 10px;
-            border-radius: 6px;
-            text-align: left;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .btn-doc-tab:hover {
-            border-color: var(--accent-blue);
-            background-color: #333;
-        }
-
-        .btn-doc-tab.active {
-            background-color: rgba(33, 150, 243, 0.1);
-            border-color: var(--accent-blue);
-            color: var(--accent-blue);
-        }
-
-        /* Columna Derecha: Visor de documentos */
-        .modal-preview-col {
-            width: 60%;
-            background-color: #151515;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 500px;
             position: relative;
         }
 
-        .viewer-placeholder {
-            color: #555;
+        /* --- BARRA DE PROGRESO MANTONET --- */
+        .progress-container {
+            width: 100%;
+            background-color: #333;
+            height: 6px;
+            border-radius: 3px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent-red);
+            width: 33.33%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
             font-size: 14px;
             text-align: center;
-            padding: 20px;
+            margin-bottom: 25px;
         }
 
-        .embedded-viewer {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background-color: #151515;
-        }
-
-        .img-viewer {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        /* Botones de acción finales */
-        .action-footer-btns {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-approve {
-            flex: 1;
-            background-color: var(--accent-green);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
+        label.pregunta {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            font-size: 14px;
             font-weight: bold;
-            cursor: pointer;
         }
 
-        .btn-approve:hover {
-            background-color: var(--accent-green-hover);
-        }
-
-        .btn-reject {
-            flex: 1;
-            background-color: var(--accent-red);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .btn-reject:hover {
-            background-color: var(--accent-red-hover);
-        }
-
-        .btn-whatsapp-reminder {
+        input[type="text"],
+        textarea,
+        select {
             width: 100%;
-            background-color: #25D366;
-            color: black;
-            border: none;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            color: var(--text-main);
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            background-color: var(--input-bg);
+            border: 1px dashed var(--text-muted);
+            color: var(--text-muted);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+
+        .custom-file-upload:hover {
+            border-color: var(--accent-red);
+            background-color: #333;
+            color: var(--text-main);
+        }
+
+        .file-selected {
+            border: 1px solid #4CAF50;
+            color: #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        button {
+            width: 100%;
             padding: 14px;
-            border-radius: 6px;
+            background-color: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            font-size: 15px;
+            transition: background-color 0.3s;
             margin-bottom: 10px;
         }
 
-        .btn-whatsapp-reminder:hover {
-            background-color: #1ebd56;
+        button:hover {
+            background-color: #1976D2;
         }
 
-        .btn-delete {
-            width: 100%;
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        .btn-back {
             background-color: transparent;
-            color: #888;
-            border: 1px solid #555;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 15px;
-            cursor: pointer;
-            transition: 0.3s;
-            font-size: 13px;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
         }
 
-        .btn-delete:hover {
-            background-color: #441111;
-            color: #ff5555;
-            border-color: #ff5555;
+        .btn-back:hover {
+            background-color: #333;
         }
 
-        /* --- ADAPTACIÓN MÓVIL --- */
-        @media (max-width: 800px) {
-            .navbar {
-                padding: 15px;
-            }
+        .step {
+            display: none;
+        }
 
-            .main-content {
-                padding: 15px;
-            }
+        .step.active {
+            display: block;
+        }
 
-            .header-section {
-                flex-direction: column;
-                align-items: flex-start;
-            }
+        #pantalla-exito {
+            display: none;
+            text-align: center;
+        }
 
-            .grid-tecnicos {
-                grid-template-columns: 1fr;
-            }
+        /* Estilos de la barra de subida dinámica */
+        #upload-status-container {
+            display: none;
+            margin-bottom: 20px;
+            background-color: #222;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
 
-            .modal-content {
-                height: 90vh;
-            }
+        #upload-status-text {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--text-main);
+            text-align: left;
+        }
 
-            .modal-body {
-                flex-direction: column;
-                overflow-y: auto;
-            }
+        .upload-bar-bg {
+            width: 100%;
+            background-color: #333;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
 
-            .modal-info-col {
-                width: 100%;
-                border-right: none;
-                border-bottom: 1px solid #333;
-                box-sizing: border-box;
-                overflow-y: visible;
-            }
-
-            .modal-preview-col {
-                width: 100%;
-                height: 400px;
-                box-sizing: border-box;
-            }
+        #upload-progress-bar {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.2s linear;
         }
     </style>
 </head>
 
 <body>
 
-    <nav class="navbar">
-        <h1>Mantonet Admin</h1>
-        <button class="btn-logout" onclick="cerrarSesion()">Cerrar Sesión</button>
-    </nav>
+    <div class="form-container" id="main-container">
 
-    <div class="main-content">
-        <div class="header-section">
-            <h2>Solicitudes de Especialistas</h2>
+        <header>
+            <div id="logoAnimado"
+                style="width: 100%; height:80px; display:flex; align-items:center; justify-content:center;">
+                <img src="../rec_img/LogoMantonet.svg" alt="Logo de Mantonet" height="100%">
+            </div>
+        </header>
+
+        <h2>Expediente Profesional</h2>
+        <p class="subtitle" id="step-description">Paso 1: Tu experiencia</p>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
         </div>
 
-        <div id="loader">Cargando base de datos...</div>
+        <div id="step-1" class="step active">
+            <label class="pregunta" for="experiencia">¿Cuántos años de experiencia tienes?</label>
+            <select id="experiencia">
+                <option value="1 a 3 años">1 a 3 años</option>
+                <option value="3 a 5 años">3 a 5 años</option>
+                <option value="5 a 10 años">5 a 10 años</option>
+                <option value="Más de 10 años">Más de 10 años</option>
+            </select>
 
-        <div class="grid-tecnicos" id="contenedor-tecnicos"></div>
-    </div>
+            <label class="pregunta" for="garantia">¿Ofreces garantía en tus trabajos?</label>
+            <select id="garantia">
+                <option value="Sí, por escrito">Sí, doy garantía por escrito</option>
+                <option value="Sí, de palabra">Sí, garantía de palabra</option>
+                <option value="No ofrezco garantía">No ofrezco garantía</option>
+            </select>
 
-    <div class="modal-overlay" id="modal-expediente">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="modal-nombre-titulo">Nombre del Técnico</h3>
-                <button class="btn-close-modal" onclick="cerrarModal()">×</button>
+            <label class="pregunta" for="herramientas">¿Con qué herramientas o equipo propio cuentas?</label>
+            <textarea id="herramientas" rows="3"
+                placeholder="Ej. Soldadora, andamios, escáner automotriz..."></textarea>
+
+            <label class="pregunta" for="herramientas">¿Con qué herramientas o equipo propio cuentas?</label>
+            <textarea id="herramientas" rows="3"
+                placeholder="Ej. Soldadora, andamios, escáner automotriz..."></textarea>
+
+            <label class="pregunta" for="cobra_visita">¿Cobras la visita de revisión o cotización?</label>
+            <select id="cobra_visita" onchange="toggleCostoVisita()">
+                <option value="No, es gratis">No, la visita es gratis</option>
+                <option value="Sí">Sí, tiene costo</option>
+            </select>
+
+            <div id="contenedor-costo-visita" style="display: none;">
+                <label class="pregunta" for="costo_visita">¿Cuánto cobras por la visita? (MXN)</label>
+                <input type="number" id="costo_visita" placeholder="Ej. 250">
             </div>
-            <div class="modal-body">
-
-                <div class="modal-info-col">
-                    <div>
-                        <h4>Datos de Contacto</h4>
-                        <div class="data-group"><strong>Perfil:</strong><span id="m-perfil"></span></div>
-                        <div class="data-group"><strong>Teléfono:</strong><span id="m-telefono"></span></div>
-                        <div class="data-group"><strong>Correo:</strong><span id="m-correo"></span></div>
-                        <div class="data-group"><strong>Zona Cobertura:</strong><span id="m-zona"></span></div>
-                        <div class="data-group"><strong>Especialidades:</strong><span id="m-especialidades"></span>
-                        </div>
-
-                        <div id="seccion-datos-avanzados" style="display:none;">
-                            <h4>Experiencia y Equipo</h4>
-                            <div class="data-group"><strong>Cobro de Visita:</strong><span id="m-visita"></span></div>
-                            <div class="data-group"><strong>Años de Experiencia:</strong><span id="m-experiencia"></span></div>
-                            <div class="data-group"><strong>Garantía:</strong><span id="m-garantia"></span></div>
-                            <div class="data-group"><strong>Herramientas Propias:</strong><span id="m-herramientas"></span></div>
-                            <div class="data-group"><strong>Detalle Certificaciones:</strong><span id="m-desc-cert"></span></div>
-
-                            <h4>Documentación Adjunta</h4>
-                            <div class="doc-tabs-container">
-                                <button class="btn-doc-tab" id="btn-tab-ine"
-                                    onclick="cambiarDocumentoEnVisor('ine')"><span>📁 Identificación Oficial
-                                        (INE)</span> <span>➔</span></button>
-                                <button class="btn-doc-tab" id="btn-tab-trabajo"
-                                    onclick="cambiarDocumentoEnVisor('trabajo')"><span>📸 Muestra de Trabajo</span>
-                                    <span>➔</span></button>
-                                <button class="btn-doc-tab" id="btn-tab-cert"
-                                    onclick="cambiarDocumentoEnVisor('cert')"><span>📜 Documento Certificación</span>
-                                    <span>➔</span></button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="margin-top: 20px;">
-                        <div id="wrapper-acciones-finales" style="display:none;">
-                            <div class="action-footer-btns">
-                                <button class="btn-approve" id="btn-aprobar-action">Aprobar</button>
-                                <button class="btn-reject" id="btn-rechazar-action">Rechazar</button>
-                            </div>
-                        </div>
-                        <div id="wrapper-recordatorio-pendiente" style="display:none;">
-                            <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Este usuario no ha
-                                completado el expediente (Paso 2).</p>
-                            <a id="link-whatsapp-remind" target="_blank" style="text-decoration: none;">
-                                <button class="btn-whatsapp-reminder">💬 Recordar por WhatsApp</button>
-                            </a>
-                        </div>
-
-                        <button class="btn-delete" id="btn-eliminar-action" onclick="eliminarPerfilCompleto()">🗑️
-                            Eliminar Perfil Definitivamente</button>
-                    </div>
-                </div>
-
-                <div class="modal-preview-col" id="visor-contenedor-principal">
-                    <div class="viewer-placeholder" id="visor-placeholder">
-                        <span style="font-size: 40px;">📄</span><br><br>
-                        Selecciona un documento de la lista de la izquierda para visualizarlo aquí en tiempo real.
-                    </div>
-                </div>
-
-            </div>
+            <button onclick="nextStep(1, 2)">Siguiente</button>
         </div>
+
+        <div id="step-2" class="step">
+
+            <div id="contenedor-ine" style="display: none;">
+                <label class="pregunta">Identificación Oficial (INE / Pasaporte) *</label>
+                <label for="foto_ine" class="custom-file-upload" id="lbl_ine">📁 Clic aquí para seleccionar
+                    INE...</label>
+                <input type="file" id="foto_ine" accept="image/*,application/pdf"
+                    onchange="actualizarNombreArchivo(this, 'lbl_ine')">
+            </div>
+
+            <label class="pregunta">Foto de un trabajo anterior (Recomendado)</label>
+            <label for="foto_trabajo" class="custom-file-upload" id="lbl_trabajo">📸 Clic aquí para subir foto de tu
+                trabajo...</label>
+            <input type="file" id="foto_trabajo" accept="image/*"
+                onchange="actualizarNombreArchivo(this, 'lbl_trabajo')">
+
+            <button onclick="nextStep(2, 3)">Siguiente</button>
+            <button class="btn-back" onclick="nextStep(2, 1)">Regresar</button>
+        </div>
+
+        <div id="step-3" class="step">
+            <label class="pregunta" for="desc_certificacion">¿Tienes certificaciones? Cuéntanos cuáles
+                (Opcional)</label>
+            <input type="text" id="desc_certificacion" placeholder="Ej. Alturas DC-3, Electricidad básica...">
+
+            <label class="pregunta">Sube tu certificación principal (Opcional)</label>
+            <label for="foto_certificacion" class="custom-file-upload" id="lbl_certificacion">📜 Clic aquí para subir
+                archivo...</label>
+            <input type="file" id="foto_certificacion" accept="image/*,application/pdf"
+                onchange="actualizarNombreArchivo(this, 'lbl_certificacion')">
+
+            <div id="upload-status-container">
+                <p id="upload-status-text">Iniciando subida...</p>
+                <div class="upload-bar-bg">
+                    <div id="upload-progress-bar"></div>
+                </div>
+            </div>
+
+            <button id="btn-subir" onclick="guardarPerfilCompleto()">Subir Expediente y Finalizar</button>
+            <button class="btn-back" id="btn-regresar" onclick="nextStep(3, 2)">Regresar</button>
+        </div>
+
+        <div id="pantalla-exito">
+            <h2 style="color: #4CAF50;">¡Todo Listo!</h2>
+            <p class="subtitle">Hemos recibido tus documentos. Nuestro equipo validará tu perfil y te contactaremos por
+                WhatsApp.</p>
+        </div>
+
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, orderBy, query, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getStorage, ref, deleteObject } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        // Importamos uploadBytesResumable en lugar de uploadBytes
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCxFbPYP6fdmgacKzee6hr6omFxgqzO4iE",
@@ -545,280 +318,201 @@
             projectId: "mantonet-reportes",
             storageBucket: "mantonet-reportes.firebasestorage.app",
             messagingSenderId: "932956793036",
-            appId: "1:932956793036:web:39df56b23e86e71062fa69"
+            appId: "1:932956793036:web:39df56b23e86e71062fa69",
+            measurementId: "G-GTM2DZ9Q5D"
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        window.tecnicosCache = {};
-        window.idTecnicoAbierto = "";
+        // Sacamos el ID y el Nombre de la URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const tecnicoId = urlParams.get('id');
+        let nombreTecnico = urlParams.get('nombre') || "Tecnico_Desconocido";
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) { cargarTecnicos(); } else { window.location.href = "admin-login.html"; }
-        });
+        // Limpiamos el nombre para que no tenga espacios ni caracteres raros para el nombre del archivo
+        const nombreLimpio = nombreTecnico.replace(/[^a-zA-Z0-9]/g, '');
 
-        window.cerrarSesion = function () {
-            signOut(auth).then(() => { window.location.href = "admin-login.html"; });
+        if (!tecnicoId) {
+            alert("Error: No se encontró tu perfil. Por favor, regístrate de nuevo.");
+            window.location.href = 'index.html';
         }
 
-        async function cargarTecnicos() {
-            const contenedor = document.getElementById('contenedor-tecnicos');
-            const loader = document.getElementById('loader');
+        window.nextStep = function (current, next) {
+            document.getElementById(`step-${current}`).classList.remove('active');
+            document.getElementById(`step-${next}`).classList.add('active');
+
+            const progressBar = document.getElementById('progress-bar');
+            if (next === 1) progressBar.style.width = '33.33%';
+            if (next === 2) progressBar.style.width = '66.66%';
+            if (next === 3) progressBar.style.width = '100%';
+
+            const desc = document.getElementById('step-description');
+            if (next === 1) desc.innerText = "Paso 1: Tu experiencia";
+            if (next === 2) desc.innerText = "Paso 2: Evidencia visual";
+            if (next === 3) desc.innerText = "Paso 3: Certificaciones";
+        }
+
+        window.actualizarNombreArchivo = function (input, labelId) {
+            const label = document.getElementById(labelId);
+            if (input.files && input.files.length > 0) {
+                label.innerText = "✅ " + input.files[0].name;
+                label.classList.add('file-selected');
+            } else {
+                label.innerText = "📁 Clic aquí para seleccionar...";
+                label.classList.remove('file-selected');
+            }
+        }
+
+        // NUEVA FUNCIÓN: Muestra u oculta el campo de costo dependiendo de la respuesta
+        window.toggleCostoVisita = function () {
+            const select = document.getElementById('cobra_visita');
+            const contenedor = document.getElementById('contenedor-costo-visita');
+            const inputCosto = document.getElementById('costo_visita');
+
+            if (select.value === 'Sí') {
+                contenedor.style.display = 'block';
+                inputCosto.focus(); // Enfoca automáticamente para mejor UX
+            } else {
+                contenedor.style.display = 'none';
+                inputCosto.value = ""; // Limpia el valor si se arrepienten y ponen "No"
+            }
+        }
+
+
+
+        // --- FUNCIÓN PARA GENERAR FECHA TIPO 20260629 ---
+        function obtenerFechaFormato() {
+            const hoy = new Date();
+            const yyyy = hoy.getFullYear();
+            const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoy.getDate()).padStart(2, '0');
+            return `${yyyy}${mm}${dd}`;
+        }
+
+        // --- FUNCIÓN DINÁMICA DE SUBIDA DE ARCHIVOS ---
+        // Envuelve la función de Firebase en una Promesa para poder usar "await"
+        function subirArchivoConProgreso(file, path, nombreVisual) {
+            return new Promise((resolve, reject) => {
+                const storageRef = ref(storage, path);
+                const uploadTask = uploadBytesResumable(storageRef, file);
+
+                const statusText = document.getElementById('upload-status-text');
+                const progressBar = document.getElementById('upload-progress-bar');
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        // Calculamos el porcentaje
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        progressBar.style.width = progress + '%';
+                        statusText.innerText = `Subiendo ${nombreVisual}: ${Math.round(progress)}%`;
+                    },
+                    (error) => {
+                        console.error("Error al subir:", error);
+                        reject(error);
+                    },
+                    () => {
+                        // Cuando termina al 100%, obtenemos la URL pública
+                        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+                            resolve(downloadURL);
+                        });
+                    }
+                );
+            });
+        }
+
+window.guardarPerfilCompleto = async function () {
+            const btnSubir = document.getElementById('btn-subir');
+            const btnRegresar = document.getElementById('btn-regresar');
+            const contenedorEstado = document.getElementById('upload-status-container');
+
+            const fileIne = document.getElementById('foto_ine').files[0];
+            const fileTrabajo = document.getElementById('foto_trabajo').files[0];
+            const fileCert = document.getElementById('foto_certificacion').files[0];
+
+            const experiencia = document.getElementById('experiencia').value;
+            const garantia = document.getElementById('garantia').value;
+            const herramientas = document.getElementById('herramientas').value;
+            const descCertificacion = document.getElementById('desc_certificacion').value.trim();
+
+            const cobraVisita = document.getElementById('cobra_visita').value;
+            const costoVisita = document.getElementById('costo_visita').value;
+
+            // Validación: Si hay documento de certificación, exige la descripción
+            if (fileCert && descCertificacion === "") {
+                alert("Has adjuntado un documento de certificación. Por favor, escribe de qué trata (ej. 'Certificación en Alturas DC-3') en la caja de texto correspondiente.");
+                document.getElementById('desc_certificacion').focus();
+                return;
+            }
+
+            // Bloqueamos botones y mostramos la barra de carga
+            btnSubir.style.display = 'none';
+            btnRegresar.style.display = 'none';
+            contenedorEstado.style.display = 'block';
 
             try {
-                const q = query(collection(db, "proveedores"), orderBy("fecha_registro", "desc"));
-                const querySnapshot = await getDocs(q);
+                let urlIne = "";
+                let urlTrabajo = "";
+                let urlCert = "";
 
-                loader.style.display = 'none';
-                contenedor.innerHTML = '';
+                const fecha = obtenerFechaFormato();
 
-                if (querySnapshot.empty) {
-                    contenedor.innerHTML = '<p style="color:#a0a0a0;">No hay técnicos registrados.</p>';
-                    return;
+                // 1. Subir INE (SOLO SI EXISTE)
+                if (fileIne) {
+                    const extIne = fileIne.name.split('.').pop();
+                    const nombreIne = `INE_${nombreLimpio}_${fecha}.${extIne}`;
+                    urlIne = await subirArchivoConProgreso(fileIne, `proveedores_docs/${tecnicoId}/${nombreIne}`, "Identificación (INE)");
                 }
 
-                querySnapshot.forEach((documento) => {
-                    const data = documento.data();
-                    const id = documento.id;
+                // 2. Subir Trabajo (SOLO SI EXISTE)
+                if (fileTrabajo) {
+                    const extTrabajo = fileTrabajo.name.split('.').pop();
+                    const nombreTrabajo = `TRABAJO_${nombreLimpio}_${fecha}.${extTrabajo}`;
+                    urlTrabajo = await subirArchivoConProgreso(fileTrabajo, `proveedores_docs/${tecnicoId}/${nombreTrabajo}`, "Foto de Trabajo");
+                }
 
-                    window.tecnicosCache[id] = data;
+                // 3. Subir Certificación (SOLO SI EXISTE)
+                if (fileCert) {
+                    const extCert = fileCert.name.split('.').pop();
+                    const nombreCert = `CERTIFICACION_${nombreLimpio}_${fecha}.${extCert}`;
+                    urlCert = await subirArchivoConProgreso(fileCert, `proveedores_docs/${tecnicoId}/${nombreCert}`, "Certificación");
+                }
 
-                    let fechaStr = "Sin fecha";
-                    if (data.fecha_registro) {
-                        fechaStr = data.fecha_registro.toDate().toLocaleDateString('es-MX');
-                    }
+                // 4. Actualizar Firestore
+                document.getElementById('upload-status-text').innerText = "Guardando información en la base de datos...";
+                document.getElementById('upload-progress-bar').style.width = '100%';
 
-                    let estatusClase = data.estatus || 'pendiente_basico';
-                    let estatusTexto = data.estatus === 'revision_final' ? 'En Revisión' :
-                        data.estatus === 'pendiente_basico' ? 'Registro Básico' :
-                            data.estatus === 'aprobado' ? 'Aprobado' : data.estatus;
-
-                    let borderLeftColor = estatusClase === 'revision_final' ? 'var(--status-review)' :
-                        estatusClase === 'aprobado' ? 'var(--status-approved)' : 'var(--status-pending)';
-
-                    const cardHTML = `
-                        <div class="card-tecnico" style="border-left-color: ${borderLeftColor}">
-                            <div>
-                                <div class="card-header">
-                                    <div>
-                                        <h3 class="card-title">${data.nombre || 'Sin Nombre'} ${data.apellidos || ''}</h3>
-                                        <p class="card-subtitle">${data.tipo_perfil || 'Técnico'}</p>
-                                    </div>
-                                    <span class="badge-status status-${estatusClase}">${estatusTexto}</span>
-                                </div>
-                                <div class="card-body">
-                                    <p><strong>Tel:</strong> ${data.telefono || 'N/A'}</p>
-                                    <p><strong>CP:</strong> ${data.codigo_postal || 'N/A'}</p>
-                                    <p><strong>Zonas:</strong> ${(data.zonas_cobertura || []).join(', ') || 'N/A'}</p>
-                                    <p><strong>Especialidades:</strong> ${(data.especialidades || []).join(', ')}</p>
-                                    <p style="color: #666; font-size: 12px; margin-top: 10px;">Registrado: ${fechaStr}</p>
-                                </div>
-                            </div>
-                            <button class="btn-action" onclick="abrirExpediente('${id}')">Ver Expediente Completo</button>
-                        </div>
-                        `;
-                    contenedor.innerHTML += cardHTML;
+                const docRef = doc(db, "proveedores", tecnicoId);
+                await updateDoc(docRef, {
+                    experiencia: experiencia,
+                    garantia: garantia,
+                    herramientas: herramientas,
+                    desc_certificaciones: descCertificacion,
+                    cobra_visita: cobraVisita,
+                    costo_visita: costoVisita || "0",
+                    url_ine: urlIne || null,
+                    url_trabajo_muestra: urlTrabajo || null,
+                    url_certificacion: urlCert || null,
+                    estatus: "revision_final"
                 });
 
-            } catch (error) {
-                console.error(error);
-                loader.innerText = "Hubo un error cargando la base de datos.";
-            }
-        }
-
-        // --- LÓGICA DE APERTURA DEL MODAL ---
-        window.abrirExpediente = function (id) {
-            window.idTecnicoAbierto = id;
-            const tecnico = window.tecnicosCache[id];
-            if (!tecnico) return;
-
-            const nombreCompleto = `${tecnico.nombre || ''} ${tecnico.apellidos || ''}`.trim();
-            document.getElementById('modal-nombre-titulo').innerText = nombreCompleto || "Expediente";
-
-            document.getElementById('m-perfil').innerText = " " + (tecnico.tipo_perfil || "N/A");
-            document.getElementById('m-telefono').innerText = " " + (tecnico.telefono || "N/A");
-            document.getElementById('m-correo').innerText = " " + (tecnico.correo || "N/A");
-            document.getElementById('m-zona').innerText = " " + (tecnico.zonas_cobertura ? tecnico.zonas_cobertura.join(', ') : "N/A");
-            document.getElementById('m-especialidades').innerText = " " + (tecnico.especialidades || []).join(', ');
-
-            resetearVisor();
-
-            const cp = tecnico.codigo_postal;
-            const contenedorInfo = document.querySelector('.modal-info-col > div');
-            const viejoMapa = document.getElementById('mapa-cp-dinamico');
-            if (viejoMapa) viejoMapa.remove();
-
-            if (cp) {
-                const urlMapa = `https://maps.google.com/maps?q=${cp},+Mexico&t=&z=13&ie=UTF8&iwloc=&output=embed`;
-                const mapaHTML = `
-                    <div id="mapa-cp-dinamico" style="margin-top: 20px; margin-bottom: 20px; border-radius: 8px; overflow: hidden; border: 1px solid #444;">
-                        <h4 style="margin: 0; padding: 10px; background-color: #2c2c2c; font-size: 13px; color: #fff;">📍 Zona de Cobertura Principal (CP: ${cp})</h4>
-                        <iframe width="100%" height="200" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="${urlMapa}"></iframe>
-                    </div>
-                `;
-                contenedorInfo.insertAdjacentHTML('beforeend', mapaHTML);
-            }
-
-            const secAvanzada = document.getElementById('seccion-datos-avanzados');
-            const wrapAcciones = document.getElementById('wrapper-acciones-finales');
-            const wrapRecordatorio = document.getElementById('wrapper-recordatorio-pendiente');
-
-            if (tecnico.estatus === "pendiente_basico") {
-                secAvanzada.style.display = "none";
-                wrapAcciones.style.display = "none";
-                wrapRecordatorio.style.display = "block";
-
-                // Lógica de URL mejorada y segura
-                const rutaActual = window.location.href.split('?')[0];
-                const urlBase = rutaActual.substring(0, rutaActual.lastIndexOf('/'));
-                const nombreSeguro = encodeURIComponent(nombreCompleto);
-                const urlCompletaPasos = `${urlBase}/app-red-contactos/registro-fase-2.html?id=${id}&nombre=${nombreSeguro}`;
-
-                const mensajeWa = `Hola ${tecnico.nombre}, te saludamos de Mantonet. Notamos que iniciaste tu registro pero no terminaste de armar tu expediente profesional. Para que los clientes puedan ver tu perfil, por favor complétalo entrando a este enlace personalizado:\n\n${urlCompletaPasos}`;
-
-                const telLimpio = (tecnico.telefono || "").replace(/[^0-9]/g, '');
-                document.getElementById('link-whatsapp-remind').href = `https://wa.me/52${telLimpio}?text=${encodeURIComponent(mensajeWa)}`;
-
-            } else {
-                secAvanzada.style.display = "block";
-                wrapRecordatorio.style.display = "none";
-                wrapAcciones.style.display = "block";
-
-                // Mostrar información de cobro de visita
-                let textoVisita = "No especificado";
-                if (tecnico.cobra_visita === 'Sí') {
-                    textoVisita = `Sí ($${tecnico.costo_visita} MXN)`;
-                } else if (tecnico.cobra_visita === 'No, es gratis') {
-                    textoVisita = "No, es gratis";
-                }
-                document.getElementById('m-visita').innerText = " " + textoVisita;
-
-                document.getElementById('m-experiencia').innerText = " " + (tecnico.experiencia || "N/A");
-                document.getElementById('m-garantia').innerText = " " + (tecnico.garantia || "N/A");
-                document.getElementById('m-herramientas').innerText = " " + (tecnico.herramientas || "Ninguna declarada");
-                document.getElementById('m-desc-cert').innerText = " " + (tecnico.desc_certificaciones || "Ninguna");
-
-                ajustarBotonTabDoc('btn-tab-ine', tecnico.url_ine);
-                ajustarBotonTabDoc('btn-tab-trabajo', tecnico.url_trabajo_muestra);
-                ajustarBotonTabDoc('btn-tab-cert', tecnico.url_certificacion);
-            }
-
-            document.getElementById('modal-expediente').classList.add('active');
-        }
-
-        window.cerrarModal = function () {
-            document.getElementById('modal-expediente').classList.remove('active');
-            resetearVisor();
-        }
-
-        function ajustarBotonTabDoc(idBoton, url) {
-            const btn = document.getElementById(idBoton);
-            if (url) {
-                btn.style.display = "flex";
-                btn.disabled = false;
-                btn.style.opacity = "1";
-            } else {
-                btn.style.display = "none";
-            }
-        }
-
-        function resetearVisor() {
-            const contenedor = document.getElementById('visor-contenedor-principal');
-            contenedor.innerHTML = `
-                <div class="viewer-placeholder" id="visor-placeholder">
-                    <span style="font-size: 40px;">📄</span><br><br>
-                    Selecciona un documento de la lista de la izquierda para visualizarlo aquí en tiempo real.
-                </div>
-            `;
-            document.querySelectorAll('.btn-doc-tab').forEach(b => b.classList.remove('active'));
-        }
-
-        window.cambiarDocumentoEnVisor = function (tipoDoc) {
-            const tecnico = window.tecnicosCache[window.idTecnicoAbierto];
-            if (!tecnico) return;
-
-            let url = "";
-            if (tipoDoc === 'ine') url = tecnico.url_ine;
-            if (tipoDoc === 'trabajo') url = tecnico.url_trabajo_muestra;
-            if (tipoDoc === 'cert') url = tecnico.url_certificacion;
-
-            if (!url) return;
-
-            document.querySelectorAll('.btn-doc-tab').forEach(b => b.classList.remove('active'));
-            if (tipoDoc === 'ine') document.getElementById('btn-tab-ine').classList.add('active');
-            if (tipoDoc === 'trabajo') document.getElementById('btn-tab-trabajo').classList.add('active');
-            if (tipoDoc === 'cert') document.getElementById('btn-tab-cert').classList.add('active');
-
-            const contenedor = document.getElementById('visor-contenedor-principal');
-            const urlMinuscula = url.toLowerCase();
-
-            if (urlMinuscula.split('?')[0].endsWith('.pdf')) {
-                contenedor.innerHTML = `<iframe class="embedded-viewer" src="${url}"></iframe>`;
-            } else {
-                contenedor.innerHTML = `<img class="img-viewer" src="${url}" alt="Documentación Mantonet">`;
-            }
-        }
-
-        async function cambiarEstatusFirebase(nuevoEstatus) {
-            if (!window.idTecnicoAbierto) return;
-            const confirmacion = confirm(`¿Estás seguro de cambiar el estatus de este perfil a: ${nuevoEstatus.toUpperCase()}?`);
-            if (!confirmacion) return;
-
-            try {
-                const docRef = doc(db, "proveedores", window.idTecnicoAbierto);
-                await updateDoc(docRef, { estatus: nuevoEstatus });
-                alert(`Perfil actualizado con éxito a: ${nuevoEstatus}`);
-                cerrarModal();
-                cargarTecnicos();
-            } catch (error) {
-                console.error("Error actualizando estatus: ", error);
-                alert("Ocurrió un error en Firestore.");
-            }
-        }
-
-        document.getElementById('btn-aprobar-action').onclick = () => cambiarEstatusFirebase('aprobado');
-        document.getElementById('btn-rechazar-action').onclick = () => cambiarEstatusFirebase('rechazado');
-
-        window.eliminarPerfilCompleto = async function () {
-            if (!window.idTecnicoAbierto) return;
-
-            const confirmacion = confirm("⚠️ ATENCIÓN: ¿Estás seguro de eliminar PERMANENTEMENTE este perfil y sus documentos? Esta acción no se puede deshacer.");
-            if (!confirmacion) return;
-
-            const tecnico = window.tecnicosCache[window.idTecnicoAbierto];
-            const btn = document.getElementById('btn-eliminar-action');
-            btn.innerText = "Eliminando información y archivos...";
-            btn.disabled = true;
-
-            try {
-                const urlsArchivos = [tecnico.url_ine, tecnico.url_trabajo_muestra, tecnico.url_certificacion];
-
-                for (const url of urlsArchivos) {
-                    if (url) {
-                        try {
-                            const archivoRef = ref(storage, url);
-                            await deleteObject(archivoRef);
-                        } catch (e) {
-                            console.warn("El archivo ya no existe o hubo un error al borrar:", url);
-                        }
-                    }
-                }
-
-                await deleteDoc(doc(db, "proveedores", window.idTecnicoAbierto));
-
-                alert("Perfil y archivos eliminados correctamente de la base de datos.");
-                cerrarModal();
-                cargarTecnicos();
+                // 5. Pantalla de Éxito
+                document.getElementById('step-3').classList.remove('active');
+                document.querySelector('.progress-container').style.display = 'none';
+                document.getElementById('step-description').style.display = 'none';
+                document.querySelector('h2').style.display = 'none';
+                document.getElementById('pantalla-exito').style.display = 'block';
 
             } catch (error) {
-                console.error("Error general al eliminar:", error);
-                alert("Hubo un error al intentar eliminar el perfil por completo.");
-            } finally {
-                btn.innerText = "🗑️ Eliminar Perfil Definitivamente";
-                btn.disabled = false;
+                console.error("Error capturado:", error); // Añadido para ver el error real en consola si algo más falla
+                alert("Hubo un error al subir los archivos. Revisa tu conexión e intenta de nuevo.");
+                // Restauramos botones si falla
+                btnSubir.style.display = 'block';
+                btnSubir.innerText = "Reintentar subida";
+                btnSubir.disabled = false;
+                btnRegresar.style.display = 'block';
+                contenedorEstado.style.display = 'none';
             }
         }
     </script>
