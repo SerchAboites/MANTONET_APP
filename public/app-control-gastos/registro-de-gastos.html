@@ -3,555 +3,42 @@
 
 <head>
   <meta charset="UTF-8">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Gastos</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400;600&display=swap" rel="stylesheet">
-
-  <!-- TUS ESTILOS CSS (AHORA ENLAZADOS EXTERNAMENTE) -->
-  <link rel="stylesheet" href="./reg-gastos.css">
-  <link rel="stylesheet" href="./reg-gastos-mobil.css">
-
-
-  <script>
-    // =================================================================
-    // --- CONFIGURACIÓN DEL BACKEND ---
-    // =================================================================
-    // 1. Despliega tu NUEVO archivo Code.gs como una "Aplicación Web".
-    // 2. Asegúrate de que "Quién tiene acceso" esté configurado como "Cualquier persona".
-    // 3. Copia la URL de esta NUEVA aplicación web y pégala aquí.
-    const GAS_FINANZAS_APP_URL = 'https://script.google.com/macros/s/AKfycbx-5a5cJYhxaJpjIFTAjsfmjE5bLGRE_y6P-0sD2s4_h3DMxO1E-rUclSNvGdajNATr/exec'; // <-- ¡Reemplaza esto!
-    // =================================================================
-
-
-    document.addEventListener("DOMContentLoaded", function () {
-
-      // --- Lógica de la cámara (sin cambios) ---
-      navigator.mediaDevices.enumerateDevices()
-        .then(devices => {
-          const cameras = devices.filter(device => device.kind === 'videoinput');
-          console.log(`Cámaras disponibles: ${cameras.length}`);
-          cameras.forEach((camera, index) => {
-            console.log(`Cámara ${index + 1}:`, camera.label || 'Sin etiqueta (requiere permiso)');
-          });
-        })
-        .catch(error => {
-          console.error('Error al enumerar dispositivos:', error);
-        });
-
-      const video = document.getElementById('video');
-      const captureButton = document.getElementById('captureButton');
-      const canvas = document.getElementById('canvas');
-      const context = canvas.getContext('2d');
-      const cameraSelect = document.getElementById('cameraSelect');
-
-      let currentStream = null;
-      let videoAspectRatio = 1; // Relación de aspecto de la cámara
-
-      function getCameras() {
-        navigator.mediaDevices.enumerateDevices()
-          .then(devices => {
-            const cameras = devices.filter(device => device.kind === 'videoinput');
-            cameraSelect.innerHTML = ''; // Limpiar las opciones anteriores
-            cameras.forEach((camera, index) => {
-              let option = document.createElement('option');
-              option.value = camera.deviceId;
-              option.textContent = camera.label || `Cámara ${index + 1}`;
-              cameraSelect.appendChild(option);
-            });
-
-            const storedCamera = localStorage.getItem('preferredCamera');
-            if (storedCamera) {
-              cameraSelect.value = storedCamera;
-              switchCamera(storedCamera);
-            } else if (cameras.length > 0) {
-              switchCamera(cameras[0].deviceId);
-            }
-          })
-          .catch(error => {
-            console.error('Error al obtener las cámaras:', error);
-          });
-      }
-
-      function switchCamera(deviceId) {
-        if (currentStream) {
-          currentStream.getTracks().forEach(track => track.stop());
-        }
-        const constraints = {
-          video: {
-            deviceId: { exact: deviceId },
-            width: { ideal: 3840 },
-            height: { ideal: 2160 },
-            facingMode: 'user',
-            focusMode: 'continuous'
-          }
-        };
-
-        navigator.mediaDevices.getUserMedia(constraints)
-          .then(stream => {
-            video.srcObject = stream;
-            video.play();
-            video.onloadedmetadata = () => {
-              const videoWidth = video.videoWidth;
-              const videoHeight = video.videoHeight;
-              videoAspectRatio = videoWidth / videoHeight;
-              const canvasWidth = window.innerWidth * 0.6;
-              const canvasHeight = canvasWidth / videoAspectRatio;
-              canvas.width = videoWidth;
-              canvas.height = videoHeight;
-              video.width = canvasWidth;
-              video.height = canvasHeight;
-            };
-            currentStream = stream;
-          })
-          .catch(error => {
-            console.error('Error al acceder a la cámara en 4K:', error);
-            switchToBestAvailableResolution(deviceId);
-          });
-      }
-
-      function switchToBestAvailableResolution(deviceId) {
-        const fallbackConstraints = {
-          video: {
-            deviceId: { exact: deviceId },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-            facingMode: 'user',
-            focusMode: 'continuous'
-          }
-        };
-        navigator.mediaDevices.getUserMedia(fallbackConstraints)
-          .then(stream => {
-            video.srcObject = stream;
-            video.play();
-            video.onloadedmetadata = () => {
-              const videoWidth = video.videoWidth;
-              const videoHeight = video.videoHeight;
-              videoAspectRatio = videoWidth / videoHeight;
-              const canvasWidth = window.innerWidth * 0.6;
-              const canvasHeight = canvasWidth / videoAspectRatio;
-              canvas.width = videoWidth;
-              canvas.height = videoHeight;
-              video.width = canvasWidth;
-              video.height = canvasHeight;
-            };
-            currentStream = stream;
-          })
-          .catch(error => {
-            console.error('Error al acceder a la cámara en resolución de respaldo:', error);
-          });
-      }
-
-      cameraSelect.addEventListener('change', function () {
-        const deviceId = cameraSelect.value;
-        if (deviceId) {
-          localStorage.setItem('preferredCamera', deviceId);
-          switchCamera(deviceId);
-        }
-      });
-
-      getCameras();
-
-      let previousCanvas = null;
-
-      captureButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        if (currentStream) {
-          context.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const base64Image = canvas.toDataURL('image/png');
-          console.log("La información de la Imagen es: " + base64Image);
-
-          if (previousCanvas) {
-            previousCanvas.remove();
-          }
-
-          const newCanvas = document.createElement('canvas');
-          const imagenPrototipoDiv = document.getElementById('imagenPrototipo');
-          imagenPrototipoDiv.appendChild(newCanvas);
-          const newContext = newCanvas.getContext('2d');
-          const contenedorWidth = imagenPrototipoDiv.offsetWidth;
-          const img = new Image();
-          img.onload = () => {
-            const aspectRatio = img.width / img.height;
-            const newWidth = contenedorWidth;
-            const newHeight = newWidth / aspectRatio;
-            newCanvas.width = newWidth;
-            newCanvas.height = newHeight;
-            newContext.drawImage(img, 0, 0, newCanvas.width, newCanvas.height);
-          };
-          img.src = base64Image;
-          previousCanvas = newCanvas;
-        }
-      });
-
-      // --- Lógica de botones y listeners (sin cambios) ---
-      const uploadBtn = document.getElementById('uploadBtn');
-      const fileInput = document.getElementById('ticketImage');
-
-      uploadBtn.addEventListener('click', function () {
-        fileInput.click();
-      });
-
-      fileInput.addEventListener('change', function () {
-        const fileName = fileInput.files[0]?.name;
-        if (fileName) {
-          console.log(`Archivo seleccionado: ${fileName}`);
-        }
-      });
-
-      const selectTicket = document.getElementById('ticket');
-      selectTicket.addEventListener('change', actualizarVisibilidadFieldset);
-
-    });
-    // --- FIN DEL DOMCONTENTLOADED ---
-
-
-    async function activarCamara() {
-      // Esta función parece estar incompleta en tu original, 
-      // la lógica principal ya está en getCameras() y switchCamera()
-      console.log("Se activó la función de la cámara (placeholder)");
-    }
-
-    function setFechaOperacion() {
-      let today = new Date();
-      today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-      let date = today.toISOString().split('T')[0];
-      document.getElementsByName('fechaOperacion')[0].value = date;
-      document.getElementsByName('fechaOperacion')[0].style.textAlign = 'center';
-    }
-
-    function estimarTamanoEnvio(datos, base64Image) {
-      const json = JSON.stringify(datos);
-      const datosBytes = new TextEncoder().encode(json).length;
-      const base64Bytes = base64Image ? (base64Image.length * 3) / 4 : 0;
-      return datosBytes + base64Bytes;
-    }
-
-
-    function actualizarVisibilidadFieldset() {
-      const select = document.getElementById('ticket');
-      const fieldset = document.getElementById('ticketFieldset');
-      const subirTicketDiv = document.getElementById('subirTicket');
-      console.log("El Formulario se actualizo SI NO");
-      if (select.value === 'SI') {
-        fieldset.style.display = 'flex';
-        subirTicketDiv.style.display = 'flex';
-        // activarCamara(); // Esta función no parece hacer nada, la lógica ya se carga.
-      } else {
-        fieldset.style.display = 'none';
-        subirTicketDiv.style.display = 'none';
-      }
-    }
-
-
-    function simularCarga(tamanoEstimado) {
-      const duracionTotal = Math.min(4000 + tamanoEstimado / 2, 25000);
-      const barra = document.getElementById('barraCarga');
-      let progreso = 0;
-      let inicio = Date.now();
-      const intervalo = setInterval(() => {
-        const tiempoTranscurrido = Date.now() - inicio;
-        progreso = Math.min((tiempoTranscurrido / duracionTotal) * 100, 100);
-        barra.style.width = progreso + '%';
-        if (progreso >= 100) {
-          clearInterval(intervalo);
-        }
-      }, 100);
-    }
-
-
-    function enviarDatos(event) {
-      event.preventDefault();
-      let formData = new FormData(document.getElementById('registroForm'));
-      let datos = {};
-      formData.forEach((value, key) => {
-        datos[key] = value;
-      });
-
-      let ticketFileInput = document.getElementById('ticketImage');
-      let ticketFile = ticketFileInput ? ticketFileInput.files[0] : null;
-      let base64Image = null;
-
-      if (ticketFile) {
-        let reader = new FileReader();
-        reader.onloadend = function () {
-          base64Image = reader.result.split(',')[1];
-          enviarDatosServidor(datos, base64Image);
-        };
-        reader.readAsDataURL(ticketFile);
-      } else {
-        // Si no hay archivo, usamos la imagen capturada en el canvas
-        let canvas = document.getElementById('canvas');
-        // Validar si el canvas está vacío (no se ha tomado foto)
-        if (canvas.toDataURL() === document.createElement('canvas').toDataURL()) {
-          // Si el ticket es "SI" pero no se ha tomado foto NI subido archivo
-          if(document.getElementById('ticket').value === 'SI') {
-             console.log("Ticket 'SI' pero no se capturó ni subió imagen. Usando base64 nulo.");
-             base64Image = null; // Enviar nulo si es 'SI' pero no hay imagen
-          } else {
-             base64Image = "NO"; // Es 'NO'
-          }
-        } else {
-          // Se tomó foto con la cámara
-          base64Image = canvas.toDataURL('image/png').split(',')[1];
-        }
-        enviarDatosServidor(datos, base64Image);
-      }
-    }
-
-    // =================================================================
-    // --- FUNCIÓN 'enviarDatosServidor' MODIFICADA PARA USAR FETCH ---
-    // =================================================================
-    async function enviarDatosServidor(datos, base64Image) {
-      var seleccion = document.getElementById('opcionSelect').value;
-      var ids = {
-        'ALSE': '15zTEe8GMA4Ji2b8GWEP94DHvfdcCqlYOSFdQG8honk4',
-        'MANTONET': '1r4Xl5yXN8SaSNnIJyDTjK0JmjVTnE394jxLjhiHf5YM'
-      };
-      var selectedId = ids[seleccion];
-
-      if (!selectedId) {
-        alert('Seleccione una opción válida.');
-        return;
-      }
-      datos.opcionSelect = seleccion;
-      console.log("Valor de opcionSelect enviado:", seleccion);
-
-      // Validar URL
-      if (GAS_FINANZAS_APP_URL === 'URL_DE_TU_NUEVA_WEB_APP_AQUI') {
-        alert('Error de configuración: Debes editar el archivo index.html y añadir la URL de tu Google Apps Script en la variable "GAS_FINANZAS_APP_URL".');
-        return;
-      }
-
-      document.getElementById('registroForm').style.display = 'none';
-      document.getElementById('loadingMessage').style.display = 'flex';
-
-      const tamanoEstimado = estimarTamanoEnvio(datos, base64Image);
-      simularCarga(tamanoEstimado);
-
-      var ticketSiNo = document.getElementById('ticket').value;
-      if (ticketSiNo == "NO") {
-        base64Image = "NO";
-      }
-
-      // --- INICIO DE LA NUEVA LÓGICA FETCH (POST) ---
-      try {
-        // Preparamos el payload para enviar
-        const payload = {
-          sheetId: selectedId,
-          sheetName: 'BD', // Este valor estaba 'hardcodeado' en tu google.script.run
-          datos: datos,
-          base64Image: base64Image
-        };
-
-        const response = await fetch(GAS_FINANZAS_APP_URL, {
-          method: 'POST',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'text/plain;charset=utf-8',
-          },
-          body: JSON.stringify(payload) // Enviamos el payload completo
-        });
-
-        const responseText = await response.text();
-        console.log('Respuesta recibida (texto):', responseText);
-
-        if (!response.ok) {
-           let errorMsg = `Error de red: ${response.status}`;
-           try { errorMsg = JSON.parse(responseText).message || errorMsg; } catch (e) {}
-           throw new Error(errorMsg);
-        }
-
-        const result = JSON.parse(responseText);
-
-        if (result.status === 'success') {
-          // ¡Éxito! Llamar a la función original
-          mostrarPanelExito(result.message); // result.message contendrá "Registro exitoso."
-        } else {
-          // El backend reportó un error
-          throw new Error(result.message || 'Error desconocido del servidor.');
-        }
-
-      } catch (error) {
-        // --- Lógica de Falla (tu .withFailureHandler) ---
-        alert('Error al enviar el registro: ' + error.message);
-        document.getElementById('registroForm').style.display = 'flex';
-        document.getElementById('loadingMessage').style.display = 'none';
-      }
-      // --- FIN DE LA NUEVA LÓGICA FETCH (POST) ---
-    }
-    
-    // =================================================================
-    // --- NUEVA FUNCIÓN PARA CARGAR PROYECTOS ---
-    // =================================================================
-    async function cargarProyectos() {
-      console.log("Cargando lista de proyectos...");
-      if (GAS_FINANZAS_APP_URL === 'URL_DE_TU_NUEVA_WEB_APP_AQUI') {
-        console.error("La URL de GAS no está configurada. No se pueden cargar proyectos.");
-        // Opcionalmente, deshabilita el dropdown
-        document.getElementById('proyecto').disabled = true;
-        return;
-      }
-      
-      try {
-        // Usamos GET para obtener datos
-        const response = await fetch(GAS_FINANZAS_APP_URL, {
-          method: 'GET',
-          mode: 'cors'
-        });
-        
-        const responseText = await response.text();
-        if (!response.ok) {
-           throw new Error(`Error de red al cargar proyectos: ${response.status}`);
-        }
-
-        const result = JSON.parse(responseText);
-
-        if (result.status === 'success' && result.proyectos) {
-          const selectProyecto = document.getElementById('proyecto');
-          // Limpiar opciones existentes (excepto la primera "disabled")
-          while (selectProyecto.options.length > 1) {
-             selectProyecto.remove(1);
-          }
-          
-          // Llenar el dropdown
-          result.proyectos.forEach(proyecto => {
-            let option = document.createElement('option');
-            option.value = proyecto;
-            option.textContent = proyecto;
-            selectProyecto.appendChild(option);
-          });
-          console.log("Proyectos cargados exitosamente.");
-        } else {
-           throw new Error(result.message || "No se recibieron datos de proyectos.");
-        }
-
-      } catch (error) {
-        console.error('Error al cargar la lista de proyectos:', error);
-        alert('No se pudo cargar la lista de proyectos. ' + error.message);
-      }
-    }
-
-
-    // --- Ejecutar al cargar la página ---
-    window.onload = () => {
-      setFechaOperacion();
-      cargarProyectos(); // <-- ¡NUEVA LLAMADA!
-      actualizarVisibilidadFieldset(); // <-- Ejecutar para estado inicial
-    };
-
-
-    function formatearMonto(input) {
-      let valor = input.value.replace(/[^0-9.]/g, '');
-      let cursorPos = input.selectionStart;
-      let puntoIndex = valor.indexOf('.');
-
-      if (puntoIndex !== -1) {
-        let partes = valor.split('.');
-        partes[0] = partes[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        valor = partes.join('.');
-      } else {
-        valor = valor.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-      }
-      input.value = `$ ${valor}`;
-      let nuevoCursorPos = Math.min(valor.length + 2, input.value.length);
-      input.setSelectionRange(nuevoCursorPos, nuevoCursorPos);
-    }
-
-    function mostrarPanelExito() {
-      const successPanel = document.getElementById('successPanel');
-      successPanel.style.display = 'flex';
-      const successSound = document.getElementById('successSound');
-      successSound.play().catch(e => console.error("Error al reproducir sonido:", e));
-
-      setTimeout(() => {
-        successPanel.style.display = 'none';
-        document.getElementById('registroForm').reset();
-        document.getElementById('registroForm').style.display = 'flex';
-        document.getElementById('loadingMessage').style.display = 'none';
-        actualizarVisibilidadFieldset();
-        setFechaOperacion();
-        
-        let base64Image = null;
-        console.log("La información de la imagen es: " + base64Image);
-        
-        document.getElementById('imagenPrototipo').innerHTML = '';
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        const isEmpty = imageData.every(value => value === 0);
-        if (isEmpty) {
-          console.log("✅ El contenido del canvas se ha borrado correctamente.");
-        } else {
-          console.log("❌ El canvas todavía tiene contenido.");
-        }
-      }, 2500);
-    }
-  </script>
-
+  
+  <link rel="stylesheet" href="registro-de-gastos.css">
 </head>
 
 <body>
 
-  <audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"
-    preload="auto"></audio>
+  <audio id="successSound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3" preload="auto"></audio>
 
-  <div id="successPanel"
-    style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
-    <div
-      style="background-color: white; padding: 40px; border-radius: 10px; text-align: center; font-family: 'Josefin Sans', sans-serif; color: #333; max-width: 90%; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-
+  <div id="successPanel" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;">
+    <div style="background-color: var(--card-bg); border: 1px solid var(--border-color); padding: 40px; border-radius: 12px; text-align: center; color: var(--text-main); max-width: 90%; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
       <svg width="80px" height="80px" viewBox="0 0 133 133" version="1.1" xmlns="http://www.w3.org/2000/svg">
         <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
           <circle fill="#4CAF50" cx="66.5" cy="66.5" r="54.5" />
           <polyline stroke="#FFFFFF" stroke-width="10" points="41.5 67 58.5 84 91.5 51" />
         </g>
       </svg>
-
       <h2 style="font-weight: 600; margin-top: 20px; color: #4CAF50;">¡Éxito!</h2>
-      <p style="font-size: 1.2em;">Registro realizado correctamente.</p>
+      <p style="font-size: 1.1em; color: var(--text-muted);">Registro realizado correctamente.</p>
     </div>
   </div>
 
   <div class="main-content">
     
-    <!-- Letrero de carga (sin cambios) -->
     <div id="loadingMessage" style="display: none;">
       <svg id="Capa_2" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 604.9 649.25">
         <defs>
           <style>
-            @keyframes fadeIn {
-              0% {
-                opacity: 0;
-                transform: scale(0.9);
-              }
-              100% {
-                opacity: 1;
-                transform: scale(1);
-              }
-            }
-            .parte {
-              opacity: 0;
-              animation: aparecer 1s ease-in-out infinite;
-            }
-            .parte1 {
-              animation-delay: 0s;
-              fill: white;
-            }
-            .parte2 {
-              animation-delay: 0.7s;
-              fill: white;
-            }
-            .parte3 {
-              animation-delay: .3s;
-              fill: white;
-            }
-            @keyframes aparecer {
-              0% { opacity: 0; }
-              50% { opacity: 1; }
-              100% { opacity: 0; }
-            }
+            .parte { opacity: 0; animation: aparecer 1s ease-in-out infinite; }
+            .parte1 { animation-delay: 0s; fill: white; }
+            .parte2 { animation-delay: 0.7s; fill: white; }
+            .parte3 { animation-delay: .3s; fill: white; }
+            @keyframes aparecer { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
           </style>
         </defs>
         <g id="Capa_4" data-name="Capa 4">
@@ -563,77 +50,27 @@
           <path class="parte parte3" d="m396.82,70.27c-1.01-1.65-2.02-3.26-3.03-4.84-2.02-3.17-4.04-6.2-6.05-9.12-1-1.46-2.01-2.88-3-4.28-1.99-2.79-3.97-5.46-5.93-8.01-1.95-2.55-3.88-4.97-5.78-7.28C351.97,11.1,335.12,0,335.12,0c-19.2,15.53-36.99,31.2-53.45,46.97-1.71,1.64-3.41,3.28-5.1,4.93-5.06,4.93-9.98,9.87-14.79,14.81-4.8,4.94-9.48,9.89-14.04,14.84-13.67,14.86-26.24,29.75-37.8,44.63-21.46,27.62-39.41,55.18-54.38,82.37,20.68-1.84,40.83-4.19,60.43-6.85,6.53-.89,13.01-1.81,19.42-2.76,3.21-.47,6.39-.95,9.57-1.44,9.52-1.46,18.9-2.97,28.14-4.51,3.08-.51,6.14-1.03,9.19-1.55,6.09-1.04,12.12-2.08,18.09-3.12,2.98-.52,5.95-1.04,8.9-1.57,8.85-1.56,17.55-3.12,26.1-4.64,5.7-1.02,11.33-2.02,16.89-3,19.47-3.43,38.11-6.58,55.86-9.14,7.61-1.1,15.06-2.09,22.35-2.94,2.43-.28,4.84-.55,7.23-.81-10.95-39.78-25.85-71.42-40.91-95.95Zm-83.28,93.31c-23.05,0-41.73-18.68-41.73-41.73s18.68-41.73,41.73-41.73,41.73,18.68,41.73,41.73-18.68,41.73-41.73,41.73Z" />
         </g>
       </svg>
-      <div id="loadingMessage" style="display:flex; flex-direction: column; align-items: center;">
-        <p style="color:white;">Enviando datos, por favor espere...</p>
-        <div style="width: 100%; background: #eee; border-radius: 10px; height: 40px; margin-top: 10px;">
-          <div id="barraCarga" style="width: 0%; height: 100%; background: pink; border-radius: 10px;"></div>
+      <div style="display:flex; flex-direction: column; align-items: center; width: 100%;">
+        <p style="color:var(--text-main); margin-bottom: 10px;">Enviando datos, por favor espere...</p>
+        <div style="width: 100%; background: #333; border-radius: 10px; height: 10px;">
+          <div id="barraCarga" style="width: 0%; height: 100%; background: var(--accent-red); border-radius: 10px; transition: width 0.3s ease;"></div>
         </div>
       </div>
     </div>
 
-
-    <!-- Formulario (HTML sin cambios) -->
     <form id="registroForm" onsubmit="enviarDatos(event)">
 
-      <div id="logoAnimado"
-        style="width: 100%; height:180px; display:flex; align-items:center;  justify-content:center; background-color:none;">
-        <svg id="LogoSvgMantonet" class="logotipo" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 446.66 134.17">
-          <title>Logotipo de Mantonet</title>
-          <defs>
-            <style>
-              .cls-1 {
-                fill: none;
-                opacity: 1;
-              }
-              .logotipo {
-                display: flex;
-                height: 100%;
-                width: 100%;
-                stroke: white;
-                stroke-width: 1.7;
-                stroke-dasharray: 400;
-                stroke-dashoffset: 400;
-                animation: draw 8s linear infinite alternate;
-                justify-content: center;
-                align-items: center;
-                background: none;
-              }
-              @keyframes draw {
-                0% {
-                  stroke-dashoffset: 400;
-                  fill: transparent;
-                }
-                45% {
-                  stroke-dashoffset: 0;
-                  fill: white;
-                }
-                50% {
-                  stroke-dashoffset: 0;
-                  fill: transparent;
-                }
-                55% {
-                  stroke-dashoffset: 0;
-                  fill: white;
-                }
-                100% {
-                  stroke-dashoffset: 400;
-                  fill: transparent;
-                }
-              }
-            </style>
-          </defs>
-          <g id="Capa_1-2" data-name="Capa 1">
-            <g>
-              <path class="cls-1 logotipo" d="m311.33,83.59c2.54-16.33-.32-32.54-2.5-41.5,3.14-1.54,4.83-5.13,3.85-8.62-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.98,3.46,4.27,5.64,7.72,5.35,2.09,8.77,4.84,24.66,2.41,40.44-.23.02-.46.04-.7.08-7.59-20.42-22.3-53.99-29.41-69.9,2.52-1.74,3.78-4.95,2.91-8.06-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.05.16.1.32.16.48-16.79,9.77-47.88,28.2-60.73,37.98-.35-.25-.73-.46-1.13-.65,2.99-9.4,10.74-27.2,27.83-34.56,1.25,2.29,3.68,3.84,6.47,3.84,4.07,0,7.38-3.3,7.38-7.38s-3.3-7.38-7.38-7.38-7.38,3.3-7.38,7.38c0,.33.03.66.07.98-18.27,7.73-26.46,26.59-29.59,36.45-.17-.01-.34-.03-.51-.03-4.07,0-7.38,3.3-7.38,7.38,0,3.52,2.47,6.47,5.78,7.2.12,15.78,4.31,52.31,39.43,62.3-.03.75.06,1.51.27,2.27,1.1,3.92,5.18,6.2,9.1,5.1,3.92-1.1,6.2-5.18,5.1-9.1-1.1-3.92-5.18-6.2-9.1-5.1-2.24.63-3.94,2.23-4.79,4.22-33.73-9.62-37.46-44.36-37.42-59.58,2.32-.31,4.3-1.7,5.42-3.66,4.76,1.65,11.66,4.05,19.69,6.83-.41,2.01-.63,4.08-.63,6.21,0,16.88,13.68,30.56,30.56,30.56,12,0,22.37-6.92,27.37-16.98,6.19,2.12,11.67,4,15.97,5.45-.14.99-.09,2.01.2,3.03.5,1.78,1.62,3.22,3.06,4.16-.55,1.41-1.15,2.8-1.83,4.16-4.85,9.74-12.46,17.08-22.67,21.91-1.7-2.69-5.01-4.06-8.23-3.16-3.92,1.1-6.2,5.18-5.1,9.1,1.1,3.92,5.18,6.2,9.1,5.1,3.74-1.05,5.98-4.81,5.22-8.55,10.84-5.08,18.93-12.86,24.08-23.22.7-1.41,1.32-2.85,1.89-4.3,1.14.25,2.37.23,3.57-.11,3.92-1.1,6.2-5.18,5.1-9.1-.7-2.48-2.58-4.3-4.87-5.03Zm-24.42-1.91c1.35-3.45,2.1-7.2,2.1-11.12,0-16.88-13.68-30.56-30.56-30.56-13.81,0-25.48,9.17-29.26,21.75-7.93-2.75-14.76-5.12-19.48-6.76.06-.37.09-.74.09-1.12,0-1.59-.51-3.07-1.37-4.27,11.5-8.31,40.32-25.76,60.29-37.43,1.76,2.05,4.57,3.04,7.35,2.36,7.1,15.87,21.77,49.38,29.33,69.71-1.18.68-2.12,1.66-2.76,2.81-4.24-1.43-9.64-3.28-15.73-5.37Z" />
-              <path class="cls-1 logotipo" d="m40.76,43.88l-9.14,24.84c-2.29,6.48-4.11,12.11-5.41,17.29h-.23c-1.29-5.33-3.05-10.97-5.18-17.29l-8.76-24.84H3.58L0,95.23h6.32l1.37-22.02c.46-7.69.84-16.3.99-22.7h.15c1.45,6.09,3.5,12.72,5.94,19.96l8.3,24.46h5.03l9.07-24.91c2.59-7.09,4.72-13.49,6.48-19.5h.23c-.08,6.4.38,15.01.76,22.17l1.29,22.55h6.48l-3.2-51.35h-8.46Z" />
-              <path class="cls-1 logotipo" d="m75.42,43.88l-17.45,51.35h6.86l5.33-16.15h18.21l5.49,16.15h7.08l-17.52-51.35h-8Zm-3.89,30.02l5.03-14.86c.99-3.12,1.83-6.25,2.59-9.29h.15c.76,2.97,1.52,6.02,2.67,9.37l5.03,14.78h-15.47Z" />
-              <path class="cls-1 logotipo" d="m140.79,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z" />
-              <polygon class="cls-1 logotipo" points="152.75 49.52 168.37 49.52 168.37 95.23 175.07 95.23 175.07 49.52 190.77 49.52 190.77 43.88 152.75 43.88 152.75 49.52" />
-              <path class="cls-1 logotipo" d="m357.98,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z" />
-              <polygon class="cls-1 logotipo" points="382.44 71.15 402.4 71.15 402.4 65.67 382.44 65.67 382.44 49.44 403.54 49.44 403.54 43.88 375.81 43.88 375.81 95.23 404.68 95.23 404.68 89.67 382.44 89.67 382.44 71.15" />
-              <polygon class="cls-1 logotipo" points="408.64 43.88 408.64 49.52 424.26 49.52 424.26 95.23 430.97 95.23 430.97 49.52 446.66 49.52 446.66 43.88 408.64 43.88" />
-            </g>
+      <div id="logoAnimado">
+        <svg class="logotipo" data-name="Capa 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 446.66 134.17">
+          <g data-name="Capa 1">
+            <path d="m311.33,83.59c2.54-16.33-.32-32.54-2.5-41.5,3.14-1.54,4.83-5.13,3.85-8.62-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.98,3.46,4.27,5.64,7.72,5.35,2.09,8.77,4.84,24.66,2.41,40.44-.23.02-.46.04-.7.08-7.59-20.42-22.3-53.99-29.41-69.9,2.52-1.74,3.78-4.95,2.91-8.06-1.1-3.92-5.18-6.2-9.1-5.1-3.92,1.1-6.2,5.18-5.1,9.1.05.16.1.32.16.48-16.79,9.77-47.88,28.2-60.73,37.98-.35-.25-.73-.46-1.13-.65,2.99-9.4,10.74-27.2,27.83-34.56,1.25,2.29,3.68,3.84,6.47,3.84,4.07,0,7.38-3.3,7.38-7.38s-3.3-7.38-7.38-7.38-7.38,3.3-7.38,7.38c0,.33.03.66.07.98-18.27,7.73-26.46,26.59-29.59,36.45-.17-.01-.34-.03-.51-.03-4.07,0-7.38,3.3-7.38,7.38,0,3.52,2.47,6.47,5.78,7.2.12,15.78,4.31,52.31,39.43,62.3-.03.75.06,1.51.27,2.27,1.1,3.92,5.18,6.2,9.1,5.1,3.92-1.1,6.2-5.18,5.1-9.1-1.1-3.92-5.18-6.2-9.1-5.1-2.24.63-3.94,2.23-4.79,4.22-33.73-9.62-37.46-44.36-37.42-59.58,2.32-.31,4.3-1.7,5.42-3.66,4.76,1.65,11.66,4.05,19.69,6.83-.41,2.01-.63,4.08-.63,6.21,0,16.88,13.68,30.56,30.56,30.56,12,0,22.37-6.92,27.37-16.98,6.19,2.12,11.67,4,15.97,5.45-.14.99-.09,2.01.2,3.03.5,1.78,1.62,3.22,3.06,4.16-.55,1.41-1.15,2.8-1.83,4.16-4.85,9.74-12.46,17.08-22.67,21.91-1.7-2.69-5.01-4.06-8.23-3.16-3.92,1.1-6.2,5.18-5.1,9.1,1.1,3.92,5.18,6.2,9.1,5.1,3.74-1.05,5.98-4.81,5.22-8.55,10.84-5.08,18.93-12.86,24.08-23.22.7-1.41,1.32-2.85,1.89-4.3,1.14.25,2.37.23,3.57-.11,3.92-1.1,6.2-5.18,5.1-9.1-.7-2.48-2.58-4.3-4.87-5.03Zm-24.42-1.91c1.35-3.45,2.1-7.2,2.1-11.12,0-16.88-13.68-30.56-30.56-30.56-13.81,0-25.48,9.17-29.26,21.75-7.93-2.75-14.76-5.12-19.48-6.76.06-.37.09-.74.09-1.12,0-1.59-.51-3.07-1.37-4.27,11.5-8.31,40.32-25.76,60.29-37.43,1.76,2.05,4.57,3.04,7.35,2.36,7.1,15.87,21.77,49.38,29.33,69.71-1.18.68-2.12,1.66-2.76,2.81-4.24-1.43-9.64-3.28-15.73-5.37Z"/>
+            <path d="m40.76,43.88l-9.14,24.84c-2.29,6.48-4.11,12.11-5.41,17.29h-.23c-1.29-5.33-3.05-10.97-5.18-17.29l-8.76-24.84H3.58L0,95.23h6.32l1.37-22.02c.46-7.69.84-16.3.99-22.7h.15c1.45,6.09,3.5,12.72,5.94,19.96l8.3,24.46h5.03l9.07-24.91c2.59-7.09,4.72-13.49,6.48-19.5h.23c-.08,6.4.38,15.01.76,22.17l1.29,22.55h6.48l-3.2-51.35h-8.46Z"/>
+            <path d="m75.42,43.88l-17.45,51.35h6.86l5.33-16.15h18.21l5.49,16.15h7.08l-17.52-51.35h-8Zm-3.89,30.02l5.03-14.86c.99-3.12,1.83-6.25,2.59-9.29h.15c.76,2.97,1.52,6.02,2.67,9.37l5.03,14.78h-15.47Z"/>
+            <path d="m140.79,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z"/>
+            <polygon points="152.75 49.52 168.37 49.52 168.37 95.23 175.07 95.23 175.07 49.52 190.77 49.52 190.77 43.88 152.75 43.88 152.75 49.52"/>
+            <path d="m357.98,65.36c0,8,.15,14.25.76,21.1l-.15.08c-2.44-5.26-5.41-10.67-9.22-16.68l-16.46-25.98h-7.24v51.35h6.25v-21.94c0-8.53-.15-14.7-.53-21.18l.23-.08c2.59,5.56,6.02,11.43,9.6,17.14l16.3,26.06h6.7v-51.35h-6.25v21.49Z"/>
+            <polygon points="382.44 71.15 402.4 71.15 402.4 65.67 382.44 65.67 382.44 49.44 403.54 49.44 403.54 43.88 375.81 43.88 375.81 95.23 404.68 95.23 404.68 89.67 382.44 89.67 382.44 71.15"/>
+            <polygon points="408.64 43.88 408.64 49.52 424.26 49.52 424.26 95.23 430.97 95.23 430.97 49.52 446.66 49.52 446.66 43.88 408.64 43.88"/>
           </g>
         </svg>
       </div>
@@ -642,15 +79,13 @@
         <label>REGISTRO DE FINANZAS</label>
       </div>
 
-      <div style="width:100%; display:flex; align-items:center; justify-content: center;">
-        <a href="https://script.google.com/macros/s/AKfycbwZEGK6yvdLiCBQZoiKEFgt57t4MxzmypypzOoQ0Z_1VVfydcDjMdk2C0AG_gk5sYn5/exec"
-          target="_blank" class="BotonNuevoCliente">
-          Registar Nuevo Cliente
-        </a>
-      </div>
+      <a href="https://script.google.com/macros/s/AKfycbwZEGK6yvdLiCBQZoiKEFgt57t4MxzmypypzOoQ0Z_1VVfydcDjMdk2C0AG_gk5sYn5/exec" target="_blank" class="BotonNuevoCliente">
+        Registrar Nuevo Cliente
+      </a>
 
       <fieldset>
         <legend>Información de la Operación</legend>
+        
         <label>Fecha Operación:</label>
         <input type="date" name="fechaOperacion">
 
@@ -664,7 +99,6 @@
         <label for="proyecto">Proyecto</label>
         <select id="proyecto" name="proyecto" required onchange="this.value = this.value.toUpperCase()">
           <option value="" disabled selected>***</option>
-          <!-- Las opciones se cargarán aquí por JavaScript -->
         </select>
 
         <label for="categoria">Categoría:</label>
@@ -683,8 +117,7 @@
         </select>
 
         <label>Concepto:</label>
-        <input type="text" name="concepto" id="concepto" oninput="this.value=this.value.toUpperCase()" required
-          placeholder="***">
+        <input type="text" name="concepto" id="concepto" oninput="this.value=this.value.toUpperCase()" required placeholder="***">
 
         <label>Tipo:</label>
         <select name="tipo" required>
@@ -704,7 +137,7 @@
 
         <label>Estatus:</label>
         <select name="estatus" required>
-          |<option value="" disabled selected>***</option>
+          <option value="" disabled selected>***</option>
           <option value="FACTURAR PENDIENTE">FACTURAR PENDIENTE</option>
           <option value="FACTURADO">FACTURADO</option>
           <option value="NO FACTURABLE">NO FACTURABLE</option>
@@ -713,49 +146,32 @@
         </select>
 
         <label>Monto Operación:</label>
-        <input type="text" name="monto" id="montoOperacion" inputmode="decimal" oninput="formatearMonto(this)"
-          placeholder="$0.00" required>
+        <input type="text" name="monto" id="montoOperacion" inputmode="decimal" oninput="formatearMonto(this)" placeholder="$0.00" required>
       </fieldset>
 
       <fieldset style="display:none;">
         <legend>Datos Ocultos</legend>
-        <label>Mes:</label>
-        <input type="text" name="mes">
-        <label>Año:</label>
-        <input type="number" name="year">
-        <label>Check:</label>
-        <input type="checkbox" name="check">
-        <label>$ IVA:</label>
-        <input type="number" name="iva" step="0.01">
-        <label>$ ISR:</label>
-        <input type="number" name="isr" step="0.01">
-        <label>$ ISR Retenido:</label>
-        <input type="number" name="isrRetenido" step="0.01">
-        <label>$ IVA Retenido:</label>
-        <input type="number" name="ivaRetenido" step="0.01">
-        <label>$ Neto:</label>
-        <input type="number" name="neto" step="0.01">
-        <label>Fecha Factura:</label>
-        <input type="date" name="fechaFactura">
-        <label>Mes Factura:</label>
-        <input type="text" name="mesFactura">
-        <label>Link Carpeta:</label>
-        <input type="url" name="linkCarpeta">
-        <label>Link Ticket:</label>
-        <input type="url" name="linkTicket">
-        <label>Factura:</label>
-        <input type="text" name="factura">
-        <label>Link Factura:</label>
-        <input type="url" name="linkFactura">
-        <label>XML:</label>
-        <input type="text" name="xml">
-        <label>Link XML:</label>
-        <input type="url" name="linkXml">
+        <label>Mes:</label> <input type="text" name="mes">
+        <label>Año:</label> <input type="number" name="year">
+        <label>Check:</label> <input type="checkbox" name="check">
+        <label>$ IVA:</label> <input type="number" name="iva" step="0.01">
+        <label>$ ISR:</label> <input type="number" name="isr" step="0.01">
+        <label>$ ISR Retenido:</label> <input type="number" name="isrRetenido" step="0.01">
+        <label>$ IVA Retenido:</label> <input type="number" name="ivaRetenido" step="0.01">
+        <label>$ Neto:</label> <input type="number" name="neto" step="0.01">
+        <label>Fecha Factura:</label> <input type="date" name="fechaFactura">
+        <label>Mes Factura:</label> <input type="text" name="mesFactura">
+        <label>Link Carpeta:</label> <input type="url" name="linkCarpeta">
+        <label>Link Ticket:</label> <input type="url" name="linkTicket">
+        <label>Factura:</label> <input type="text" name="factura">
+        <label>Link Factura:</label> <input type="url" name="linkFactura">
+        <label>XML:</label> <input type="text" name="xml">
+        <label>Link XML:</label> <input type="url" name="linkXml">
       </fieldset>
 
       <fieldset>
         <legend>Ticket y Facturación</legend>
-        <label>Ticket:</label>
+        <label>¿Requiere subir Ticket?</label>
         <select name="ticket" id="ticket" required>
           <option value="" disabled selected>***</option>
           <option value="NO">NO</option>
@@ -763,35 +179,33 @@
         </select>
       </fieldset>
 
-      <fieldset id="ticketFieldset">
+      <fieldset id="ticketFieldset" style="display: none;">
         <div id="subirTicket">
-          <label>Subir Imagen del Ticket:</label>
-          <button type="button" class="btn" id="uploadBtn">Subir Imagen</button>
+          <button type="button" class="btn" id="uploadBtn">Seleccionar Imagen (Archivo)</button>
           <input type="file" class="hidden" id="ticketImage" accept="image/*">
         </div>
 
-        <legend>Captura de Imagen</legend>
+        <legend style="margin-top: 15px;">Captura de Imagen</legend>
         <label for="cameraSelect">Seleccionar cámara:</label>
         <select id="cameraSelect">
           <option value="">--Selecciona una cámara--</option>
         </select>
 
-        <video id="video" width="320" height="240" autoplay></video>
+        <video id="video" autoplay playsinline></video>
         <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
         <button id="captureButton" class="btn" type="button">Capturar Foto</button>
         <div id="imagenPrototipo"></div>
       </fieldset>
 
-      <button type="submit" class="full-width, btn">Registrar</button>
+      <button type="submit" class="btn">Registrar Operación</button>
     </form>
   </div>
 
   <footer class="footer-content">
-    <p>&copy; 2025 MANTONET.</p>
-    <p> </p>
-    <p>Todos los derechos reservados.</p>
+    <p>&copy; 2026 MANTONET. Todos los derechos reservados.</p>
     <p>V: 2025_05_10_5</p>
   </footer>
 
+  <script src="registro-de-gastos.js"></script>
 </body>
 </html>

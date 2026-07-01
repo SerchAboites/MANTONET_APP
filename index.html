@@ -9,6 +9,8 @@
     <link rel="icon" href="public/rec_img/IconoMantoApp.png" type="image/png">
     <link rel="apple-touch-icon" href="public/rec_img/IconoMantoApp.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
     <style>
         :root {
@@ -20,6 +22,7 @@
             --accent-red-hover: #b71c1c;
             --accent-blue: #2196F3;
             --accent-blue-hover: #1976D2;
+            --input-bg: transparent; /* Asegurando que exista esta variable usada en btn-menu */
         }
 
         body {
@@ -47,7 +50,6 @@
 
         header {
             margin-bottom: 20px;
-            /* Reducimos el margen inferior */
             border-bottom: 1px solid #333;
             padding-bottom: 10px;
         }
@@ -55,7 +57,6 @@
         header p {
             color: var(--text-muted);
             font-size: 14px;
-            /* Un poco más pequeño para que sea elegante */
             margin: 5px 0 0 0;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -64,19 +65,16 @@
         #logoAnimado {
             width: 100%;
             height: 80px;
-            /* Reducido de 120px a 80px para que no domine la pantalla */
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            /* Asegura que nada se salga del área */
         }
 
         #logoAnimado img {
             height: 100%;
             width: auto;
             object-fit: contain;
-            /* Mantiene la proporción sin estirarse */
         }
 
         /* --- ESTILOS DE BOTONES (ENLACES) --- */
@@ -87,9 +85,12 @@
         }
 
         .btn-menu {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Alinea los elementos hacia la izquierda */
+            gap: 12px; /* Separación entre el icono y el texto */
             width: 100%;
-            padding: 14px;
+            padding: 14px 20px; /* Padding ajustado para alinear correctamente el icono */
             background-color: var(--input-bg);
             border: 1px solid #444;
             color: var(--text-main);
@@ -99,6 +100,12 @@
             font-weight: 500;
             transition: all 0.3s ease;
             box-sizing: border-box;
+        }
+
+        /* Asegurar que el icono sea blanco siempre y mantenga tamaño uniforme */
+        .btn-menu .material-symbols-outlined {
+            color: #ffffff;
+            font-size: 22px; 
         }
 
         .btn-menu:hover {
@@ -188,19 +195,34 @@
         <nav class="main-nav">
 
             <div class="section-title">OPERACIONES</div>
-            <a href="public/app-manto-reportes/manto-reportes.html" class="btn-menu btn-red">Manto Reportes</a>
-            <a href="public/app-registro-clientes/registro-de-clientes.html" class="btn-menu">Registro de Clientes</a>
-            <a href="public/app-control-gastos/registro-de-gastos.html" class="btn-menu">Registro de Gastos</a>
+            <a href="public/app-registro-clientes/registro-de-clientes.html" class="btn-menu btn-red">
+                <span class="material-symbols-outlined">person_add</span> Registro de Clientes
+            </a>
+            <a href="public/app-manto-reportes/manto-reportes.html" class="btn-menu">
+                <span class="material-symbols-outlined">assignment</span> Manto Reportes
+            </a>
+            <a href="public/app-control-gastos/registro-de-gastos.html" class="btn-menu">
+                <span class="material-symbols-outlined">receipt_long</span> Registro de Gastos
+            </a>
 
             <div class="section-title">VENTAS Y MÉTRICAS</div>
-            <a href="public/app-cotizadores/cotizador-imper.html" class="btn-menu">Cotizador Imper</a>
-            <a href="public/app-cotizadores/cotizador-imper-clientes.html" class="btn-menu">Cotizador Imper Clientes</a>
-            <a href="public/app-metricas-Web/analisis-web.html" class="btn-menu">Analíticas Mantonet</a>
+            <a href="public/app-cotizadores/cotizador-imper.html" class="btn-menu">
+                <span class="material-symbols-outlined">calculate</span> Cotizador Imper
+            </a>
+            <a href="public/app-cotizadores/cotizador-imper-clientes.html" class="btn-menu">
+                <span class="material-symbols-outlined">price_check</span> Cotizador Imper Clientes
+            </a>
+            <a href="public/app-metricas-Web/analisis-web.html" class="btn-menu">
+                <span class="material-symbols-outlined">analytics</span> Analíticas Mantonet
+            </a>
 
             <div class="section-title">RED DE ESPECIALISTAS</div>
-            <a href="public/app-red-contactos/admin-login.html" class="btn-menu btn-blue">Panel Administrativo</a>
-            <a href="public/app-red-contactos/registro-fase-1.html" class="btn-menu">Formulario de Registro (Paso 1)</a>
-            <a href="public/app-red-contactos/registro-fase-2.html" class="btn-menu">Completar Perfil (Paso 2)</a>
+            <a href="public/app-red-contactos/admin-login.html" class="btn-menu btn-blue">
+                <span class="material-symbols-outlined">admin_panel_settings</span> Panel Administrativo
+            </a>
+            <a href="public/app-red-contactos/registro-fase-1.html" class="btn-menu">
+                <span class="material-symbols-outlined">app_registration</span> Formulario de Registro (Paso 1)
+            </a>
 
         </nav>
 
