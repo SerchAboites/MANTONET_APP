@@ -675,7 +675,7 @@
                 const rutaActual = window.location.href.split('?')[0];
                 const urlBase = rutaActual.substring(0, rutaActual.lastIndexOf('/'));
                 const nombreSeguro = encodeURIComponent(nombreCompleto);
-                const urlCompletaPasos = `${urlBase}/registro-fase-2.html?id=${id}&nombre=${nombreSeguro}`;
+                const urlCompletaPasos = `${urlBase}/public/app-red-contactos/registro-fase-2.html?id=${id}&nombre=${nombreSeguro}`;
 
                 const mensajeWa = `Hola ${tecnico.nombre}, te saludamos de Mantonet. Notamos que iniciaste tu registro pero no terminaste de armar tu expediente profesional. Para que los clientes puedan ver tu perfil, por favor complétalo entrando a este enlace personalizado:\n\n${urlCompletaPasos}`;
 
