@@ -701,16 +701,26 @@
                 wrapAcciones.style.display = "none";
                 wrapRecordatorio.style.display = "block";
 
-                // Armar link de WhatsApp dinámico apuntando a "perfil-completo.html"
-                const urlBase = window.location.origin;
-                // Código actualizado
-                const urlCompletaPasos = `${urlBase}/registro-fase-2.html?id=${id}&nombre=${encodeURIComponent(nombreCompleto)}`;
 
-                const mensajeWa = `Hola ${tecnico.nombre}, te saludamos de Mantonet. Notamos que iniciaste tu registro pero no terminaste de armar tu expediente profesional. Para que los clientes puedan ver tu perfil, por favor complétalo entrando a este enlace personalizado: ${urlCompletaPasos}`;
 
-                // Limpiamos el número de caracteres extraños
+                // 1. Obtenemos la URL actual exacta del admin (ej. https://tu-sitio.netlify.app/app-red-contactos/admin-dashboard.html)
+                const rutaActual = window.location.href.split('?')[0];
+
+                // 2. Le cortamos el nombre del archivo para quedarnos solo con la carpeta base
+                const urlBase = rutaActual.substring(0, rutaActual.lastIndexOf('/'));
+
+                // 3. Armamos la URL ABSOLUTA agregando el nombre del archivo de la fase 2
+                const nombreSeguro = encodeURIComponent(nombreCompleto);
+                const urlCompletaPasos = `${urlBase}/registro-fase-2.html?id=${id}&nombre=${nombreSeguro}`;
+
+                // 4. Creamos el mensaje de WhatsApp
+                const mensajeWa = `Hola ${tecnico.nombre}, te saludamos de Mantonet. Notamos que iniciaste tu registro pero no terminaste de armar tu expediente profesional. Para que los clientes puedan ver tu perfil, por favor complétalo entrando a este enlace personalizado:\n\n${urlCompletaPasos}`;
+
                 const telLimpio = (tecnico.telefono || "").replace(/[^0-9]/g, '');
-                document.getElementById('link-whatsapp-remind').href = `https://wa.me/${telLimpio}?text=${encodeURIComponent(mensajeWa)}`;
+                document.getElementById('link-whatsapp-remind').href = `https://wa.me/52${telLimpio}?text=${encodeURIComponent(mensajeWa)}`;
+
+
+
 
             } else {
                 // Tiene documentos: Mostramos la información avanzada y los botones de aprobar/rechazar
