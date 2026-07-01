@@ -422,7 +422,7 @@
             });
         }
 
-        window.guardarPerfilCompleto = async function () {
+window.guardarPerfilCompleto = async function () {
             const btnSubir = document.getElementById('btn-subir');
             const btnRegresar = document.getElementById('btn-regresar');
             const contenedorEstado = document.getElementById('upload-status-container');
@@ -434,23 +434,12 @@
             const experiencia = document.getElementById('experiencia').value;
             const garantia = document.getElementById('garantia').value;
             const herramientas = document.getElementById('herramientas').value;
-            const descCertificacion = document.getElementById('desc_certificacion').value.trim(); // .trim() quita espacios vacíos
+            const descCertificacion = document.getElementById('desc_certificacion').value.trim();
 
-            // NUEVO: Capturar valores de la visita
             const cobraVisita = document.getElementById('cobra_visita').value;
             const costoVisita = document.getElementById('costo_visita').value;
 
-            // Validación 1: El INE es obligatorio (OCULTA TEMPORALMENTE)
-            /*
-            if (!fileIne) {
-                alert("Por favor, regresa al Paso 2 y sube tu Identificación Oficial para continuar.");
-                window.nextStep(3, 2);
-                return;
-            }
-            */
-
-
-            // NUEVA VALIDACIÓN: Si hay documento de certificación, exige la descripción
+            // Validación: Si hay documento de certificación, exige la descripción
             if (fileCert && descCertificacion === "") {
                 alert("Has adjuntado un documento de certificación. Por favor, escribe de qué trata (ej. 'Certificación en Alturas DC-3') en la caja de texto correspondiente.");
                 document.getElementById('desc_certificacion').focus();
@@ -469,28 +458,26 @@
 
                 const fecha = obtenerFechaFormato();
 
-                // 1. Subir INE
-                const extIne = fileIne.name.split('.').pop(); // Obtenemos la extensión (pdf, jpg, etc)
-                const nombreIne = `INE_${nombreLimpio}_${fecha}.${extIne}`;
-                urlIne = await subirArchivoConProgreso(fileIne, `proveedores_docs/${tecnicoId}/${nombreIne}`, "Identificación (INE)");
+                // 1. Subir INE (SOLO SI EXISTE)
+                if (fileIne) {
+                    const extIne = fileIne.name.split('.').pop();
+                    const nombreIne = `INE_${nombreLimpio}_${fecha}.${extIne}`;
+                    urlIne = await subirArchivoConProgreso(fileIne, `proveedores_docs/${tecnicoId}/${nombreIne}`, "Identificación (INE)");
+                }
 
-                // 2. Subir Trabajo (Si existe)
+                // 2. Subir Trabajo (SOLO SI EXISTE)
                 if (fileTrabajo) {
                     const extTrabajo = fileTrabajo.name.split('.').pop();
                     const nombreTrabajo = `TRABAJO_${nombreLimpio}_${fecha}.${extTrabajo}`;
                     urlTrabajo = await subirArchivoConProgreso(fileTrabajo, `proveedores_docs/${tecnicoId}/${nombreTrabajo}`, "Foto de Trabajo");
                 }
 
-                // 3. Subir Certificación (Si existe)
+                // 3. Subir Certificación (SOLO SI EXISTE)
                 if (fileCert) {
                     const extCert = fileCert.name.split('.').pop();
                     const nombreCert = `CERTIFICACION_${nombreLimpio}_${fecha}.${extCert}`;
                     urlCert = await subirArchivoConProgreso(fileCert, `proveedores_docs/${tecnicoId}/${nombreCert}`, "Certificación");
                 }
-
-                // 4. Actualizar Firestore
-                document.getElementById('upload-status-text').innerText = "Guardando información en la base de datos...";
-                document.getElementById('upload-progress-bar').style.width = '100%';
 
                 // 4. Actualizar Firestore
                 document.getElementById('upload-status-text').innerText = "Guardando información en la base de datos...";
@@ -502,8 +489,8 @@
                     garantia: garantia,
                     herramientas: herramientas,
                     desc_certificaciones: descCertificacion,
-                    cobra_visita: cobraVisita,                // NUEVO CAMPO
-                    costo_visita: costoVisita || "0",         // NUEVO CAMPO (Si está vacío, manda 0)
+                    cobra_visita: cobraVisita,
+                    costo_visita: costoVisita || "0",
                     url_ine: urlIne || null,
                     url_trabajo_muestra: urlTrabajo || null,
                     url_certificacion: urlCert || null,
@@ -518,6 +505,7 @@
                 document.getElementById('pantalla-exito').style.display = 'block';
 
             } catch (error) {
+                console.error("Error capturado:", error); // Añadido para ver el error real en consola si algo más falla
                 alert("Hubo un error al subir los archivos. Revisa tu conexión e intenta de nuevo.");
                 // Restauramos botones si falla
                 btnSubir.style.display = 'block';
