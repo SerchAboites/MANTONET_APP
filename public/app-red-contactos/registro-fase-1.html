@@ -155,12 +155,12 @@
 
     <div class="form-container">
 
-                    <header>
-                <div id="logoAnimado"
-                    style="width: 100%; height:80px; display:flex; align-items:center; justify-content:center;">
-                    <img src="../rec_img/LogoMantonet.svg" alt="Logo de Mantonet" height="100%">
-                </div>
-            </header>
+        <header>
+            <div id="logoAnimado"
+                style="width: 100%; height:80px; display:flex; align-items:center; justify-content:center;">
+                <img src="../rec_img/LogoMantonet.svg" alt="Logo de Mantonet" height="100%">
+            </div>
+        </header>
 
         <h2>Únete a Mantonet</h2>
         <p id="step-description">Comencemos con tus datos básicos</p>
@@ -383,7 +383,8 @@
             if (window.tecnicoId) {
                 const nombreTecnico = document.getElementById('nombre').value;
                 const nombreCodificado = encodeURIComponent(nombreTecnico);
-                // Código actualizado
+
+                // PERFECTO: Como están en la misma carpeta, solo llamas al archivo directamente.
                 window.location.href = `registro-fase-2.html?id=${window.tecnicoId}&nombre=${nombreCodificado}`;
             } else {
                 alert("Hubo un problema recuperando tu perfil. Intenta de nuevo.");
