@@ -1,0 +1,13 @@
+
+HtmlFile                                                                                           Url                                          Resolved                                                                                        
+--------                                                                                           ---                                          --------                                                                                        
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes.html          public/App_MantoReportes/MantoReportes_v2.js C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\public\App_MantoReport...
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /css/stylesReportes.css                      C:\Users\sergi\Documentos\GitHub\MANTONET_APP\css\stylesReportes.css                            
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/IconoMantoApp.png                       C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\IconoMantoApp.png                             
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/IconoMantoApp.png                       C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\IconoMantoApp.png                             
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/Cargando_ico.webm                       C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\Cargando_ico.webm                             
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/LogoMantonet.svg                        C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\LogoMantonet.svg                              
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /MantoReportes/main.js                       C:\Users\sergi\Documentos\GitHub\MANTONET_APP\MantoReportes\main.js                             
+
+
+

@@ -375,7 +375,8 @@
             if (window.tecnicoId) {
                 const nombreTecnico = document.getElementById('nombre').value;
                 const nombreCodificado = encodeURIComponent(nombreTecnico);
-                window.location.href = `perfil-completo.html?id=${window.tecnicoId}&nombre=${nombreCodificado}`;
+                // Código actualizado
+                window.location.href = `RegistroFase2.html?id=${window.tecnicoId}&nombre=${nombreCodificado}`;
             } else {
                 alert("Hubo un problema recuperando tu perfil. Intenta de nuevo.");
             }

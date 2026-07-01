@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mantonet | Menú Principal</title>
 
-    <link rel="icon" href="/img/IconoMantoApp.png" type="image/png">
-    <link rel="apple-touch-icon" href="/img/IconoMantoApp.png">
+    <link rel="icon" href="public/rec_img/IconoMantoApp.png" type="image/png">
+    <link rel="apple-touch-icon" href="public/rec_img/IconoMantoApp.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <style>
@@ -170,7 +170,7 @@
 
     <div id="loader-overlay" class="hidden">
         <video id="loader-video" autoplay loop muted playsinline>
-            <source src="/img/Cargando_ico.webm" type="video/webm">
+            <source src="public/rec_img/Cargando_ico.webm" type="video/webm">
             Tu navegador no soporta el video de carga.
         </video>
         <p style="color: var(--text-muted);">Cargando...</p>
@@ -180,7 +180,7 @@
 
         <header>
             <div id="logoAnimado">
-                <img src="/img/LogoMantonet.svg" alt="Logo de Mantonet">
+                <img src="public/rec_img/LogoMantonet.svg" alt="Logo de Mantonet">
             </div>
             <p>Portal de Herramientas</p>
         </header>
@@ -188,28 +188,27 @@
         <nav class="main-nav">
 
             <div class="section-title">OPERACIONES</div>
-            <a href="/html/MantoReportes.html" class="btn-menu btn-red">Manto Reportes</a>
-            <a href="/html/CarpetasDeClientes.html" class="btn-menu btn-red">Carpetas de Clientes</a>
-            <a href="/html/RegistroDeClientes.html" class="btn-menu">Registro de Clientes</a>
-            <a href="/html/RegistroDeGastos.html" class="btn-menu">Registro de Gastos</a>
+            <a href="public/App_MantoReportes/MantoReportes.html" class="btn-menu btn-red">Manto Reportes</a>
+            <a href="public/App_RegistroClientes/RegistroDeClientes.html" class="btn-menu btn-red">Carpetas de Clientes</a>
+            <a href="public/App_RegistroClientes/RegistroDeClientes.html" class="btn-menu">Registro de Clientes</a>
+            <a href="public/App_ControlGastos/RegistroDeGastos.html" class="btn-menu">Registro de Gastos</a>
 
             <div class="section-title">VENTAS Y MÉTRICAS</div>
-            <a href="/html/Cotizador Imper.html" class="btn-menu">Cotizador Imper</a>
-            <a href="/html/Cotizador-Imper-Clientes.html" class="btn-menu">Cotizador Imper Clientes</a>
-            <a href="/html/AnalisisWeb.html" class="btn-menu">Analíticas Mantonet</a>
+            <a href="public/App_Cotizadores/Cotizador Imper.html" class="btn-menu">Cotizador Imper</a>
+            <a href="public/App_Cotizadores/Cotizador-Imper-Clientes.html" class="btn-menu">Cotizador Imper Clientes</a>
+            <a href="public/App_MetricasWeb/AnalisisWeb.html" class="btn-menu">Analíticas Mantonet</a>
 
             <div class="section-title">RED DE ESPECIALISTAS</div>
-            <a href="html/admin-login.html" class="btn-menu btn-blue">Panel Administrativo</a>
-            <a href="html/MantonetRedContactos.html" class="btn-menu">Formulario de Registro (Paso 1)</a>
-            <a href="html/perfil-completo.html" class="btn-menu">Completar Perfil (Paso 2)</a>
+            <a href="public/App_RedContactos/admin-login.html" class="btn-menu btn-blue">Panel Administrativo</a>
+            <a href="public/App_RedContactos/RegistroFase1.html" class="btn-menu">Formulario de Registro (Paso 1)</a>
+            <a href="public/App_RedContactos/RegistroFase2.html" class="btn-menu">Completar Perfil (Paso 2)</a>
 
         </nav>
 
     </div>
 
-    <script src="/js/main.js"></script>
     <script>
-        // Script básico para ocultar el loader automáticamente al cargar la página (opcional, si no lo hace ya tu main.js)
+        // Script básico para ocultar el loader automáticamente al cargar la página
         window.addEventListener('load', () => {
             const loader = document.getElementById('loader-overlay');
             if (loader) {

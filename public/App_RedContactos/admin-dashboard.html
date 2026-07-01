@@ -609,7 +609,7 @@
                     let borderLeftColor = estatusClase === 'revision_final' ? 'var(--status-review)' :
                         estatusClase === 'aprobado' ? 'var(--status-approved)' : 'var(--status-pending)';
 
-                        const cardHTML = `
+                    const cardHTML = `
                         <div class="card-tecnico" style="border-left-color: ${borderLeftColor}">
                             <div>
                                 <div class="card-header">
@@ -640,15 +640,15 @@
         }
 
         // --- LÓGICA DE APERTURA DEL MODAL ---
-        window.abrirExpediente = function(id) {
+        window.abrirExpediente = function (id) {
             window.idTecnicoAbierto = id;
             const tecnico = window.tecnicosCache[id];
-            if(!tecnico) return;
+            if (!tecnico) return;
 
             // 1. Concatenamos nombre y apellido para el título si existen
             const nombreCompleto = `${tecnico.nombre || ''} ${tecnico.apellidos || ''}`.trim();
             document.getElementById('modal-nombre-titulo').innerText = nombreCompleto || "Expediente";
-            
+
             // 2. Inyectar textos básicos
             document.getElementById('m-perfil').innerText = " " + (tecnico.tipo_perfil || "N/A");
             document.getElementById('m-telefono').innerText = " " + (tecnico.telefono || "N/A");
@@ -662,10 +662,10 @@
             // 4. Lógica del Mapa Gratuito incrustado
             const cp = tecnico.codigo_postal;
             const contenedorInfo = document.querySelector('.modal-info-col > div');
-            
+
             // Eliminamos el mapa anterior si existía para que no se duplique al abrir otros perfiles
             const viejoMapa = document.getElementById('mapa-cp-dinamico');
-            if(viejoMapa) viejoMapa.remove();
+            if (viejoMapa) viejoMapa.remove();
 
             if (cp) {
                 // Generamos la URL de inserción de Google Maps
@@ -692,11 +692,12 @@
                 wrapRecordatorio.style.display = "block";
 
                 // Armar link de WhatsApp dinámico apuntando a "perfil-completo.html"
-                const urlBase = window.location.origin; 
-                const urlCompletaPasos = `${urlBase}/perfil-completo.html?id=${id}&nombre=${encodeURIComponent(nombreCompleto)}`;
-                
+                const urlBase = window.location.origin;
+                // Código actualizado
+                const urlCompletaPasos = `${urlBase}/RegistroFase2.html?id=${id}&nombre=${encodeURIComponent(nombreCompleto)}`;
+
                 const mensajeWa = `Hola ${tecnico.nombre}, te saludamos de Mantonet. Notamos que iniciaste tu registro pero no terminaste de armar tu expediente profesional. Para que los clientes puedan ver tu perfil, por favor complétalo entrando a este enlace personalizado: ${urlCompletaPasos}`;
-                
+
                 // Limpiamos el número de caracteres extraños
                 const telLimpio = (tecnico.telefono || "").replace(/[^0-9]/g, '');
                 document.getElementById('link-whatsapp-remind').href = `https://wa.me/${telLimpio}?text=${encodeURIComponent(mensajeWa)}`;

@@ -1,0 +1,20 @@
+
+HtmlFile                                                                                           Url                                           Resolved                                                                                       
+--------                                                                                           ---                                           --------                                                                                       
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_ControlGastos\RegistroDeGastos.html       /public/App_ControlGastos/RegGastos_mobil.css C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_ControlGastos\RegGastos_mobil.css     
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_ControlGastos\RegistroDeGastos.html       /public/App_ControlGastos/RegGastos.css       C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_ControlGastos\RegGastos.css           
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes.html          ../rec_img/Cargando_ico.webm                  C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\..\rec_img\Cargando_i...
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes.html          ../rec_img/LogoMantonet.svg                   C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\..\rec_img\LogoManton...
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes.html          public/App_MantoReportes/MantoReportes_v2.js  C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\public\App_MantoRepor...
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes.html          ./stylesReportes.css                          C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\.\stylesReportes.css    
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes.html          ../rec_img/IconoMantoApp.png                  C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\..\rec_img\IconoManto...
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes.html          ../rec_img/IconoMantoApp.png                  C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\..\rec_img\IconoManto...
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/Cargando_ico.webm                        C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\Cargando_ico.webm                            
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/LogoMantonet.svg                         C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\LogoMantonet.svg                             
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /MantoReportes/main.js                        C:\Users\sergi\Documentos\GitHub\MANTONET_APP\MantoReportes\main.js                            
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /css/stylesReportes.css                       C:\Users\sergi\Documentos\GitHub\MANTONET_APP\css\stylesReportes.css                           
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/IconoMantoApp.png                        C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\IconoMantoApp.png                            
+C:\Users\sergi\Documentos\GitHub\MANTONET_APP\public\App_MantoReportes\MantoReportes_respaldo.html /img/IconoMantoApp.png                        C:\Users\sergi\Documentos\GitHub\MANTONET_APP\img\IconoMantoApp.png                            
+
+
+
